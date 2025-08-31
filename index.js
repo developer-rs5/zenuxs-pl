@@ -3,9 +3,11 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const fs = require('fs');
 const path = require('path');
+const cors = require('cors');
 const app = express();
 
 app.use(express.json());
+app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 
 // Connect to MongoDB with optimized settings
