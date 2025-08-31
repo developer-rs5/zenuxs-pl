@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Advanced Auth - Minecraft Plugin</title>
+  
+
+  <!-- SEO Meta -->
+  <meta name="description" content="Advanced Auth is a Minecraft plugin by Zenuxs that Have a full stack login plugin with a dashboard support for Admins" />
+  <meta name="keywords" content="advanced Auth, Minecraft plugin, Login Plugin , Zenuxs plugins, Auth plugin, developer-rs5, rishabh sharma,developer rs" />
+  <meta name="author" content="Zenuxs" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="BuildFFA by Zenuxs" />
+  <meta property="og:description" content="PvP plugin with block placing and arena resets. Full customization and simple setup." />
+  <meta property="og:image" content="https://media.discordapp.net/attachments/1355564536064901384/1357327547901149204/standard.gif?ex=680393c9&is=68024249&hm=dc6628b0ba05b86a8cb07f69444da77a709a9f61744fb95b5c303db048243aae&=&width=864&height=486" />
+  <meta property="og:url" content="https://plugins.zenuxs.xyz/buildffa.html" />
+  <meta property="og:type" content="website" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="shortcut icon" href="zenux.png" type="image/x-icon">
+    <style>
+        :root {
+            --cyan: #00ffff;
+            --dark-bg: #0a0a0a;
+            --card-bg: #111111;
+            --discord-blue: #5865F2;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: var(--card-bg);
+            padding: 15px 5%;
+            position: sticky;
+            top: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--cyan);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            padding: 5px 0;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--cyan);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--cyan);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-links a.active {
+            color: var(--cyan);
+        }
+
+        .mobile-menu {
+            display: none;
+            width: 100%;
+            background-color: var(--card-bg);
+            padding: 15px;
+            border-top: 1px solid rgba(0, 255, 255, 0.1);
+        }
+
+        .mobile-menu.active {
+            display: block;
+        }
+
+        .mobile-menu a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .mobile-menu a:last-child {
+            border-bottom: none;
+        }
+
+        /* Breadcrumbs */
+        .breadcrumbs {
+            padding: 15px 5%;
+            background-color: rgba(0, 0, 0, 0.2);
+            font-size: 0.9rem;
+        }
+
+        .breadcrumbs a {
+            color: var(--cyan);
+            text-decoration: none;
+        }
+
+        .breadcrumbs span {
+            margin: 0 5px;
+            color: #777;
+        }
+
+        /* Plugin Main Content */
+        .plugin-main {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 30px 5%;
+            gap: 30px;
+        }
+
+        .plugin-sidebar {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .plugin-content {
+            flex: 3;
+            min-width: 300px;
+        }
+
+        /* Plugin Card */
+        .plugin-header-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(0, 255, 255, 0.1);
+        }
+
+        .plugin-title {
+            font-size: 2.2rem;
+            color: var(--cyan);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .plugin-icon {
+            font-size: 2.5rem;
+            color: var(--cyan);
+        }
+
+        .plugin-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .plugin-version-badge {
+            background-color: rgba(0, 255, 255, 0.1);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .plugin-download-count {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #aaa;
+        }
+
+        .plugin-description {
+            line-height: 1.6;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        .plugin-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .download-btn {
+            background-color: var(--cyan);
+            color: var(--dark-bg);
+        }
+
+        .download-btn:hover {
+            background-color: white;
+            transform: translateY(-2px);
+        }
+
+        .discord-btn {
+            background-color: var(--discord-blue);
+            color: white;
+        }
+
+        .discord-btn:hover {
+            background-color: #7289da;
+            transform: translateY(-2px);
+        }
+
+        /* Details Sections */
+        .details-section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: var(--cyan);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+        }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .feature-card {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 255, 255, 0.1);
+        }
+
+        .feature-icon {
+            font-size: 1.5rem;
+            color: var(--cyan);
+            margin-bottom: 10px;
+        }
+
+        /* Commands Table */
+        .commands-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            overflow-x: auto;
+            display: block;
+        }
+
+        .commands-table th {
+            background-color: rgba(0, 255, 255, 0.1);
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        .commands-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.1);
+        }
+
+        .commands-table code {
+            background-color: rgba(0, 255, 255, 0.1);
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+
+        /* Config File Display */
+        .config-file-container {
+            margin-top: 20px;
+        }
+
+        .config-actions {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .config-file {
+            background-color: #1e1e1e;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid rgba(0, 255, 255, 0.1);
+            font-family: monospace;
+            white-space: pre;
+            overflow-x: auto;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        /* Versions Table */
+        .versions-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .versions-table th {
+            background-color: rgba(0, 255, 255, 0.1);
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        .versions-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.1);
+        }
+
+        .version-badge {
+            padding: 3px 10px;
+            background-color: rgba(0, 255, 255, 0.1);
+            border-radius: 3px;
+            font-size: 0.8rem;
+        }
+
+        .download-link {
+            color: var(--cyan);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .download-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Sidebar */
+        .sidebar-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(0, 255, 255, 0.1);
+        }
+
+        .sidebar-title {
+            font-size: 1.2rem;
+            color: var(--cyan);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #aaa;
+        }
+
+        .info-value {
+            font-weight: 500;
+        }
+
+        .compatibility-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            background-color: rgba(0, 255, 255, 0.1);
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--card-bg);
+            padding: 40px 5%;
+            text-align: center;
+            margin-top: auto;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--cyan);
+        }
+
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .social-icons a {
+            color: white;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .social-icons a:hover {
+            color: var(--cyan);
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            color: #777;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .plugin-main {
+                flex-direction: column;
+            }
+            
+            .plugin-title {
+                font-size: 1.8rem;
+            }
+            
+            .versions-table, .commands-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .plugin-actions {
+                flex-direction: column;
+            }
+            
+            .plugin-actions a, .plugin-actions button {
+                width: 100%;
+                text-align: center;
+                justify-content: center;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .info-row {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .config-actions {
+                flex-direction: column;
+            }
+
+            .config-actions button {
+                width: 100%;
+            }
+        }
+
+        button{
+            height: 40px;
+            width: 150px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="/" class="logo">
+            <i class="fas fa-cube plugin-icon"></i>
+            ZENUXS PLUGINS
+        </a>
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+            <i class="fas fa-bars"></i>
+        </button>
+        <nav class="nav-links">
+            <a href="/">Home</a>
+            <a href="/" class="active">Plugins</a>
+            <a href="/">Support</a>
+            <a href="https://discord.zenuxs.xyz">Discord</a>
+        </nav>
+    </header>
+
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="/">Home</a>
+        <a href="/plugins" class="active">Plugins</a>
+        <a href="/support">Support</a>
+        <a href="https://discord.zenuxs.xyz">Discord</a>
+    </div>
+
+    <div class="breadcrumbs">
+        <a href="/">Home</a>
+        <span>/</span>
+        <a href="/">Plugins</a>
+        <span>/</span>
+        <a href="#">Orbs</a>
+    </div>
+
+    <main class="plugin-main">
+        <aside class="plugin-sidebar">
+            <div class="sidebar-card">
+                <h3 class="sidebar-title">Plugin Information</h3>
+                <div class="info-row">
+                    <span class="info-label">Current Version:</span>
+                    <span class="info-value">1.3</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Last Updated:</span>
+                    <span class="info-value">2025-05-2</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Purchased:</span>
+                    <span class="info-value">1</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Developer:</span>
+                    <span class="info-value">Rishabh</span>
+                </div>
+            </div>
+
+            <div class="sidebar-card">
+                <h3 class="sidebar-title">Compatibility</h3>
+                <div class="info-row">
+                    <span class="info-label">Minecraft:</span>
+                    <span class="info-value">
+                        <span class="compatibility-badge">1.8.x</span>
+                        <span class="compatibility-badge">1.13.x</span>
+                        <span class="compatibility-badge">1.16.x</span>
+                        <span class="compatibility-badge">1.17.x</span>
+                        <span class="compatibility-badge">1.18.x</span>
+                        <span class="compatibility-badge">1.19.x</span>
+                        <span class="compatibility-badge">1.20.x</span>
+                        <span class="compatibility-badge">1.21.x</span>
+                    </span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Server Software:</span>
+                    <span class="info-value">
+                        <span class="compatibility-badge">Spigot</span>
+                        <span class="compatibility-badge">Paper</span>
+                    </span>
+                </div>
+            </div>
+
+            <div class="sidebar-card">
+                <h3 class="sidebar-title">Resources</h3>
+                <a href="#" class="download-btn" style="width: 100%; text-align: center; margin-bottom: 10px;">
+                    <i class="fas fa-book"></i> Documentation
+                </a>
+                <a href="#" class="discord-btn" style="width: 100%; text-align: center;">
+                    <i class="fas fa-question-circle"></i> Support
+                </a>
+            </div>
+        </aside>
+
+        <div class="plugin-content">
+            <div class="plugin-header-card">
+                <h1 class="plugin-title">
+                    <i class="fas fa-cubes plugin-icon"></i>
+                    ORBS
+                </h1>
+                <div class="plugin-meta">
+                    <span class="plugin-version-badge">
+                        <i class="fas fa-tag"></i> v1.3
+                    </span>
+                    <span class="plugin-download-count">
+                        <i class="fas fa-download"></i>downloads
+                    </span>
+                </div>
+                <p class="plugin-description">
+                    Is is an advanced and customizable plugin with so many features 
+                </p>
+                <div class="plugin-actions">
+                    <a href="/plugins/advancedAuth.jar" class="download-btn">
+                        <i class="fas fa-download"></i> download
+                    </a>
+                    <a href="/advancedAuth/dash" class="discord-btn">
+                        <i class="fas fa-tag"></i> Dashboard
+                    </a>
+                </div>
+            </div>
+
+            <div class="details-section">
+                <h2 class="section-title">Features</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-map-marked-alt"></i>
+                        </div>
+                        <h3>customizable</h3>
+                        <p>customizable abilites power, cooldown,particles,texture pack,quantity.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-tshirt"></i>
+                        </div>
+                        <h3>Texture Pack</h3>
+                        <p>have default texture pack and also can add your own.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <h3>Free update or bugs fixes</h3>
+                        <p>If you purchase it we will provide you free update and bug fixes.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                        <h3>Easy to use</h3>
+                        <p>Just need to put file and here we go .</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="details-section">
+                <h2 class="section-title">Commands</h2>
+                <table class="commands-table">
+                    <thead>
+                        <tr>
+                            <th>Command</th>
+                            <th>Description</th>
+                            <th>Permission</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>/orb reload</code></td>
+                            <td>Reload the config file</td>
+                            <td>operator</td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="details-section">
+                <h2 class="section-title">Configuration</h2>
+                <div class="config-file-container">
+                    <div class="config-actions">
+                        <button class="btn download-btn" id="refreshConfig">
+                            <i class="fas fa-sync-alt"></i> Refresh Config
+                        </button>
+                        <button class="btn download-btn" id="downloadConfig">
+                            <i class="fas fa-download"></i> Download Config
+                        </button>
+                    </div>
+                    <div class="config-file" id="configDisplay">
+                        # developed by Rishabh
+                        # https://discord.zenuxs.xyz
+                        
+                        
+                        global-cooldown: 5
+                        starting-orbs: 3
+
+                        orbs:
+                            fire:
+                                display-name: "&6Fire Orb"
+                                texture: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2M3OWQ0MjM4NmNhMDM5Zjk5ZDBmMzYwNjRkNjM3ZmMwZmViYmVlZmJlY2U0ZjY4YTlmNjJjMmY2NzcwZThkMSJ9fX0="
+                                fireball-speed: 2.0
+                                lore:
+                                    - "&7Right-click to toggle fire protection"
+                                    - "&7Sneak+Left-click to shoot fireball"
+                            dirt:
+                                display-name: "&2Dirt Orb"
+                                texture: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTIwYzllN2RjZDQyZjgzNTgyZDNmYmU2MTE2NmFjZjYxNjY1NDZmYTVjNWIzMTAyMzc0NmIyNDM5YjQ1NDBiNiJ9fX0="
+                                radius: 5.0
+                                duration: 10
+                                amplifier: 2
+                            air:
+                                display-name: "&fAir Orb"
+                                texture: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGFmMGU1MmYzODk5ODY5NWE3YmJmYTlhY2RjOGVlYTFmY2U2OTdiYjA4NWIzYzllZTQwMTdmNTE5YWQ5ZTU4YyJ9fX0="
+                                duration: 30
+                                jump-amplifier: 1
+                            water:
+                                display-name: "&9Water Orb"
+                                texture: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmZmZWU2ZTIwMmNiZjcxNDAxZDQ3NTMxOGVlZDQyOTVlOGYwN2RjN2RhOWQyZTJjMzM5YzFiMDYyYjZlNGY4MiJ9fX0="
+                            earth:
+                                display-name: "&aEarth Orb"
+                                texture: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzY5MTk2YjMzMGM2Yjg5NjJmMjNhZDU2MjdmYjZlY2NlNDcyZWFmNWM5ZDQ0Zjc5MWY2NzA5YzdkMGY0ZGVjZSJ9fX0="
+                    </div>
+                </div>
+            </div>
+
+            <div class="details-section">
+                <h2 class="section-title">Version History</h2>
+                <table class="versions-table">
+                    <thead>
+                        <tr>
+                            <th>Version</th>
+                            <th>Minecraft</th>
+                            <th>Release Date</th>
+                            <th>Download</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="version-badge">v1.3</span></td>
+                            <td>1.8 - 1.21.4</td>
+                            <td>2025-05-2</td>
+                            <td><a href="https://discord.zenuxs.xyz" class="download-link">Download</a></td>
+                        </tr>
+                        <!--
+                        <tr>
+                            <td><span class="version-badge">v2.0.2</span></td>
+                            <td>1.16 - 1.19</td>
+                            <td>2025-01-15</td>
+                            <td><a href="#" class="download-link">Download</a></td>
+                        </tr>
+                        <tr>
+                            <td><span class="version-badge">v1.9.5</span></td>
+                            <td>1.16 - 1.18</td>
+                            <td>2024-11-30</td>
+                            <td><a href="#" class="download-link">Download</a></td>
+                        </tr> -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-links">
+            <a href="index.html">Home</a>
+            <a href="plugins.html">Plugins</a>
+            <a href="support.html">Support</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Privacy Policy</a>
+        </div>
+        <div class="social-icons">
+            <a href="#"><i class="fab fa-youtube"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-github"></i></a>
+            <a href="https://discord.zenuxs.xyz"><i class="fab fa-discord"></i></a>
+        </div>
+        <p class="copyright">© 2025 Zenuxs Plugins. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('active');
+        });
+
+        // Config file functionality
+        document.getElementById('refreshConfig').addEventListener('click', function() {
+            const configDisplay = document.getElementById('configDisplay');
+            configDisplay.textContent = "Refreshing configuration...";
+            
+            // Simulate loading from file
+            setTimeout(() => {
+                configDisplay.textContent = `
+                        # OrbsPlugin Configuration
+                        # Last Updated: 2025-05-02
+                        # developed by Rishabh
+                        # https://discord.zenuxs.xyz
+                        
+                        
+                        global-cooldown: 5
+                        starting-orbs: 3
+
+                        orbs:
+                            fire:
+                                display-name: "&6Fire Orb"
+                                texture: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2M3OWQ0MjM4NmNhMDM5Zjk5ZDBmMzYwNjRkNjM3ZmMwZmViYmVlZmJlY2U0ZjY4YTlmNjJjMmY2NzcwZThkMSJ9fX0="
+                                fireball-speed: 2.0
+                                lore:
+                                    - "&7Right-click to toggle fire protection"
+                                    - "&7Sneak+Left-click to shoot fireball"
+                            dirt:
+                                display-name: "&2Dirt Orb"
+                                texture: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTIwYzllN2RjZDQyZjgzNTgyZDNmYmU2MTE2NmFjZjYxNjY1NDZmYTVjNWIzMTAyMzc0NmIyNDM5YjQ1NDBiNiJ9fX0="
+                                radius: 5.0
+                                duration: 10
+                                amplifier: 2
+                            air:
+                                display-name: "&fAir Orb"
+                                texture: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGFmMGU1MmYzODk5ODY5NWE3YmJmYTlhY2RjOGVlYTFmY2U2OTdiYjA4NWIzYzllZTQwMTdmNTE5YWQ5ZTU4YyJ9fX0="
+                                duration: 30
+                                jump-amplifier: 1
+                            water:
+                                display-name: "&9Water Orb"
+                                texture: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmZmZWU2ZTIwMmNiZjcxNDAxZDQ3NTMxOGVlZDQyOTVlOGYwN2RjN2RhOWQyZTJjMzM5YzFiMDYyYjZlNGY4MiJ9fX0="
+                            earth:
+                                display-name: "&aEarth Orb"
+                                texture: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzY5MTk2YjMzMGM2Yjg5NjJmMjNhZDU2MjdmYjZlY2NlNDcyZWFmNWM5ZDQ0Zjc5MWY2NzA5YzdkMGY0ZGVjZSJ9fX0="
+`
+            }, 500);
+        });
+
+        document.getElementById('downloadConfig').addEventListener('click', function() {
+            const configContent = document.getElementById('configDisplay').textContent;
+            const blob = new Blob([configContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'buildffa-config.yml';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+    </script>
+</body> 
+</html>

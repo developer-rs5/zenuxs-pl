@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Discover free plugins to enhance your digital experience. Free plugin support, custom plugins, and dedicated minecraftcommunity.">
+    <meta name="keywords" content="plugins, minecraftugins, premium plugins, custom plugins, free plugins">
+    <title>Zenuxs Plugins - Premium and free Plugins Marketplace</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+    <style>
+        :root {
+            --primary: #1a1f36;
+            --secondary: #0f1322;
+            --accent: #2563eb;
+            --accent-hover: #1d4ed8;
+            --text: #f0f6fc;
+            --text-muted: #8b949e;
+            --card-bg: #212936;
+            --card-border: #2d3748;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            text-decoration: none;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            background-color: rgba(15, 19, 34, 0.95);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        .logo i {
+            color: var(--accent);
+            transition: var(--transition);
+        }
+
+        .logo:hover i {
+            transform: rotate(15deg);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .mobile-menu-btn:hover {
+            color: var(--accent);
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            padding: 8rem 5%;
+            text-align: center;
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                        url('https://images.unsplash.com/photo-1542831371-29b0f74f9713?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80') center/cover;
+            margin-bottom: 4rem;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .hero-content {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: slideInFromTop 1s ease-out;
+        }
+
+        .hero p {
+            font-size: 1.4rem;
+            margin-bottom: 2.5rem;
+            color: var(--text-muted);
+            animation: slideInFromBottom 1s ease-out;
+        }
+
+        .discord-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            background-color: #5865f2;
+            color: white;
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            margin-top: 1.5rem;
+            animation: fadeIn 2s ease-out;
+            box-shadow: 0 4px 15px rgba(88, 101, 242, 0.3);
+        }
+
+        .discord-btn:hover {
+            background-color: #4752c4;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Plugins Section */
+        .section-title {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 3rem;
+            position: relative;
+            padding-bottom: 1rem;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 5px;
+            background: linear-gradient(to right, var(--accent), #00f2fe);
+            border-radius: 3px;
+        }
+
+        .plugins-section {
+            padding: 5rem 5%;
+        }
+
+        .search-container {
+            max-width: 700px;
+            margin: 0 auto 4rem;
+            position: relative;
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1.2rem 2rem;
+            border-radius: 50px;
+            border: 2px solid var(--card-border);
+            background-color: var(--card-bg);
+            color: var(--text);
+            font-size: 1.1rem;
+            padding-left: 3.5rem;
+            transition: var(--transition);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 5px 20px rgba(37, 99, 235, 0.2);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 1.2rem;
+        }
+
+        .plugins-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2.5rem;
+        }
+
+        .plugin-card {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: var(--transition);
+            border: 1px solid var(--card-border);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 1s ease-out;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .plugin-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .plugin-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .plugin-header {
+            padding: 2rem;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .plugin-name {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .plugin-author {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .plugin-body {
+            padding: 2rem;
+        }
+
+        .plugin-description {
+            margin-bottom: 1.5rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+
+        .plugin-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .plugin-price {
+            font-weight: 700;
+            color: var(--accent);
+            font-size: 1.3rem;
+        }
+
+        .plugin-btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.8rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+        }
+
+        .plugin-btn:hover {
+            background-color: var(--accent-hover);
+            transform: scale(1.05);
+        }
+
+        /* Team Section */
+        .team-section {
+            padding: 6rem 5%;
+            background-color: var(--secondary);
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 3rem;
+        }
+
+        .team-card {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            text-align: center;
+            transition: var(--transition);
+            border: 1px solid var(--card-border);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 1s ease-out;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .team-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .team-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .team-img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .team-card:hover .team-img {
+            transform: scale(1.05);
+        }
+
+        .team-info {
+            padding: 2rem;
+        }
+
+        .team-name {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .team-role {
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+
+        .team-social {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .team-social a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: var(--text);
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .team-social a:hover {
+            background-color: var(--accent);
+            transform: translateY(-3px);
+        }
+
+        /* Features Section */
+        .features-section {
+            padding: 6rem 5%;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 3rem;
+        }
+
+        .feature-card {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            padding: 2.5rem;
+            text-align: center;
+            border: 1px solid var(--card-border);
+            transition: var(--transition);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 1s ease-out;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .feature-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .feature-icon {
+            font-size: 3.5rem;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .feature-card:hover .feature-icon {
+            transform: scale(1.2);
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-description {
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--secondary);
+            padding: 6rem 5% 3rem;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 4rem;
+        }
+
+        .footer-column h3 {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            padding-bottom: 0.8rem;
+        }
+
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 4px;
+            background-color: var(--accent);
+            border-radius: 2px;
+        }
+
+        .footer-column p {
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: var(--transition);
+            display: block;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+            transform: translateX(5px);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1.2rem;
+            margin-top: 2rem;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background-color: var(--card-bg);
+            color: var(--text);
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .social-links a:hover {
+            background-color: var(--accent);
+            transform: translateY(-5px);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 4rem;
+            margin-top: 4rem;
+            border-top: 1px solid var(--card-border);
+            color: var(--text-muted);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideInFromTop {
+            from { 
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInFromBottom {
+            from { 
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .hero h1 {
+                font-size: 3.5rem;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background-color: var(--secondary);
+                flex-direction: column;
+                padding: 2rem;
+                gap: 1.5rem;
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            }
+
+            .nav-links.active {
+                display: flex;
+                animation: slideInFromTop 0.5s ease-out;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .hero h1 {
+                font-size: 3rem;
+            }
+
+            .hero p {
+                font-size: 1.2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                padding: 6rem 5%;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .section-title {
+                font-size: 2.5rem;
+            }
+
+            .plugins-grid,
+            .team-grid,
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+
+            .section-title {
+                font-size: 2.2rem;
+            }
+
+            .discord-btn {
+                padding: 0.8rem 2rem;
+            }
+        }
+
+        /* Loading Animation */
+        .loader {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+
+        .loader-circle {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(37, 99, 235, 0.2);
+            border-radius: 50%;
+            border-top: 5px solid var(--accent);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <a href="#" class="logo">
+            <i class="fas fa-puzzle-piece"></i>
+            <span>Zenuxs Plugins</span>
+        </a>
+        <div class="nav-links" id="nav-links">
+            <a href="#">Home</a>
+            <a href="#plugins">Plugins</a>
+            <a href="#team">Team</a>
+            <a href="#features">Features</a>
+            <a href="https://discord.zenuxs.xyz">Discord</a>
+        </div>
+        <button class="mobile-menu-btn" id="mobile-menu-btn">
+            <i class="fas fa-bars"></i>
+        </button>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Elevate Your Experience With Zenuxs Plugins</h1>
+            <p>Discover powerful plugins that enhance functionality, improve productivity, and transform your digital experience. Join our community of developers and enthusiasts.</p>
+            <a href="#" class="discord-btn">
+                <i class="fab fa-discord"></i> Join Our Discord
+            </a>
+        </div>
+    </section>
+
+    <!-- Plugins Section -->
+    <section class="plugins-section" id="plugins">
+        <h2 class="section-title">Featured Plugins</h2>
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="search-input" placeholder="Search plugins..." id="search-input">
+        </div>
+        <div class="plugins-grid" id="plugins-container">
+            <div class="loader">
+                <div class="loader-circle"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="team-section" id="team">
+        <h2 class="section-title">Our Team</h2>
+        <div class="team-grid" id="team-container">
+            <div class="loader">
+                <div class="loader-circle"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section" id="features">
+        <h2 class="section-title">Why Choose Us</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <h3 class="feature-title">Buy Premium Plugins</h3>
+                <p class="feature-description">Get access to our exclusive premium plugins available only on our Discord server. Enhance your experience with our carefully crafted tools.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <h3 class="feature-title">Free Plugin Support</h3>
+                <p class="feature-description">We provide free support for all our plugins to ensure you have the best experience. Our team is always ready to help you.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-bug"></i>
+                </div>
+                <h3 class="feature-title">Report Bugs</h3>
+                <p class="feature-description">Join our Discord to report any issues or bugs you encounter with our plugins. We quickly address all reported issues.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-tools"></i>
+                </div>
+                <h3 class="feature-title">Custom Plugins</h3>
+                <p class="feature-description">Request custom plugins tailored to your specific needs through our Discord community. We bring your ideas to life.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="footer">
+        <div class="footer-content">
+            <div class="footer-column">
+                <h3>About PluginHub</h3>
+                <p>We provide high-quality plugins to enhance your digital experience. Our team is dedicated to creating powerful tools that make a difference.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-discord"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-github"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+            <div class="footer-column">
+                <h3>Quick Links</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#plugins">Plugins</a></li>
+                    <li><a href="#team">Team</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#footer">Support</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Support</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Documentation</a></li>
+                    <li><a href="#">FAQs</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">Discord</a></li>
+                    <li><a href="#">Report a Bug</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Newsletter</h3>
+                <p>Subscribe to our newsletter to get updates on new plugins and features.</p>
+                <form>
+                    <input type="email" placeholder="Your Email" style="width: 100%; padding: 0.8rem; margin-bottom: 1rem; border-radius: 5px; border: none; background: var(--card-bg); color: var(--text);">
+                    <button type="submit" class="plugin-btn" style="width: 100%;">Subscribe</button>
+                </form>
+            </div>
+        </div>
+        <div class="copyright">
+            <p>&copy; 2023 PluginHub. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu functionality
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const navLinks = document.getElementById('nav-links');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            mobileMenuBtn.innerHTML = navLinks.classList.contains('active') ? 
+                '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+        });
+
+        // Close mobile menu when clicking on a link
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+                mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+            });
+        });
+
+        // JSON data for plugins (would typically be in an external file)
+        const pluginsData = {
+            "plugins": [
+                {
+                    "name": "Advanced Auth",
+                    "author": "Rishabh",
+                    "description": "An adcanced authentication plugin which have its own admin dashboard and user management system , free for now",
+                    "price": "0.00",
+                    "link": "/advancedAuth"
+                },
+                {
+                    "name": "Orbs",
+                    "author": "Rishabh",
+                    "description": "Orbs is a paid plugins which have its own orbs and custom features of each orb , user gets a orb when join for first time and he cant lose that orb anyhow",
+                    "price": "200.00 INR",
+                    "link": "https://discord.zenuxs.xyz"
+                },
+                {
+                    "name": "Build FFA",
+                    "author": "Rishabh",
+                    "description": "Build FFA is a free plugin and have its own features like custom kits , custom arenas, auto block desepeare and more",
+                    "price": "0.00",
+                    "link": "/buildFFA"
+                }
+            ]
+        };
+
+        // JSON data for team (would typically be in an external file)
+        const teamData = {
+            "team": [
+                {
+                    "name": "Rishabh Sharma || developer rs",
+                    "role": "Lead Developer || Founder",
+                    "image": "/images/team-rishabh.png",
+                    "social": {
+                        "instagram": "https://instagram.com/developer.rs",
+                        "github": "https://github.com/developer-rs5",
+                        "discord": "https://discord.zenuxs.xyz"
+                    }
+                },
+                
+                {
+                    "name": "Dark lord",
+                    "role": "Developer ",
+                    "image": "/images/team-dark.png",
+                    "social": {
+                        "twitter": "#",
+                        "github": "#",
+                        "discord": "#"
+                    }
+                },
+                {
+                    "name": "Aditya",
+                    "role": "Manager",
+                    "image": "/images/team-aditya.png",
+                    "social": {
+                        "discord": "https://discord.zenuxs.xyz",
+                        "instagram": "#",
+                        "twitter": "#"
+                    }
+                },
+                {
+                    "name": "Savio || SPG",
+                    "role": "Head developer || Moderator",
+                    "image": "/images/team-spg.png",
+                    "social": {
+                        "twitter": "#",
+                        "linkedin": "#",
+                        "discord": "#"
+                    }
+                }
+            ]
+        };
+
+        // Function to load plugins
+        function loadPlugins() {
+            const pluginsContainer = document.getElementById('plugins-container');
+            pluginsContainer.innerHTML = ''; // Remove loader
+            
+            pluginsData.plugins.forEach(plugin => {
+                const pluginCard = document.createElement('div');
+                pluginCard.className = 'plugin-card';
+                pluginCard.innerHTML = `
+                    <div class="plugin-header">
+                        <h3 class="plugin-name">${plugin.name}</h3>
+                        <p class="plugin-author">By ${plugin.author}</p>
+                    </div>
+                    <div class="plugin-body">
+                        <p class="plugin-description">${plugin.description}</p>
+                    </div>
+                    <div class="plugin-footer">
+                        <span class="plugin-price">${plugin.price}</span>
+                        <a href="${plugin.link}" class="plugin-btn">Get Plugin</a>
+                    </div>
+                `;
+                pluginsContainer.appendChild(pluginCard);
+                
+                // Add animation with delay
+                setTimeout(() => {
+                    pluginCard.classList.add('visible');
+                }, 100);
+            });
+        }
+
+        // Function to load team members
+        function loadTeam() {
+            const teamContainer = document.getElementById('team-container');
+            teamContainer.innerHTML = ''; // Remove loader
+            
+            teamData.team.forEach(member => {
+                const teamCard = document.createElement('div');
+                teamCard.className = 'team-card';
+                
+                let socialHTML = '';
+                for (const [platform, link] of Object.entries(member.social)) {
+                    socialHTML += `<a href="${link}"><i class="fab fa-${platform}"></i></a>`;
+                }
+                
+                teamCard.innerHTML = `
+                    <img src="${member.image}" alt="${member.name}" class="team-img">
+                    <div class="team-info">
+                        <h3 class="team-name">${member.name}</h3>
+                        <p class="team-role">${member.role}</p>
+                        <div class="team-social">
+                            ${socialHTML}
+                        </div>
+                    </div>
+                `;
+                teamContainer.appendChild(teamCard);
+                
+                // Add animation with delay
+                setTimeout(() => {
+                    teamCard.classList.add('visible');
+                }, 100);
+            });
+        }
+
+        // Search functionality
+        function setupSearch() {
+            const searchInput = document.getElementById('search-input');
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const pluginCards = document.querySelectorAll('.plugin-card');
+                
+                pluginCards.forEach(card => {
+                    const pluginName = card.querySelector('.plugin-name').textContent.toLowerCase();
+                    const pluginDesc = card.querySelector('.plugin-description').textContent.toLowerCase();
+                    const pluginAuthor = card.querySelector('.plugin-author').textContent.toLowerCase();
+                    
+                    if (pluginName.includes(searchTerm) || pluginDesc.includes(searchTerm) || pluginAuthor.includes(searchTerm)) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        }
+
+        // Animate elements on scroll
+        function animateOnScroll() {
+            const elements = document.querySelectorAll('.plugin-card, .team-card, .feature-card');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            elements.forEach(element => {
+                observer.observe(element);
+            });
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simulate loading from external files with a delay
+            setTimeout(() => {
+                loadPlugins();
+                loadTeam();
+                setupSearch();
+                animateOnScroll();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

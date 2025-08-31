@@ -1,0 +1,2418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdvanceAuth Admin Panel - Zenuxs</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --gray: #64748b;
+            --light-gray: #e2e8f0;
+            --border: #cbd5e1;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f1f5f9;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: var(--bg-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Login Styles */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .login-form {
+            width: 100%;
+            max-width: 400px;
+            background: var(--bg-primary);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+        }
+        
+        .login-form .logo {
+            margin-bottom: 30px;
+        }
+        
+        .login-form .logo h1 {
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .login-form .logo p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: var(--bg-secondary);
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            background: var(--bg-primary);
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+        
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-danger { background: var(--danger); }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-warning { background: var(--warning); }
+        .btn-warning:hover { background: #d97706; }
+        .btn-success { background: var(--success); }
+        .btn-success:hover { background: #059669; }
+        .btn-info { background: var(--info); }
+        .btn-info:hover { background: #2563eb; }
+        .btn-secondary { background: var(--gray); }
+        .btn-secondary:hover { background: #475569; }
+        
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+        
+        .btn-xs {
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+        
+        /* Header Styles */
+        .header {
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border);
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+        
+        .header-left h1 {
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+        
+        .header-left p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .social-links a:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border);
+            padding: 0 30px;
+            overflow-x: auto;
+        }
+        
+        .nav-tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        
+        .nav-tab:hover {
+            color: var(--primary);
+            background: var(--bg-secondary);
+        }
+        
+        .nav-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        
+        /* Dashboard Styles */
+        .dashboard {
+            display: none;
+            flex: 1;
+            padding: 30px;
+            background: var(--bg-secondary);
+        }
+        
+        .dashboard.active {
+            display: block;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: var(--bg-primary);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary);
+        }
+        
+        .stat-card:nth-child(2)::before { background: var(--info); }
+        .stat-card:nth-child(3)::before { background: var(--success); }
+        .stat-card:nth-child(4)::before { background: var(--warning); }
+        .stat-card:nth-child(5)::before { background: var(--danger); }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            margin-bottom: 15px;
+        }
+        
+        .stat-card:nth-child(1) .stat-icon { background: var(--primary); }
+        .stat-card:nth-child(2) .stat-icon { background: var(--info); }
+        .stat-card:nth-child(3) .stat-icon { background: var(--success); }
+        .stat-card:nth-child(4) .stat-icon { background: var(--warning); }
+        .stat-card:nth-child(5) .stat-icon { background: var(--danger); }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        
+        .stat-change {
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+        
+        .stat-change.positive {
+            color: var(--success);
+        }
+        
+        .stat-change.negative {
+            color: var(--danger);
+        }
+        
+        /* Charts Grid */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-container {
+            background: var(--bg-primary);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+            position: relative;
+            height: 350px;
+        }
+        
+        .chart-container:hover {
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .chart-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .chart-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        /* Heatmap specific styles */
+        .heatmap-container {
+            grid-column: 1 / -1;
+            height: auto;
+        }
+        
+        .heatmap-grid {
+            display: grid;
+            grid-template-columns: repeat(24, 1fr);
+            gap: 2px;
+            margin-top: 20px;
+        }
+        
+        .heatmap-cell {
+            aspect-ratio: 1;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .heatmap-cell:hover {
+            transform: scale(1.1);
+            z-index: 10;
+        }
+        
+        /* Table Styles */
+        .table-container {
+            background: var(--bg-primary);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        
+        .table-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .table-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .table-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 16px 25px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        th {
+            background: var(--bg-secondary);
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        tr:hover {
+            background: var(--bg-secondary);
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-active {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+        
+        .status-banned {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+        
+        .status-expired {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background: var(--bg-primary);
+            padding: 30px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: var(--shadow-lg);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            margin-bottom: 25px;
+        }
+        
+        .modal-header h3 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+        
+        .modal-header p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .modal-footer {
+            margin-top: 25px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        /* Toast Styles */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 20px;
+            background: var(--success);
+            color: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s;
+            z-index: 1100;
+            font-weight: 500;
+            max-width: 400px;
+        }
+        
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .toast.error {
+            background: var(--danger);
+        }
+        
+        .toast.warning {
+            background: var(--warning);
+        }
+        
+        .toast.info {
+            background: var(--info);
+        }
+        
+        /* Loading Spinner */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            backdrop-filter: blur(3px);
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        /* Footer */
+        .footer {
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border);
+            padding: 20px 30px;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+        
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .pagination button {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .pagination button:hover:not(:disabled) {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .pagination button.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .dashboard {
+                padding: 20px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-container {
+                height: 300px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .social-links {
+                order: -1;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .nav-tabs {
+                padding: 0 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Section -->
+        <div id="login" class="login-container">
+            <div class="login-form">
+                <div class="logo">
+                    <h1><i class="fas fa-shield-alt"></i> AdvanceAuth</h1>
+                    <p>by <strong>DEVELOPER.RS (Rishabh)</strong> • Zenuxs Plugins</p>
+                </div>
+                <div class="form-group">
+                    <label for="serverKey"><i class="fas fa-key"></i> Server Key</label>
+                    <input type="text" id="serverKey" class="form-control" placeholder="Enter your server key">
+                </div>
+                <div class="form-group">
+                    <label for="apiEndpoint"><i class="fas fa-server"></i> API Endpoint</label>
+                    <input type="text" id="apiEndpoint" class="form-control" placeholder="https://your-api-server.com" value="http://localhost:3000">
+                </div>
+                <button onclick="login()" class="btn" style="width: 100%;" id="loginBtn">
+                    <i class="fas fa-sign-in-alt"></i> Access Dashboard
+                </button>
+                
+                <div style="margin-top: 20px; padding: 15px; background: var(--bg-secondary); border-radius: 10px; font-size: 14px; color: var(--text-secondary);">
+                    <p><strong>Demo Key:</strong> c126434b-eaf2-439a-a759-ca7600a7e146</p>
+                    <p>Update the API endpoint to connect to your server</p>
+                </div>
+                
+                <div style="margin-top: 20px; text-align: center;">
+                    <div class="social-links" style="justify-content: center;">
+                        <a href="https://rs.zenuxs.xyz" target="_blank" title="Website">
+                            <i class="fas fa-globe"></i>
+                        </a>
+                        <a href="https://discord.zenuxs.xyz" target="_blank" title="Discord">
+                            <i class="fab fa-discord"></i>
+                        </a>
+                        <a href="https://instagram.com/zenuxs" target="_blank" title="Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="https://youtube.com/@zenuxs" target="_blank" title="YouTube">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <div id="header" class="header" style="display: none;">
+            <div class="header-left">
+                <h1><i class="fas fa-shield-alt"></i> AdvanceAuth</h1>
+                <p>by <strong>DEVELOPER.RS (Rishabh)</strong> • Zenuxs Plugins Network</p>
+            </div>
+            <div class="header-right">
+                <div class="social-links">
+                    <a href="https://rs.zenuxs.xyz" target="_blank" title="Website">
+                        <i class="fas fa-globe"></i>
+                    </a>
+                    <a href="https://discord.zenuxs.xyz" target="_blank" title="Discord">
+                        <i class="fab fa-discord"></i>
+                    </a>
+                    <a href="https://instagram.com/zenuxs" target="_blank" title="Instagram">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="https://youtube.com/@zenuxs" target="_blank" title="YouTube">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                </div>
+                <button class="btn btn-danger btn-sm" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div id="nav-tabs" class="nav-tabs" style="display: none;">
+            <div class="nav-tab active" onclick="showTab('dashboard')">
+                <i class="fas fa-chart-line"></i> Dashboard
+            </div>
+            <div class="nav-tab" onclick="showTab('users')">
+                <i class="fas fa-users"></i> Users
+            </div>
+            <div class="nav-tab" onclick="showTab('licenses')">
+                <i class="fas fa-key"></i> Licenses
+            </div>
+            <div class="nav-tab" onclick="showTab('server-keys')">
+                <i class="fas fa-server"></i> Server Keys
+            </div>
+            <div class="nav-tab" onclick="showTab('analytics')">
+                <i class="fas fa-chart-bar"></i> Analytics
+            </div>
+            <div class="nav-tab" onclick="showTab('system')">
+                <i class="fas fa-cog"></i> System
+            </div>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="dashboard active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-value" id="totalUsers">Loading...</div>
+                    <div class="stat-label">Total Users</div>
+                    <div class="stat-change positive" id="userChange">+0% from last month</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-sign-in-alt"></i>
+                    </div>
+                    <div class="stat-value" id="loggedInToday">Loading...</div>
+                    <div class="stat-label">Logged In Today</div>
+                    <div class="stat-change positive" id="loginChange">+0% from yesterday</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="stat-value" id="newRegistrations">Loading...</div>
+                    <div class="stat-label">New Registrations (30d)</div>
+                    <div class="stat-change positive" id="regChange">+0% from last period</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <div class="stat-value" id="activeUsers">Loading...</div>
+                    <div class="stat-label">Active Users</div>
+                    <div class="stat-change positive" id="activeChange">Not banned</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-user-times"></i>
+                    </div>
+                    <div class="stat-value" id="bannedUsers">Loading...</div>
+                    <div class="stat-label">Banned Users</div>
+                    <div class="stat-change negative" id="banChange">Total banned</div>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Login Activity (24h)</div>
+                            <div class="chart-subtitle">Hourly login trends</div>
+                        </div>
+                    </div>
+                    <canvas id="loginChart24h"></canvas>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">User Registrations (30d)</div>
+                            <div class="chart-subtitle">Daily registration trends</div>
+                        </div>
+                    </div>
+                    <canvas id="registrationChart"></canvas>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+                <div class="chart-container heatmap-container">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Login Activity Heatmap</div>
+                            <div class="chart-subtitle">Login patterns by day and hour</div>
+                        </div>
+                    </div>
+                    <div class="heatmap-grid" id="loginHeatmap"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Users Tab -->
+        <div id="users" class="dashboard">
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="table-title">
+                        <i class="fas fa-users"></i> User Management
+                    </div>
+                    <div class="table-actions">
+                        <button class="btn btn-success btn-sm" onclick="refreshUsers()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table id="usersTable">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Registration Date</th>
+                                <th>Last Login</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination" id="usersPagination">
+                </div>
+            </div>
+        </div>
+
+        <!-- Licenses Tab -->
+        <div id="licenses" class="dashboard">
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="table-title">
+                        <i class="fas fa-key"></i> License Management
+                    </div>
+                    <div class="table-actions">
+                        <button class="btn btn-success btn-sm" onclick="showCreateLicenseModal()">
+                            <i class="fas fa-plus"></i> Create License
+                        </button>
+                        <button class="btn btn-info btn-sm" onclick="refreshLicenses()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table id="licensesTable">
+                        <thead>
+                            <tr>
+                                <th>License Key</th>
+                                <th>Type</th>
+                                <th>Max Servers</th>
+                                <th>Used Servers</th>
+                                <th>Valid Until</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="licensesTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Server Keys Tab -->
+        <div id="server-keys" class="dashboard">
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="table-title">
+                        <i class="fas fa-server"></i> Server Key Management
+                    </div>
+                    <div class="table-actions">
+                        <button class="btn btn-success btn-sm" onclick="showCreateServerKeyModal()">
+                            <i class="fas fa-plus"></i> Create Server Key
+                        </button>
+                        <button class="btn btn-info btn-sm" onclick="refreshServerKeys()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table id="serverKeysTable">
+                        <thead>
+                            <tr>
+                                <th>Server Key</th>
+                                <th>Name</th>
+                                <th>Owner</th>
+                                <th>Current Users</th>
+                                <th>Max Users</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="serverKeysTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Tab -->
+        <div id="analytics" class="dashboard">
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Weekly Login Activity</div>
+                            <div class="chart-subtitle">Login trends over the past 7 days</div>
+                        </div>
+                    </div>
+                    <canvas id="weeklyChart"></canvas>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Monthly Activity</div>
+                            <div class="chart-subtitle">30-day login patterns</div>
+                        </div>
+                    </div>
+                    <canvas id="monthlyChart"></canvas>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Top Countries</div>
+                            <div class="chart-subtitle">User distribution by location</div>
+                        </div>
+                    </div>
+                    <canvas id="countriesChart"></canvas>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">User Status Distribution</div>
+                            <div class="chart-subtitle">Active vs Banned users</div>
+                        </div>
+                    </div>
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Tab -->
+        <div id="system" class="dashboard">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <div class="stat-value" id="systemVersion">Loading...</div>
+                    <div class="stat-label">System Version</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-server"></i>
+                    </div>
+                    <div class="stat-value" id="totalServers">Loading...</div>
+                    <div class="stat-label">Total Servers</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-value" id="systemUptime">Loading...</div>
+                    <div class="stat-label">System Uptime</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-key"></i>
+                    </div>
+                    <div class="stat-value" id="activeLicenses">Loading...</div>
+                    <div class="stat-label">Active Licenses</div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="table-title">
+                        <i class="fas fa-info"></i> System Information
+                    </div>
+                </div>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td><strong>Plugin Name</strong></td>
+                            <td>AdvanceAuth</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Company</strong></td>
+                            <td>Zenuxs</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Developer</strong></td>
+                            <td>DEVELOPER.RS (Rishabh)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Website</strong></td>
+                            <td><a href="https://rs.zenuxs.xyz" target="_blank">https://rs.zenuxs.xyz</a></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Node.js Version</strong></td>
+                            <td id="nodeVersion">Loading...</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Total System Users</strong></td>
+                            <td id="systemTotalUsers">Loading...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div id="footer" class="footer" style="display: none;">
+            <div class="footer-content">
+                <div>
+                    <p>&copy; 2025 <strong>Zenuxs</strong> - AdvanceAuth by DEVELOPER.RS (Rishabh)</p>
+                </div>
+                <div class="footer-links">
+                    <a href="https://rs.zenuxs.xyz" target="_blank">Website</a>
+                    <a href="https://discord.zenuxs.xyz" target="_blank">Support</a>
+                    <a href="https://rs.zenuxs.xyz/docs" target="_blank">Documentation</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Change Password Modal -->
+    <div id="passwordModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-lock"></i> Change Password</h3>
+                <p>Update user password</p>
+            </div>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="passwordUsername" class="form-control" readonly>
+            </div>
+            <div class="form-group">
+                <label>New Password</label>
+                <input type="password" id="newPassword" class="form-control" placeholder="Enter new password">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('passwordModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="changePassword()">Update Password</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ban User Modal -->
+    <div id="banModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-ban"></i> Ban User</h3>
+                <p>Ban user from accessing the server</p>
+            </div>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="banUsername" class="form-control" readonly>
+            </div>
+            <div class="form-group">
+                <label>Ban Message</label>
+                <textarea id="banMessage" class="form-control" rows="3" placeholder="Reason for ban (optional)"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('banModal')">Cancel</button>
+                <button class="btn btn-danger" onclick="banUser()">Ban User</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create License Modal -->
+    <div id="createLicenseModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-key"></i> Create License</h3>
+                <p>Generate a new license key</p>
+            </div>
+            <div class="form-group">
+                <label>License Key (optional)</label>
+                <input type="text" id="licenseKey" class="form-control" placeholder="Auto-generated if empty">
+            </div>
+            <div class="form-group">
+                <label>Type</label>
+                <select id="licenseType" class="form-control">
+                    <option value="GLOBAL">Global</option>
+                    <option value="SERVER_SPECIFIC">Server Specific</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Max Servers (-1 for unlimited)</label>
+                <input type="number" id="maxServers" class="form-control" value="-1">
+            </div>
+            <div class="form-group">
+                <label>Valid Until</label>
+                <input type="date" id="validUntil" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label>Created By</label>
+                <input type="text" id="createdBy" class="form-control" value="admin">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('createLicenseModal')">Cancel</button>
+                <button class="btn btn-success" onclick="createLicense()">Create License</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Server Key Modal -->
+    <div id="createServerKeyModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-server"></i> Create Server Key</h3>
+                <p>Generate a new server key</p>
+            </div>
+            <div class="form-group">
+                <label>Server Key</label>
+                <input type="text" id="serverKeyInput" class="form-control" placeholder="Enter unique server key" required>
+            </div>
+            <div class="form-group">
+                <label>Server Name</label>
+                <input type="text" id="serverName" class="form-control" placeholder="Enter server name" required>
+            </div>
+            <div class="form-group">
+                <label>Owner</label>
+                <input type="text" id="serverOwner" class="form-control" placeholder="Server owner">
+            </div>
+            <div class="form-group">
+                <label>Max Users (-1 for unlimited)</label>
+                <input type="number" id="serverMaxUsers" class="form-control" value="-1">
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="serverDescription" class="form-control" rows="3" placeholder="Server description (optional)"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('createServerKeyModal')">Cancel</button>
+                <button class="btn btn-success" onclick="createServerKey()">Create Server Key</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // Global variables
+        let currentServerKey = '';
+        let apiEndpoint = '';
+        let currentPage = 1;
+        let charts = {};
+        let userData = [];
+        let licenseData = [];
+        let serverKeyData = [];
+
+        
+
+        // Initialize on page load
+        window.addEventListener('load', () => {
+            document.getElementById('loginBtn').addEventListener('click', login);
+
+            // Load saved settings
+            const savedEndpoint = sessionStorage.getItem('apiEndpoint');
+            const savedServerKey = sessionStorage.getItem('serverKey');
+            
+            if (savedEndpoint) {
+                document.getElementById('apiEndpoint').value = savedEndpoint;
+                apiEndpoint = savedEndpoint;
+            }
+            
+            if (savedServerKey) {
+                document.getElementById('serverKey').value = savedServerKey;
+            }
+            
+            // Auto-login if we have saved credentials
+            if (savedEndpoint && savedServerKey) {
+                currentServerKey = savedServerKey;
+                apiEndpoint = savedEndpoint;
+                validateAndLogin();
+            }
+        });
+
+        // API Helper Functions
+        async function apiCall(endpoint, options = {}) {
+            const url = `${apiEndpoint}${endpoint}`;
+            const defaultOptions = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'server-key': currentServerKey
+                }
+            };
+
+            const finalOptions = {
+                ...defaultOptions,
+                ...options,
+                headers: {
+                    ...defaultOptions.headers,
+                    ...(options.headers || {})
+                }
+            };
+
+            try {
+                const response = await fetch(url, finalOptions);
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || `HTTP ${response.status}`);
+                }
+                
+                return data;
+            } catch (error) {
+                console.error('API call failed:', error);
+                throw error;
+            }
+        }
+
+            // Authentication Functions
+            async function login() {
+                const serverKey = document.getElementById('serverKey').value.trim();
+                const endpoint = document.getElementById('apiEndpoint').value.trim();
+                
+                if (!serverKey) {
+                    showToast('Please enter a server key', 'error');
+                    return;
+                }
+                
+                if (!endpoint) {
+                    showToast('Please enter API endpoint', 'error');
+                    return;
+                }
+
+                apiEndpoint = endpoint;
+                currentServerKey = serverKey;
+                
+                setLoading(true, 'loginBtn');
+                
+                try {
+                    // Validate server key
+                    const response = await apiCall('/api/validateToken', {
+                        method: 'POST',
+                        body: JSON.stringify({ token: serverKey })
+                    });
+                    
+                    if (response.valid && response.pluginEnabled) {
+                        // Save credentials
+                        sessionStorage.setItem('serverKey', serverKey);
+                        sessionStorage.setItem('apiEndpoint', endpoint);
+                        
+                        // Show dashboard
+                        document.getElementById('login').style.display = 'none';
+                        document.getElementById('header').style.display = 'flex';
+                        document.getElementById('nav-tabs').style.display = 'flex';
+                        document.getElementById('footer').style.display = 'block';
+                        
+                        showTab('dashboard');
+                        showToast('Login successful!', 'success');
+                    } else {
+                        throw new Error(response.error || 'Invalid server key or plugin disabled');
+                    }
+                } catch (error) {
+                    showToast(`Login failed: ${error.message}`, 'error');
+                    console.error('Login error:', error);
+                } finally {
+                    setLoading(false, 'loginBtn');
+                }
+            }
+
+        async function validateAndLogin() {
+            try {
+                const response = await apiCall('/api/validateToken', {
+                    method: 'POST',
+                    body: JSON.stringify({ token: currentServerKey })
+                });
+                
+                if (response.valid && response.pluginEnabled) {
+                    document.getElementById('login').style.display = 'none';
+                    document.getElementById('header').style.display = 'flex';
+                    document.getElementById('nav-tabs').style.display = 'flex';
+                    document.getElementById('footer').style.display = 'block';
+                    showTab('dashboard');
+                }
+            } catch (error) {
+                logout();
+            }
+        }
+
+        function logout() {
+            currentServerKey = '';
+            apiEndpoint = '';
+            
+            // Clear saved credentials
+            sessionStorage.removeItem('serverKey');
+            sessionStorage.removeItem('apiEndpoint');
+            
+            document.getElementById('login').style.display = 'flex';
+            document.getElementById('header').style.display = 'none';
+            document.getElementById('nav-tabs').style.display = 'none';
+            document.getElementById('footer').style.display = 'none';
+            
+            // Clear all dashboards
+            document.querySelectorAll('.dashboard').forEach(tab => {
+                tab.classList.remove('active');
+                tab.style.display = 'none';
+            });
+            
+            showToast('Logged out successfully', 'info');
+        }
+
+        // Tab Management
+        function showTab(tabName) {
+            // Update nav tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Find and activate the clicked tab
+            const tabs = document.querySelectorAll('.nav-tab');
+            tabs.forEach(tab => {
+                if (tab.textContent.toLowerCase().includes(tabName.toLowerCase().replace('-', ' '))) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            // Update dashboard content
+            document.querySelectorAll('.dashboard').forEach(dashboard => {
+                dashboard.classList.remove('active');
+                dashboard.style.display = 'none';
+            });
+            
+            const targetDashboard = document.getElementById(tabName);
+            if (targetDashboard) {
+                targetDashboard.classList.add('active');
+                targetDashboard.style.display = 'block';
+            }
+
+            // Load data for specific tabs
+            switch(tabName) {
+                case 'dashboard':
+                    loadDashboardData();
+                    break;
+                case 'users':
+                    loadUsers();
+                    break;
+                case 'licenses':
+                    loadLicenses();
+                    break;
+                case 'server-keys':
+                    loadServerKeys();
+                    break;
+                case 'analytics':
+                    loadAnalyticsData();
+                    break;
+                case 'system':
+                    loadSystemInfo();
+                    break;
+            }
+        }
+
+        // Dashboard Data Loading
+        async function loadDashboardData() {
+            try {
+                showLoading();
+                const response = await apiCall('/api/stats');
+                
+                // Update stats cards
+                document.getElementById('totalUsers').textContent = response.totalUsers || 0;
+                document.getElementById('loggedInToday').textContent = response.loggedInToday || 0;
+                document.getElementById('newRegistrations').textContent = response.registrationsLast30Days || 0;
+                document.getElementById('activeUsers').textContent = response.activeUsers || 0;
+                document.getElementById('bannedUsers').textContent = response.bannedUsers || 0;
+
+                // Create charts
+                if (response.last24hData) {
+                    createLoginChart24h(response.last24hData);
+                }
+                if (response.registrationData) {
+                    createRegistrationChart(response.registrationData);
+                }
+                if (response.loginHeatmap) {
+                    createLoginHeatmap(response.loginHeatmap);
+                }
+                
+                hideLoading();
+            } catch (error) {
+                hideLoading();
+                showToast(`Failed to load dashboard: ${error.message}`, 'error');
+                console.error('Dashboard load error:', error);
+            }
+        }
+
+        // Users Management
+        async function loadUsers(page = 1) {
+            try {
+                showLoading();
+                const response = await apiCall(`/api/admin/users?page=${page}&limit=50`);
+                userData = response.users || [];
+                
+                const tbody = document.getElementById('usersTableBody');
+                tbody.innerHTML = '';
+
+                userData.forEach(user => {
+                    const row = document.createElement('tr');
+                    const lastLogin = user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : 'Never';
+                    const createdAt = new Date(user.createdAt).toLocaleDateString();
+                    
+                    row.innerHTML = `
+                        <td>${escapeHtml(user.username)}</td>
+                        <td>${escapeHtml(user.email || 'N/A')}</td>
+                        <td>${createdAt}</td>
+                        <td>${lastLogin}</td>
+                        <td>
+                            <span class="status-badge ${user.isBanned ? 'status-banned' : 'status-active'}">
+                                <i class="fas fa-${user.isBanned ? 'ban' : 'check'}"></i>
+                                ${user.isBanned ? 'Banned' : 'Active'}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-warning btn-xs" onclick="showPasswordModal('${escapeHtml(user.username)}')">
+                                    <i class="fas fa-key"></i> Password
+                                </button>
+                                ${user.isBanned ? 
+                                    `<button class="btn btn-success btn-xs" onclick="unbanUser('${escapeHtml(user.username)}')">
+                                        <i class="fas fa-unlock"></i> Unban
+                                    </button>` :
+                                    `<button class="btn btn-warning btn-xs" onclick="showBanModal('${escapeHtml(user.username)}')">
+                                        <i class="fas fa-ban"></i> Ban
+                                    </button>`
+                                }
+                                <button class="btn btn-danger btn-xs" onclick="deleteUser('${escapeHtml(user.username)}')">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+                // Update pagination
+                updatePagination('usersPagination', page, response.totalPages || 1, loadUsers);
+                currentPage = page;
+                
+                hideLoading();
+            } catch (error) {
+                hideLoading();
+                showToast(`Failed to load users: ${error.message}`, 'error');
+                console.error('Users load error:', error);
+            }
+        }
+
+        // License Management
+        async function loadLicenses() {
+            try {
+                showLoading();
+                const response = await apiCall('/api/admin/licenses');
+                licenseData = response || [];
+                
+                const tbody = document.getElementById('licensesTableBody');
+                tbody.innerHTML = '';
+
+                licenseData.forEach(license => {
+                    const row = document.createElement('tr');
+                    const isExpired = new Date(license.validUntil) < new Date();
+                    const validUntil = new Date(license.validUntil).toLocaleDateString();
+                    
+                    row.innerHTML = `
+                        <td style="font-family: monospace; font-size: 12px;">${escapeHtml(license.key)}</td>
+                        <td>
+                            <span class="status-badge ${license.type === 'GLOBAL' ? 'status-active' : 'status-banned'}">
+                                ${license.type}
+                            </span>
+                        </td>
+                        <td>${license.maxServers === -1 ? 'Unlimited' : license.maxServers}</td>
+                        <td>${license.usedServers ? license.usedServers.length : 0}</td>
+                        <td>${validUntil}</td>
+                        <td>
+                            <span class="status-badge ${!isExpired && license.isActive ? 'status-active' : (isExpired ? 'status-expired' : 'status-banned')}">
+                                <i class="fas fa-${!isExpired && license.isActive ? 'check' : 'times'}"></i>
+                                ${!isExpired && license.isActive ? 'Active' : (isExpired ? 'Expired' : 'Inactive')}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-danger btn-xs" onclick="deleteLicense('${escapeHtml(license.key)}')">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+                
+                hideLoading();
+            } catch (error) {
+                hideLoading();
+                showToast(`Failed to load licenses: ${error.message}`, 'error');
+                console.error('Licenses load error:', error);
+            }
+        }
+
+        // Server Keys Management
+        async function loadServerKeys() {
+            try {
+                showLoading();
+                const response = await apiCall('/api/admin/serverKeys');
+                serverKeyData = response || [];
+                
+                const tbody = document.getElementById('serverKeysTableBody');
+                tbody.innerHTML = '';
+
+                serverKeyData.forEach(serverKey => {
+                    const row = document.createElement('tr');
+                    const createdAt = new Date(serverKey.createdAt).toLocaleDateString();
+                    
+                    row.innerHTML = `
+                        <td style="font-family: monospace; font-size: 12px;">${escapeHtml(serverKey.key)}</td>
+                        <td>${escapeHtml(serverKey.name)}</td>
+                        <td>${escapeHtml(serverKey.owner || 'N/A')}</td>
+                        <td>${serverKey.currentUsers || 0}</td>
+                        <td>${serverKey.maxUsers === -1 ? 'Unlimited' : serverKey.maxUsers}</td>
+                        <td>
+                            <span class="status-badge ${serverKey.isActive ? 'status-active' : 'status-banned'}">
+                                <i class="fas fa-${serverKey.isActive ? 'check' : 'times'}"></i>
+                                ${serverKey.isActive ? 'Active' : 'Inactive'}
+                            </span>
+                        </td>
+                        <td>${createdAt}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-danger btn-xs" onclick="deleteServerKey('${escapeHtml(serverKey.key)}')">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+                
+                hideLoading();
+            } catch (error) {
+                hideLoading();
+                showToast(`Failed to load server keys: ${error.message}`, 'error');
+                console.error('Server keys load error:', error);
+            }
+        }
+
+        // Analytics Data Loading
+        async function loadAnalyticsData() {
+            try {
+                showLoading();
+                const response = await apiCall('/api/stats');
+                
+                if (response.last7dData) {
+                    createWeeklyChart(response.last7dData);
+                }
+                if (response.last30dData) {
+                    createMonthlyChart(response.last30dData);
+                }
+                if (response.topCountries) {
+                    createCountriesChart(response.topCountries);
+                }
+                
+                // Create status chart from current data
+                createStatusChart({
+                    activeUsers: response.activeUsers || 0,
+                    bannedUsers: response.bannedUsers || 0
+                });
+                
+                hideLoading();
+            } catch (error) {
+                hideLoading();
+                showToast(`Failed to load analytics: ${error.message}`, 'error');
+                console.error('Analytics load error:', error);
+            }
+        }
+
+        // System Information Loading
+        async function loadSystemInfo() {
+            try {
+                showLoading();
+                const response = await apiCall('/api/system/info');
+                
+                document.getElementById('systemVersion').textContent = response.version || '2.0.0';
+                document.getElementById('totalServers').textContent = response.totalServers || 0;
+                document.getElementById('systemUptime').textContent = formatUptime(response.uptime || 0);
+                document.getElementById('activeLicenses').textContent = response.activeLicenses || 0;
+                document.getElementById('nodeVersion').textContent = response.nodeVersion || 'Unknown';
+                document.getElementById('systemTotalUsers').textContent = response.totalUsers || 0;
+                
+                hideLoading();
+            } catch (error) {
+                hideLoading();
+                showToast(`Failed to load system info: ${error.message}`, 'error');
+                console.error('System info load error:', error);
+            }
+        }
+
+        // User Management Functions
+        function showPasswordModal(username) {
+            document.getElementById('passwordUsername').value = username;
+            document.getElementById('newPassword').value = '';
+            showModal('passwordModal');
+        }
+
+        function showBanModal(username) {
+            document.getElementById('banUsername').value = username;
+            document.getElementById('banMessage').value = '';
+            showModal('banModal');
+        }
+
+        async function changePassword() {
+            const username = document.getElementById('passwordUsername').value;
+            const newPassword = document.getElementById('newPassword').value;
+
+            if (!newPassword) {
+                showToast('Please enter a new password', 'error');
+                return;
+            }
+
+            try {
+                setLoading(true, 'changePasswordBtn');
+                await apiCall('/api/admin/changePassword', {
+                    method: 'POST',
+                    body: JSON.stringify({ username, newPassword })
+                });
+
+                showToast(`Password changed for ${username}`, 'success');
+                closeModal('passwordModal');
+            } catch (error) {
+                showToast(`Failed to change password: ${error.message}`, 'error');
+            } finally {
+                setLoading(false, 'changePasswordBtn');
+            }
+        }
+
+        async function banUser() {
+            const username = document.getElementById('banUsername').value;
+            const banMessage = document.getElementById('banMessage').value;
+
+            try {
+                setLoading(true, 'banUserBtn');
+                await apiCall('/api/admin/banUser', {
+                    method: 'POST',
+                    body: JSON.stringify({ username, banMessage })
+                });
+
+                showToast(`User ${username} banned successfully`, 'success');
+                closeModal('banModal');
+                loadUsers(currentPage);
+                loadDashboardData();
+            } catch (error) {
+                showToast(`Failed to ban user: ${error.message}`, 'error');
+            } finally {
+                setLoading(false, 'banUserBtn');
+            }
+        }
+
+        async function unbanUser(username) {
+            if (!confirm(`Are you sure you want to unban ${username}?`)) return;
+
+            try {
+                await apiCall('/api/admin/unbanUser', {
+                    method: 'POST',
+                    body: JSON.stringify({ username })
+                });
+
+                showToast(`User ${username} unbanned successfully`, 'success');
+                loadUsers(currentPage);
+                loadDashboardData();
+            } catch (error) {
+                showToast(`Failed to unban user: ${error.message}`, 'error');
+            }
+        }
+
+        async function deleteUser(username) {
+            if (!confirm(`Are you sure you want to delete user ${username}? This action cannot be undone.`)) return;
+
+            try {
+                await apiCall('/api/admin/deleteUser', {
+                    method: 'POST',
+                    body: JSON.stringify({ username })
+                });
+
+                showToast(`User ${username} deleted successfully`, 'success');
+                loadUsers(currentPage);
+                loadDashboardData();
+            } catch (error) {
+                showToast(`Failed to delete user: ${error.message}`, 'error');
+            }
+        }
+
+        // License Management Functions
+        function showCreateLicenseModal() {
+            document.getElementById('licenseKey').value = '';
+            document.getElementById('licenseType').value = 'GLOBAL';
+            document.getElementById('maxServers').value = '-1';
+            document.getElementById('createdBy').value = 'admin';
+            
+            // Set default date to 1 year from now
+            const nextYear = new Date();
+            nextYear.setFullYear(nextYear.getFullYear() + 1);
+            document.getElementById('validUntil').value = nextYear.toISOString().split('T')[0];
+            
+            showModal('createLicenseModal');
+        }
+
+        async function createLicense() {
+            const licenseKey = document.getElementById('licenseKey').value.trim();
+            const type = document.getElementById('licenseType').value;
+            const maxServers = parseInt(document.getElementById('maxServers').value);
+            const validUntil = document.getElementById('validUntil').value;
+            const createdBy = document.getElementById('createdBy').value.trim();
+
+            if (!validUntil) {
+                showToast('Please select a valid until date', 'error');
+                return;
+            }
+
+            try {
+                setLoading(true, 'createLicenseBtn');
+                await apiCall('/api/admin/licenses', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        key: licenseKey || undefined,
+                        type,
+                        maxServers,
+                        validUntil,
+                        createdBy
+                    })
+                });
+
+                showToast('License created successfully', 'success');
+                closeModal('createLicenseModal');
+                loadLicenses();
+            } catch (error) {
+                showToast(`Failed to create license: ${error.message}`, 'error');
+            } finally {
+                setLoading(false, 'createLicenseBtn');
+            }
+        }
+
+        async function deleteLicense(licenseKey) {
+            if (!confirm(`Are you sure you want to delete license ${licenseKey}?`)) return;
+
+            try {
+                await apiCall(`/api/admin/licenses/${encodeURIComponent(licenseKey)}`, {
+                    method: 'DELETE'
+                });
+
+                showToast('License deleted successfully', 'success');
+                loadLicenses();
+            } catch (error) {
+                showToast(`Failed to delete license: ${error.message}`, 'error');
+            }
+        }
+
+        // Server Key Management Functions
+        function showCreateServerKeyModal() {
+            document.getElementById('serverKeyInput').value = generateUUID();
+            document.getElementById('serverName').value = '';
+            document.getElementById('serverOwner').value = '';
+            document.getElementById('serverMaxUsers').value = '-1';
+            document.getElementById('serverDescription').value = '';
+            showModal('createServerKeyModal');
+        }
+
+        async function createServerKey() {
+            const key = document.getElementById('serverKeyInput').value.trim();
+            const name = document.getElementById('serverName').value.trim();
+            const owner = document.getElementById('serverOwner').value.trim();
+            const maxUsers = parseInt(document.getElementById('serverMaxUsers').value);
+            const description = document.getElementById('serverDescription').value.trim();
+
+            if (!key || !name) {
+                showToast('Server key and name are required', 'error');
+                return;
+            }
+
+            try {
+                setLoading(true, 'createServerKeyBtn');
+                await apiCall('/api/admin/serverKeys', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        key,
+                        name,
+                        owner,
+                        maxUsers,
+                        description
+                    })
+                });
+
+                showToast('Server key created successfully', 'success');
+                closeModal('createServerKeyModal');
+                loadServerKeys();
+            } catch (error) {
+                showToast(`Failed to create server key: ${error.message}`, 'error');
+            } finally {
+                setLoading(false, 'createServerKeyBtn');
+            }
+        }
+
+        async function deleteServerKey(serverKey) {
+            if (!confirm(`Are you sure you want to delete server key ${serverKey ?? ''}?`)) return;
+
+            try {
+                await apiCall(`/api/admin/serverKeys/${encodeURIComponent(serverKey)}`, {
+                    method: 'DELETE'
+                });
+
+                showToast('Server key deleted successfully', 'success');
+                loadServerKeys();
+            } catch (error) {
+                showToast(`Failed to delete server key: ${error.message}`, 'error');
+            }
+        }
+
+        // Refresh Functions
+        async function refreshUsers() {
+            showToast('Refreshing users...', 'info');
+            await loadUsers(currentPage);
+        }
+
+        async function refreshLicenses() {
+            showToast('Refreshing licenses...', 'info');
+            await loadLicenses();
+        }
+
+        async function refreshServerKeys() {
+            showToast('Refreshing server keys...', 'info');
+            await loadServerKeys();
+        }
+
+        // Chart Creation Functions
+        function createLoginChart24h(data) {
+            const ctx = document.getElementById('loginChart24h');
+            if (!ctx) return;
+            
+            if (charts.login24h) {
+                charts.login24h.destroy();
+            }
+            
+            charts.login24h = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(d => d.period),
+                    datasets: [{
+                        label: 'Logins',
+                        data: data.map(d => d.count),
+                        borderColor: '#6366f1',
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#e2e8f0'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createRegistrationChart(data) {
+            const ctx = document.getElementById('registrationChart');
+            if (!ctx) return;
+            
+            if (charts.registration) {
+                charts.registration.destroy();
+            }
+            
+            charts.registration = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(d => d.period),
+                    datasets: [{
+                        label: 'Registrations',
+                        data: data.map(d => d.count),
+                        backgroundColor: '#10b981',
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#e2e8f0'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createWeeklyChart(data) {
+            const ctx = document.getElementById('weeklyChart');
+            if (!ctx) return;
+            
+            if (charts.weekly) {
+                charts.weekly.destroy();
+            }
+            
+            charts.weekly = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(d => d.period),
+                    datasets: [{
+                        label: 'Logins',
+                        data: data.map(d => d.count),
+                        borderColor: '#8b5cf6',
+                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#e2e8f0'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createMonthlyChart(data) {
+            const ctx = document.getElementById('monthlyChart');
+            if (!ctx) return;
+            
+            if (charts.monthly) {
+                charts.monthly.destroy();
+            }
+            
+            charts.monthly = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(d => d.period),
+                    datasets: [{
+                        label: 'Daily Logins',
+                        data: data.map(d => d.count),
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#e2e8f0'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createCountriesChart(data) {
+            const ctx = document.getElementById('countriesChart');
+            if (!ctx || !data || data.length === 0) return;
+            
+            if (charts.countries) {
+                charts.countries.destroy();
+            }
+            
+            charts.countries = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: data.map(d => d.country),
+                    datasets: [{
+                        data: data.map(d => d.count),
+                        backgroundColor: [
+                            '#6366f1', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444',
+                            '#3b82f6', '#ec4899', '#14b8a6', '#f97316', '#84cc16'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function createStatusChart(data) {
+            const ctx = document.getElementById('statusChart');
+            if (!ctx) return;
+            
+            if (charts.status) {
+                charts.status.destroy();
+            }
+            
+            charts.status = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Active Users', 'Banned Users'],
+                    datasets: [{
+                        data: [data.activeUsers || 0, data.bannedUsers || 0],
+                        backgroundColor: ['#10b981', '#ef4444']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function createLoginHeatmap(data) {
+            const heatmapContainer = document.getElementById('loginHeatmap');
+            if (!heatmapContainer || !data || data.length === 0) return;
+            
+            heatmapContainer.innerHTML = '';
+
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            const maxCount = Math.max(...data.map(d => d.count), 1);
+
+            // Create day labels and cells
+            for (let day = 0; day < 7; day++) {
+                const dayLabel = document.createElement('div');
+                dayLabel.style.gridColumn = '1 / -1';
+                dayLabel.style.textAlign = 'center';
+                dayLabel.style.fontWeight = '600';
+                dayLabel.style.color = 'var(--text-secondary)';
+                dayLabel.style.fontSize = '12px';
+                dayLabel.style.marginBottom = '5px';
+                dayLabel.textContent = days[day];
+                heatmapContainer.appendChild(dayLabel);
+
+                // Create hour cells for this day
+                for (let hour = 0; hour < 24; hour++) {
+                    const cellData = data.find(d => d.day === days[day] && d.hour === hour);
+                    const count = cellData ? cellData.count : 0;
+                    const intensity = count / maxCount;
+                    
+                    const cell = document.createElement('div');
+                    cell.className = 'heatmap-cell';
+                    cell.style.backgroundColor = `rgba(99, 102, 241, ${Math.max(intensity, 0.1)})`;
+                    cell.textContent = count;
+                    cell.title = `${days[day]} ${hour}:00 - ${count} logins`;
+                    
+                    heatmapContainer.appendChild(cell);
+                }
+            }
+        }
+
+        // Utility Functions
+        function showModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        function showLoading() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        function setLoading(loading, buttonId) {
+            const button = document.getElementById(buttonId);
+            if (!button) return;
+            
+            if (loading) {
+                button.disabled = true;
+                const originalContent = button.innerHTML;
+                button.dataset.originalContent = originalContent;
+                button.innerHTML = '<div class="loading"></div> Loading...';
+            } else {
+                button.disabled = false;
+                if (button.dataset.originalContent) {
+                    button.innerHTML = button.dataset.originalContent;
+                }
+            }
+        }
+
+        function updatePagination(containerId, currentPage, totalPages, onPageClick) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            container.innerHTML = '';
+
+            if (totalPages <= 1) return;
+
+            // Previous button
+            const prevBtn = document.createElement('button');
+            prevBtn.textContent = '‹';
+            prevBtn.disabled = currentPage === 1;
+            prevBtn.onclick = () => onPageClick(currentPage - 1);
+            container.appendChild(prevBtn);
+
+            // Page numbers
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(totalPages, currentPage + 2);
+
+            for (let i = startPage; i <= endPage; i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.textContent = i;
+                pageBtn.className = i === currentPage ? 'active' : '';
+                pageBtn.onclick = () => onPageClick(i);
+                container.appendChild(pageBtn);
+            }
+
+            // Next button
+            const nextBtn = document.createElement('button');
+            nextBtn.textContent = '›';
+            nextBtn.disabled = currentPage === totalPages;
+            nextBtn.onclick = () => onPageClick(currentPage + 1);
+            container.appendChild(nextBtn);
+        }
+
+        function formatUptime(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            
+            if (hours > 24) {
+                const days = Math.floor(hours / 24);
+                return `${days}d ${hours % 24}h`;
+            }
+            
+            return `${hours}h ${minutes}m`;
+        }
+
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Event Listeners
+        document.getElementById('serverKey').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                login();
+            }
+        });
+
+        document.getElementById('apiEndpoint').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                login();
+            }
+        });
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+
+        // Handle tab navigation with keyboard
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                const tabMap = {
+                    '1': 'dashboard',
+                    '2': 'users', 
+                    '3': 'licenses',
+                    '4': 'server-keys',
+                    '5': 'analytics',
+                    '6': 'system'
+                };
+                
+                if (tabMap[e.key]) {
+                    e.preventDefault();
+                    showTab(tabMap[e.key]);
+                    
+                    // Update active nav tab
+                    document.querySelectorAll('.nav-tab').forEach((tab, index) => {
+                        tab.classList.toggle('active', index === parseInt(e.key) - 1);
+                    });
+                }
+            }
+        });
+
+        // Initialize application
+        console.log('AdvanceAuth Admin Panel v2.0.0 - Live API Mode');
+        console.log('Developed by DEVELOPER.RS (Rishabh) for Zenuxs');
+        console.log('Visit: https://rs.zenuxs.xyz');
+    </script>
+</body>
+</html>
