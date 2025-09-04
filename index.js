@@ -370,6 +370,7 @@ app.post('/api/checkUser', checkServerKey, async (req, res) => {
 });
 
 // Register endpoint - FIXED LICENSE LOGIC
+// Register endpoint - FIXED LICENSE LOGIC
 app.post('/api/register', checkServerKey, async (req, res) => {
     try {
         const { username, email, password, licenseKey } = req.body;
@@ -379,13 +380,13 @@ app.post('/api/register', checkServerKey, async (req, res) => {
             return res.status(400).json({ error: 'Username and password are required' });
         }
         
-        // Check if user already exists
+        // Check if user already exists for this specific server
         const existingUser = await User.findOne({ username, serverKey });
         
         if (existingUser) {
             return res.status(400).json({ 
-                error: 'User already exists, please use /login instead',
-                code: 'USER_EXISTS'
+                error: 'Username already taken for this server',
+                code: 'USERNAME_TAKEN'
             });
         }
         
@@ -443,13 +444,13 @@ app.post('/api/register', checkServerKey, async (req, res) => {
     } catch (error) {
         console.error('Registration error:', error);
         if (error.code === 11000) {
+            // This handles the case where there's a unique index violation
             res.status(400).json({ error: 'Username already taken for this server' });
         } else {
             res.status(500).json({ error: 'Registration failed' });
         }
     }
 });
-
 // Login endpoint
 app.post('/api/login', checkServerKey, async (req, res) => {
     try {
