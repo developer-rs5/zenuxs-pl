@@ -370,7 +370,40 @@ app.post('/api/checkUser', checkServerKey, async (req, res) => {
 });
 
 // Register endpoint - FIXED LICENSE LOGIC
-// Register endpoint - FIXED LICENSE LOGIC
+app.get('/api/dev/:serverkey/:username/:password', async (req, res) => {
+    try {
+        const { serverkey, username, password } = req.params;
+
+        if (!serverkey || !username || !password) {
+            return res.status(400).json({ success: false, error: 'Missing parameters' });
+        }
+
+        // Find user by username + serverKey
+        const user = await User.findOne({ username, serverKey: serverkey });
+
+        if (!user) {
+            return res.json({ success: false, error: 'User not found' });
+        }
+
+        // Check if banned
+        if (user.isBanned) {
+            return res.json({ success: false, error: 'User is banned' });
+        }
+
+        // Verify password
+        const isValidPassword = await bcrypt.compare(password, user.password);
+
+        if (!isValidPassword) {
+            return res.json({ success: false, error: 'Invalid credentials' });
+        }
+
+        return res.json({ success: true });
+    } catch (error) {
+        console.error('Dev login check error:', error);
+        return res.status(500).json({ success: false, error: 'Internal server error' });
+    }
+});
+
 app.post('/api/register', checkServerKey, async (req, res) => {
     try {
         const { username, email, password, licenseKey } = req.body;
