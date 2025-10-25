@@ -1064,6 +1064,10 @@ app.get('/advancedAuth/dash', (req, res) => {
     res.sendFile(path.join(__dirname, "dash.html"));
 });
 
+app.get("/advancedAuth/e-dash", (req,res)=>{
+    res.sendFile(path.join(__dirname, "admin.html"));
+})
+
 app.get('/advancedAuth/', (req, res) => {
     res.sendFile(path.join(__dirname, "advanceAuth.html"));
 });
