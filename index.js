@@ -723,7 +723,6 @@ async function getTopCountries(serverKey) {
         .slice(0, 10);
 }
 
-app.use("/plugins", express.static("plugins"));
 
 // Admin endpoints
 app.get('/api/admin/users', checkServerKey, async (req, res) => {
@@ -1058,6 +1057,7 @@ async function initializeApp() {
 // Serve admin panel
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/images', express.static(path.join(__dirname, 'images')));
+app.use('/plugins', express.static(path.join(__dirname, 'plugins')));
 
 
 app.get('/advancedAuth/dash', (req, res) => {
