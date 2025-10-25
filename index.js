@@ -723,7 +723,7 @@ async function getTopCountries(serverKey) {
         .slice(0, 10);
 }
 
-app.use("/plugin", express.static("plugin"));
+app.use("/plugins", express.static("plugins"));
 
 // Admin endpoints
 app.get('/api/admin/users', checkServerKey, async (req, res) => {
