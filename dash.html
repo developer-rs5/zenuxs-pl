@@ -3,10 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AdvanceAuth Admin Panel - Zenuxs</title>
+    
+    <!-- SEO Meta Tags -->
+    <title>AdvanceAuth Admin Panel - Advanced Authentication System by Zenuxs</title>
+    <meta name="description" content="Professional admin dashboard for AdvanceAuth - Manage users, monitor analytics, and control authentication systems. Built by DEVELOPER.RS (Rishabh) for Zenuxs Network.">
+    <meta name="keywords" content="AdvanceAuth, Admin Panel, User Management, Authentication System, Zenuxs, Minecraft Authentication, Server Management">
+    <meta name="author" content="DEVELOPER.RS (Rishabh) - Zenuxs">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="AdvanceAuth Admin Panel - Zenuxs">
+    <meta property="og:description" content="Advanced authentication and user management system for Minecraft servers">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Zenuxs Network">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="AdvanceAuth Admin Panel">
+    <meta name="twitter:description" content="Professional authentication management dashboard">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://plugins.zenuxs.xyz/admin">
+    
+    <!-- Preconnect for Performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    
+    <!-- Stylesheets -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Defer Chart.js loading -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    
+    <!-- Schema.org Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "AdvanceAuth Admin Panel",
+      "applicationCategory": "SecurityApplication",
+      "operatingSystem": "Web",
+      "offers": {
+        "@type": "Offer",
+        "price": "0"
+      },
+      "creator": {
+        "@type": "Organization",
+        "name": "Zenuxs",
+        "url": "https://rs.zenuxs.xyz"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "DEVELOPER.RS (Rishabh)"
+      }
+    }
+    </script>
+    
     <style>
         :root {
             --primary: #6366f1;
@@ -368,10 +423,31 @@
             transition: all 0.3s;
             position: relative;
             height: 350px;
+            min-height: 350px;
         }
         
         .chart-container:hover {
             box-shadow: var(--shadow-lg);
+        }
+        
+        .chart-loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 280px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .chart-loading .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--light-gray);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
         }
         
         .chart-header {
@@ -761,7 +837,6 @@
                     <input type="text" id="serverKey" class="form-control" placeholder="Enter your server key">
                 </div>
                 <div class="form-group">
-                    <!-- <label for="apiEndpoint"><i class="fas fa-server"></i> API Endpoint</label> -->
                     <input type="hidden" id="apiEndpoint" class="form-control" placeholder="https://your-api-server.com" value="https://plugins.zenuxs.xyz">
                 </div>
                 <button onclick="login()" class="btn" style="width: 100%;" id="loginBtn">
@@ -951,6 +1026,7 @@
                 </div>
             </div>
         </div>
+
         <!-- Analytics Tab -->
         <div id="analytics" class="dashboard">
             <div class="charts-grid">
@@ -1136,7 +1212,6 @@
         </div>
     </div>
 
-    
     <!-- Toast Container -->
     <div id="toast" class="toast"></div>
 
@@ -1147,10 +1222,7 @@
         let currentPage = 1;
         let charts = {};
         let userData = [];
-        let licenseData = [];
-        let serverKeyData = [];
-
-        
+        let loadedTabs = {}; // Track which tabs have been loaded
 
         // Initialize on page load
         window.addEventListener('load', () => {
@@ -1211,56 +1283,56 @@
             }
         }
 
-            // Authentication Functions
-            async function login() {
-                const serverKey = document.getElementById('serverKey').value.trim();
-                const endpoint = document.getElementById('apiEndpoint').value.trim();
-                
-                if (!serverKey) {
-                    showToast('Please enter a server key', 'error');
-                    return;
-                }
-                
-                if (!endpoint) {
-                    showToast('Please enter API endpoint', 'error');
-                    return;
-                }
-
-                apiEndpoint = endpoint;
-                currentServerKey = serverKey;
-                
-                setLoading(true, 'loginBtn');
-                
-                try {
-                    // Validate server key
-                    const response = await apiCall('/api/validateToken', {
-                        method: 'POST',
-                        body: JSON.stringify({ token: serverKey })
-                    });
-                    
-                    if (response.valid && response.pluginEnabled) {
-                        // Save credentials
-                        sessionStorage.setItem('serverKey', serverKey);
-                        sessionStorage.setItem('apiEndpoint', endpoint);
-                        
-                        // Show dashboard
-                        document.getElementById('login').style.display = 'none';
-                        document.getElementById('header').style.display = 'flex';
-                        document.getElementById('nav-tabs').style.display = 'flex';
-                        document.getElementById('footer').style.display = 'block';
-                        
-                        showTab('dashboard');
-                        showToast('Login successful!', 'success');
-                    } else {
-                        throw new Error(response.error || 'Invalid server key or plugin disabled');
-                    }
-                } catch (error) {
-                    showToast(`Login failed: ${error.message}`, 'error');
-                    console.error('Login error:', error);
-                } finally {
-                    setLoading(false, 'loginBtn');
-                }
+        // Authentication Functions
+        async function login() {
+            const serverKey = document.getElementById('serverKey').value.trim();
+            const endpoint = document.getElementById('apiEndpoint').value.trim();
+            
+            if (!serverKey) {
+                showToast('Please enter a server key', 'error');
+                return;
             }
+            
+            if (!endpoint) {
+                showToast('Please enter API endpoint', 'error');
+                return;
+            }
+
+            apiEndpoint = endpoint;
+            currentServerKey = serverKey;
+            
+            setLoading(true, 'loginBtn');
+            
+            try {
+                // Validate server key
+                const response = await apiCall('/api/validateToken', {
+                    method: 'POST',
+                    body: JSON.stringify({ token: serverKey })
+                });
+                
+                if (response.valid && response.pluginEnabled) {
+                    // Save credentials
+                    sessionStorage.setItem('serverKey', serverKey);
+                    sessionStorage.setItem('apiEndpoint', endpoint);
+                    
+                    // Show dashboard
+                    document.getElementById('login').style.display = 'none';
+                    document.getElementById('header').style.display = 'flex';
+                    document.getElementById('nav-tabs').style.display = 'flex';
+                    document.getElementById('footer').style.display = 'block';
+                    
+                    showTab('dashboard');
+                    showToast('Login successful!', 'success');
+                } else {
+                    throw new Error(response.error || 'Invalid server key or plugin disabled');
+                }
+            } catch (error) {
+                showToast(`Login failed: ${error.message}`, 'error');
+                console.error('Login error:', error);
+            } finally {
+                setLoading(false, 'loginBtn');
+            }
+        }
 
         async function validateAndLogin() {
             try {
@@ -1330,50 +1402,56 @@
                 targetDashboard.style.display = 'block';
             }
 
-            // Load data for specific tabs
-            switch(tabName) {
-                case 'dashboard':
-                    loadDashboardData();
-                    break;
-                case 'users':
-                    loadUsers();
-                    break;
-                case 'analytics':
-                    loadAnalyticsData();
-                    break;
-                case 'system':
-                    loadSystemInfo();
-                    break;
+            // Load data only once per tab, and do it asynchronously
+            if (!loadedTabs[tabName]) {
+                loadedTabs[tabName] = true;
+                
+                setTimeout(() => {
+                    switch(tabName) {
+                        case 'dashboard':
+                            loadDashboardData();
+                            break;
+                        case 'users':
+                            loadUsers();
+                            break;
+                        case 'analytics':
+                            loadAnalyticsData();
+                            break;
+                        case 'system':
+                            loadSystemInfo();
+                            break;
+                    }
+                }, 50);
             }
         }
 
         // Dashboard Data Loading
         async function loadDashboardData() {
             try {
-                showLoading();
+                // Don't show loading overlay - let page be interactive
                 const response = await apiCall('/api/stats');
                 
-                // Update stats cards
+                // Update stats cards immediately
                 document.getElementById('totalUsers').textContent = response.totalUsers || 0;
                 document.getElementById('loggedInToday').textContent = response.loggedInToday || 0;
                 document.getElementById('newRegistrations').textContent = response.registrationsLast30Days || 0;
                 document.getElementById('activeUsers').textContent = response.activeUsers || 0;
                 document.getElementById('bannedUsers').textContent = response.bannedUsers || 0;
 
-                // Create charts
+                // Load charts asynchronously with longer delays
                 if (response.last24hData) {
-                    createLoginChart24h(response.last24hData);
-                }
-                if (response.registrationData) {
-                    createRegistrationChart(response.registrationData);
-                }
-                if (response.loginHeatmap) {
-                    createLoginHeatmap(response.loginHeatmap);
+                    setTimeout(() => createLoginChart24h(response.last24hData), 500);
                 }
                 
-                hideLoading();
+                if (response.registrationData) {
+                    setTimeout(() => createRegistrationChart(response.registrationData), 1000);
+                }
+                
+                if (response.loginHeatmap) {
+                    setTimeout(() => createLoginHeatmap(response.loginHeatmap), 1500);
+                }
+                
             } catch (error) {
-                hideLoading();
                 showToast(`Failed to load dashboard: ${error.message}`, 'error');
                 console.error('Dashboard load error:', error);
             }
@@ -1382,7 +1460,6 @@
         // Users Management
         async function loadUsers(page = 1) {
             try {
-                showLoading();
                 const response = await apiCall(`/api/admin/users?page=${page}&limit=50`);
                 userData = response.users || [];
                 
@@ -1431,135 +1508,38 @@
                 updatePagination('usersPagination', page, response.totalPages || 1, loadUsers);
                 currentPage = page;
                 
-                hideLoading();
             } catch (error) {
-                hideLoading();
                 showToast(`Failed to load users: ${error.message}`, 'error');
                 console.error('Users load error:', error);
-            }
-        }
-
-        // License Management
-        async function loadLicenses() {
-            try {
-                showLoading();
-                const response = await apiCall('/api/admin/licenses');
-                licenseData = response || [];
-                
-                const tbody = document.getElementById('licensesTableBody');
-                tbody.innerHTML = '';
-
-                licenseData.forEach(license => {
-                    const row = document.createElement('tr');
-                    const isExpired = new Date(license.validUntil) < new Date();
-                    const validUntil = new Date(license.validUntil).toLocaleDateString();
-                    
-                    row.innerHTML = `
-                        <td style="font-family: monospace; font-size: 12px;">${escapeHtml(license.key)}</td>
-                        <td>
-                            <span class="status-badge ${license.type === 'GLOBAL' ? 'status-active' : 'status-banned'}">
-                                ${license.type}
-                            </span>
-                        </td>
-                        <td>${license.maxServers === -1 ? 'Unlimited' : license.maxServers}</td>
-                        <td>${license.usedServers ? license.usedServers.length : 0}</td>
-                        <td>${validUntil}</td>
-                        <td>
-                            <span class="status-badge ${!isExpired && license.isActive ? 'status-active' : (isExpired ? 'status-expired' : 'status-banned')}">
-                                <i class="fas fa-${!isExpired && license.isActive ? 'check' : 'times'}"></i>
-                                ${!isExpired && license.isActive ? 'Active' : (isExpired ? 'Expired' : 'Inactive')}
-                            </span>
-                        </td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn btn-danger btn-xs" onclick="deleteLicense('${escapeHtml(license.key)}')">
-                                    <i class="fas fa-trash"></i> Delete
-                                </button>
-                            </div>
-                        </td>
-                    `;
-                    tbody.appendChild(row);
-                });
-                
-                hideLoading();
-            } catch (error) {
-                hideLoading();
-                showToast(`Failed to load licenses: ${error.message}`, 'error');
-                console.error('Licenses load error:', error);
-            }
-        }
-
-        // Server Keys Management
-        async function loadServerKeys() {
-            try {
-                showLoading();
-                const response = await apiCall('/api/admin/serverKeys');
-                serverKeyData = response || [];
-                
-                const tbody = document.getElementById('serverKeysTableBody');
-                tbody.innerHTML = '';
-
-                serverKeyData.forEach(serverKey => {
-                    const row = document.createElement('tr');
-                    const createdAt = new Date(serverKey.createdAt).toLocaleDateString();
-                    
-                    row.innerHTML = `
-                        <td style="font-family: monospace; font-size: 12px;">${escapeHtml(serverKey.key)}</td>
-                        <td>${escapeHtml(serverKey.name)}</td>
-                        <td>${escapeHtml(serverKey.owner || 'N/A')}</td>
-                        <td>${serverKey.currentUsers || 0}</td>
-                        <td>${serverKey.maxUsers === -1 ? 'Unlimited' : serverKey.maxUsers}</td>
-                        <td>
-                            <span class="status-badge ${serverKey.isActive ? 'status-active' : 'status-banned'}">
-                                <i class="fas fa-${serverKey.isActive ? 'check' : 'times'}"></i>
-                                ${serverKey.isActive ? 'Active' : 'Inactive'}
-                            </span>
-                        </td>
-                        <td>${createdAt}</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn btn-danger btn-xs" onclick="deleteServerKey('${escapeHtml(serverKey.key)}')">
-                                    <i class="fas fa-trash"></i> Delete
-                                </button>
-                            </div>
-                        </td>
-                    `;
-                    tbody.appendChild(row);
-                });
-                
-                hideLoading();
-            } catch (error) {
-                hideLoading();
-                showToast(`Failed to load server keys: ${error.message}`, 'error');
-                console.error('Server keys load error:', error);
             }
         }
 
         // Analytics Data Loading
         async function loadAnalyticsData() {
             try {
-                showLoading();
                 const response = await apiCall('/api/stats');
                 
+                // Load charts asynchronously with longer delays
                 if (response.last7dData) {
-                    createWeeklyChart(response.last7dData);
+                    setTimeout(() => createWeeklyChart(response.last7dData), 500);
                 }
+                
                 if (response.last30dData) {
-                    createMonthlyChart(response.last30dData);
+                    setTimeout(() => createMonthlyChart(response.last30dData), 1000);
                 }
+                
                 if (response.topCountries) {
-                    createCountriesChart(response.topCountries);
+                    setTimeout(() => createCountriesChart(response.topCountries), 1500);
                 }
                 
-                // Create status chart from current data
-                createStatusChart({
-                    activeUsers: response.activeUsers || 0,
-                    bannedUsers: response.bannedUsers || 0
-                });
+                setTimeout(() => {
+                    createStatusChart({
+                        activeUsers: response.activeUsers || 0,
+                        bannedUsers: response.bannedUsers || 0
+                    });
+                }, 2000);
                 
-                hideLoading();
             } catch (error) {
-                hideLoading();
                 showToast(`Failed to load analytics: ${error.message}`, 'error');
                 console.error('Analytics load error:', error);
             }
@@ -1568,7 +1548,6 @@
         // System Information Loading
         async function loadSystemInfo() {
             try {
-                showLoading();
                 const response = await apiCall('/api/system/info');
                 
                 document.getElementById('systemVersion').textContent = response.version || '2.0.0';
@@ -1578,9 +1557,7 @@
                 document.getElementById('nodeVersion').textContent = response.nodeVersion || 'Unknown';
                 document.getElementById('systemTotalUsers').textContent = response.totalUsers || 0;
                 
-                hideLoading();
             } catch (error) {
-                hideLoading();
                 showToast(`Failed to load system info: ${error.message}`, 'error');
                 console.error('System info load error:', error);
             }
@@ -1609,7 +1586,6 @@
             }
 
             try {
-                setLoading(true, 'changePasswordBtn');
                 await apiCall('/api/admin/changePassword', {
                     method: 'POST',
                     body: JSON.stringify({ username, newPassword })
@@ -1619,8 +1595,6 @@
                 closeModal('passwordModal');
             } catch (error) {
                 showToast(`Failed to change password: ${error.message}`, 'error');
-            } finally {
-                setLoading(false, 'changePasswordBtn');
             }
         }
 
@@ -1629,7 +1603,6 @@
             const banMessage = document.getElementById('banMessage').value;
 
             try {
-                setLoading(true, 'banUserBtn');
                 await apiCall('/api/admin/banUser', {
                     method: 'POST',
                     body: JSON.stringify({ username, banMessage })
@@ -1641,8 +1614,6 @@
                 loadDashboardData();
             } catch (error) {
                 showToast(`Failed to ban user: ${error.message}`, 'error');
-            } finally {
-                setLoading(false, 'banUserBtn');
             }
         }
 
@@ -1680,145 +1651,11 @@
             }
         }
 
-        // License Management Functions
-        function showCreateLicenseModal() {
-            document.getElementById('licenseKey').value = '';
-            document.getElementById('licenseType').value = 'GLOBAL';
-            document.getElementById('maxServers').value = '-1';
-            document.getElementById('createdBy').value = 'admin';
-            
-            // Set default date to 1 year from now
-            const nextYear = new Date();
-            nextYear.setFullYear(nextYear.getFullYear() + 1);
-            document.getElementById('validUntil').value = nextYear.toISOString().split('T')[0];
-            
-            showModal('createLicenseModal');
-        }
-
-        async function createLicense() {
-            const licenseKey = document.getElementById('licenseKey').value.trim();
-            const type = document.getElementById('licenseType').value;
-            const maxServers = parseInt(document.getElementById('maxServers').value);
-            const validUntil = document.getElementById('validUntil').value;
-            const createdBy = document.getElementById('createdBy').value.trim();
-
-            if (!validUntil) {
-                showToast('Please select a valid until date', 'error');
-                return;
-            }
-
-            try {
-                setLoading(true, 'createLicenseBtn');
-                await apiCall('/api/admin/licenses', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        key: licenseKey || undefined,
-                        type,
-                        maxServers,
-                        validUntil,
-                        createdBy
-                    })
-                });
-
-                showToast('License created successfully', 'success');
-                closeModal('createLicenseModal');
-                loadLicenses();
-            } catch (error) {
-                showToast(`Failed to create license: ${error.message}`, 'error');
-            } finally {
-                setLoading(false, 'createLicenseBtn');
-            }
-        }
-
-        async function deleteLicense(licenseKey) {
-            if (!confirm(`Are you sure you want to delete license ${licenseKey}?`)) return;
-
-            try {
-                await apiCall(`/api/admin/licenses/${encodeURIComponent(licenseKey)}`, {
-                    method: 'DELETE'
-                });
-
-                showToast('License deleted successfully', 'success');
-                loadLicenses();
-            } catch (error) {
-                showToast(`Failed to delete license: ${error.message}`, 'error');
-            }
-        }
-
-        // Server Key Management Functions
-        function showCreateServerKeyModal() {
-            document.getElementById('serverKeyInput').value = generateUUID();
-            document.getElementById('serverName').value = '';
-            document.getElementById('serverOwner').value = '';
-            document.getElementById('serverMaxUsers').value = '-1';
-            document.getElementById('serverDescription').value = '';
-            showModal('createServerKeyModal');
-        }
-
-        async function createServerKey() {
-            const key = document.getElementById('serverKeyInput').value.trim();
-            const name = document.getElementById('serverName').value.trim();
-            const owner = document.getElementById('serverOwner').value.trim();
-            const maxUsers = parseInt(document.getElementById('serverMaxUsers').value);
-            const description = document.getElementById('serverDescription').value.trim();
-
-            if (!key || !name) {
-                showToast('Server key and name are required', 'error');
-                return;
-            }
-
-            try {
-                setLoading(true, 'createServerKeyBtn');
-                await apiCall('/api/admin/serverKeys', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        key,
-                        name,
-                        owner,
-                        maxUsers,
-                        description
-                    })
-                });
-
-                showToast('Server key created successfully', 'success');
-                closeModal('createServerKeyModal');
-                loadServerKeys();
-            } catch (error) {
-                showToast(`Failed to create server key: ${error.message}`, 'error');
-            } finally {
-                setLoading(false, 'createServerKeyBtn');
-            }
-        }
-
-        async function deleteServerKey(serverKey) {
-            if (!confirm(`Are you sure you want to delete server key ${serverKey ?? ''}?`)) return;
-
-            try {
-                await apiCall(`/api/admin/serverKeys/${encodeURIComponent(serverKey)}`, {
-                    method: 'DELETE'
-                });
-
-                showToast('Server key deleted successfully', 'success');
-                loadServerKeys();
-            } catch (error) {
-                showToast(`Failed to delete server key: ${error.message}`, 'error');
-            }
-        }
-
         // Refresh Functions
         async function refreshUsers() {
             showToast('Refreshing users...', 'info');
+            loadedTabs['users'] = false; // Mark as not loaded to force refresh
             await loadUsers(currentPage);
-        }
-
-        async function refreshLicenses() {
-            showToast('Refreshing licenses...', 'info');
-            await loadLicenses();
-        }
-
-        async function refreshServerKeys() {
-            showToast('Refreshing server keys...', 'info');
-            await loadServerKeys();
         }
 
         // Chart Creation Functions
@@ -1826,243 +1663,360 @@
             const ctx = document.getElementById('loginChart24h');
             if (!ctx) return;
             
-            if (charts.login24h) {
-                charts.login24h.destroy();
-            }
+            // Show loading state
+            const chartContainer = ctx.parentElement.parentElement;
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'chart-loading';
+            loadingDiv.innerHTML = '<div class="spinner"></div><span>Loading chart...</span>';
+            chartContainer.appendChild(loadingDiv);
             
-            charts.login24h = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: data.map(d => d.period),
-                    datasets: [{
-                        label: 'Logins',
-                        data: data.map(d => d.count),
-                        borderColor: '#6366f1',
-                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
+            // Wait for Chart.js to be available
+            const initChart = () => {
+                if (typeof Chart === 'undefined') {
+                    setTimeout(initChart, 100);
+                    return;
+                }
+                
+                if (charts.login24h) {
+                    charts.login24h.destroy();
+                }
+                
+                charts.login24h = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(d => d.period),
+                        datasets: [{
+                            label: 'Logins',
+                            data: data.map(d => d.count),
+                            borderColor: '#6366f1',
+                            backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
                     },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: '#e2e8f0'
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
                             }
                         },
-                        x: {
-                            grid: {
-                                display: false
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: '#e2e8f0'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
                             }
                         }
                     }
+                });
+                
+                // Remove loading state
+                if (loadingDiv && loadingDiv.parentElement) {
+                    loadingDiv.remove();
                 }
-            });
+            };
+            
+            initChart();
         }
 
         function createRegistrationChart(data) {
             const ctx = document.getElementById('registrationChart');
             if (!ctx) return;
             
-            if (charts.registration) {
-                charts.registration.destroy();
-            }
+            const chartContainer = ctx.parentElement.parentElement;
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'chart-loading';
+            loadingDiv.innerHTML = '<div class="spinner"></div><span>Loading chart...</span>';
+            chartContainer.appendChild(loadingDiv);
             
-            charts.registration = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: data.map(d => d.period),
-                    datasets: [{
-                        label: 'Registrations',
-                        data: data.map(d => d.count),
-                        backgroundColor: '#10b981',
-                        borderRadius: 8
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
+            const initChart = () => {
+                if (typeof Chart === 'undefined') {
+                    setTimeout(initChart, 100);
+                    return;
+                }
+                
+                if (charts.registration) {
+                    charts.registration.destroy();
+                }
+                
+                charts.registration = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.map(d => d.period),
+                        datasets: [{
+                            label: 'Registrations',
+                            data: data.map(d => d.count),
+                            backgroundColor: '#10b981',
+                            borderRadius: 8
+                        }]
                     },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: '#e2e8f0'
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
                             }
                         },
-                        x: {
-                            grid: {
-                                display: false
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: '#e2e8f0'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
                             }
                         }
                     }
+                });
+                
+                if (loadingDiv && loadingDiv.parentElement) {
+                    loadingDiv.remove();
                 }
-            });
+            };
+            
+            initChart();
         }
 
         function createWeeklyChart(data) {
             const ctx = document.getElementById('weeklyChart');
             if (!ctx) return;
             
-            if (charts.weekly) {
-                charts.weekly.destroy();
-            }
+            const chartContainer = ctx.parentElement.parentElement;
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'chart-loading';
+            loadingDiv.innerHTML = '<div class="spinner"></div><span>Loading chart...</span>';
+            chartContainer.appendChild(loadingDiv);
             
-            charts.weekly = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: data.map(d => d.period),
-                    datasets: [{
-                        label: 'Logins',
-                        data: data.map(d => d.count),
-                        borderColor: '#8b5cf6',
-                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
+            const initChart = () => {
+                if (typeof Chart === 'undefined') {
+                    setTimeout(initChart, 100);
+                    return;
+                }
+                
+                if (charts.weekly) {
+                    charts.weekly.destroy();
+                }
+                
+                charts.weekly = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(d => d.period),
+                        datasets: [{
+                            label: 'Logins',
+                            data: data.map(d => d.count),
+                            borderColor: '#8b5cf6',
+                            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
                     },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: '#e2e8f0'
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
                             }
                         },
-                        x: {
-                            grid: {
-                                display: false
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: '#e2e8f0'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
                             }
                         }
                     }
+                });
+                
+                if (loadingDiv && loadingDiv.parentElement) {
+                    loadingDiv.remove();
                 }
-            });
+            };
+            
+            initChart();
         }
 
         function createMonthlyChart(data) {
             const ctx = document.getElementById('monthlyChart');
             if (!ctx) return;
             
-            if (charts.monthly) {
-                charts.monthly.destroy();
-            }
+            const chartContainer = ctx.parentElement.parentElement;
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'chart-loading';
+            loadingDiv.innerHTML = '<div class="spinner"></div><span>Loading chart...</span>';
+            chartContainer.appendChild(loadingDiv);
             
-            charts.monthly = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: data.map(d => d.period),
-                    datasets: [{
-                        label: 'Daily Logins',
-                        data: data.map(d => d.count),
-                        borderColor: '#f59e0b',
-                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
+            const initChart = () => {
+                if (typeof Chart === 'undefined') {
+                    setTimeout(initChart, 100);
+                    return;
+                }
+                
+                if (charts.monthly) {
+                    charts.monthly.destroy();
+                }
+                
+                charts.monthly = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(d => d.period),
+                        datasets: [{
+                            label: 'Daily Logins',
+                            data: data.map(d => d.count),
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
                     },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: '#e2e8f0'
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
                             }
                         },
-                        x: {
-                            grid: {
-                                display: false
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: '#e2e8f0'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
                             }
                         }
                     }
+                });
+                
+                if (loadingDiv && loadingDiv.parentElement) {
+                    loadingDiv.remove();
                 }
-            });
+            };
+            
+            initChart();
         }
 
         function createCountriesChart(data) {
             const ctx = document.getElementById('countriesChart');
             if (!ctx || !data || data.length === 0) return;
             
-            if (charts.countries) {
-                charts.countries.destroy();
-            }
+            const chartContainer = ctx.parentElement.parentElement;
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'chart-loading';
+            loadingDiv.innerHTML = '<div class="spinner"></div><span>Loading chart...</span>';
+            chartContainer.appendChild(loadingDiv);
             
-            charts.countries = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: data.map(d => d.country),
-                    datasets: [{
-                        data: data.map(d => d.count),
-                        backgroundColor: [
-                            '#6366f1', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444',
-                            '#3b82f6', '#ec4899', '#14b8a6', '#f97316', '#84cc16'
-                        ]
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
+            const initChart = () => {
+                if (typeof Chart === 'undefined') {
+                    setTimeout(initChart, 100);
+                    return;
+                }
+                
+                if (charts.countries) {
+                    charts.countries.destroy();
+                }
+                
+                charts.countries = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: data.map(d => d.country),
+                        datasets: [{
+                            data: data.map(d => d.count),
+                            backgroundColor: [
+                                '#6366f1', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444',
+                                '#3b82f6', '#ec4899', '#14b8a6', '#f97316', '#84cc16'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
                         }
                     }
+                });
+                
+                if (loadingDiv && loadingDiv.parentElement) {
+                    loadingDiv.remove();
                 }
-            });
+            };
+            
+            initChart();
         }
 
         function createStatusChart(data) {
             const ctx = document.getElementById('statusChart');
             if (!ctx) return;
             
-            if (charts.status) {
-                charts.status.destroy();
-            }
+            const chartContainer = ctx.parentElement.parentElement;
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'chart-loading';
+            loadingDiv.innerHTML = '<div class="spinner"></div><span>Loading chart...</span>';
+            chartContainer.appendChild(loadingDiv);
             
-            charts.status = new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: ['Active Users', 'Banned Users'],
-                    datasets: [{
-                        data: [data.activeUsers || 0, data.bannedUsers || 0],
-                        backgroundColor: ['#10b981', '#ef4444']
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
+            const initChart = () => {
+                if (typeof Chart === 'undefined') {
+                    setTimeout(initChart, 100);
+                    return;
+                }
+                
+                if (charts.status) {
+                    charts.status.destroy();
+                }
+                
+                charts.status = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Active Users', 'Banned Users'],
+                        datasets: [{
+                            data: [data.activeUsers || 0, data.bannedUsers || 0],
+                            backgroundColor: ['#10b981', '#ef4444']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
                         }
                     }
+                });
+                
+                if (loadingDiv && loadingDiv.parentElement) {
+                    loadingDiv.remove();
                 }
-            });
+            };
+            
+            initChart();
         }
 
         function createLoginHeatmap(data) {
@@ -2194,14 +2148,6 @@
             return `${hours}h ${minutes}m`;
         }
 
-        function generateUUID() {
-            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                const r = Math.random() * 16 | 0;
-                const v = c == 'x' ? r : (r & 0x3 | 0x8);
-                return v.toString(16);
-            });
-        }
-
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
@@ -2234,10 +2180,8 @@
                 const tabMap = {
                     '1': 'dashboard',
                     '2': 'users', 
-                    '3': 'licenses',
-                    '4': 'server-keys',
-                    '5': 'analytics',
-                    '6': 'system'
+                    '3': 'analytics',
+                    '4': 'system'
                 };
                 
                 if (tabMap[e.key]) {
@@ -2253,7 +2197,7 @@
         });
 
         // Initialize application
-        console.log('AdvanceAuth Admin Panel v2.0.0 - Live API Mode');
+        console.log('AdvanceAuth Admin Panel v2.0.0 - Optimized with Async Loading');
         console.log('Developed by DEVELOPER.RS (Rishabh) for Zenuxs');
         console.log('Visit: https://rs.zenuxs.xyz');
     </script>
