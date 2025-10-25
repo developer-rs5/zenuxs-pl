@@ -940,7 +940,6 @@ app.delete('/api/admin/licenses/:key', checkServerKey, async (req, res) => {
     }
 });
 
-// Token validation endpoint
 app.post('/api/validateToken', async (req, res) => {
     try {
         const { token } = req.body;
