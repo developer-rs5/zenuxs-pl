@@ -23,7 +23,7 @@
     <meta name="twitter:description" content="Professional authentication management dashboard">
     
     <!-- Canonical URL -->
-    <link rel="canonical" href="https://plugins.zenuxs.xyz/admin">
+    <link rel="canonical" href="https://plugins.zenuxs.in/admin">
     
     <!-- Preconnect for Performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -53,7 +53,7 @@
       "creator": {
         "@type": "Organization",
         "name": "Zenuxs",
-        "url": "https://rs.zenuxs.xyz"
+        "url": "https://zenuxs.in"
       },
       "author": {
         "@type": "Person",
@@ -837,9 +837,9 @@
                     <input type="text" id="serverKey" class="form-control" placeholder="Enter your server key">
                 </div>
                 <div class="form-group">
-                    <input type="hidden" id="apiEndpoint" class="form-control" placeholder="https://your-api-server.com" value="https://plugins.zenuxs.xyz">
+                    <input type="hidden" id="apiEndpoint" class="form-control" placeholder="https://your-api-server.com" value="https://plugins.zenuxs.in">
                 </div>
-                <button onclick="login()" class="btn" style="width: 100%;" id="loginBtn">
+                <button class="btn" style="width: 100%;" id="loginBtn">
                     <i class="fas fa-sign-in-alt"></i> Access Dashboard
                 </button>
                 
@@ -849,10 +849,10 @@
                 
                 <div style="margin-top: 20px; text-align: center;">
                     <div class="social-links" style="justify-content: center;">
-                        <a href="https://rs.zenuxs.xyz" target="_blank" title="Website">
+                        <a href="https://zenuxs.in" target="_blank" title="Website">
                             <i class="fas fa-globe"></i>
                         </a>
-                        <a href="https://discord.zenuxs.xyz" target="_blank" title="Discord">
+                        <a href="https://discord.zenuxs.in" target="_blank" title="Discord">
                             <i class="fab fa-discord"></i>
                         </a>
                         <a href="https://instagram.com/zenuxs" target="_blank" title="Instagram">
@@ -874,10 +874,10 @@
             </div>
             <div class="header-right">
                 <div class="social-links">
-                    <a href="https://rs.zenuxs.xyz" target="_blank" title="Website">
+                    <a href="https://zenuxs.in" target="_blank" title="Website">
                         <i class="fas fa-globe"></i>
                     </a>
-                    <a href="https://discord.zenuxs.xyz" target="_blank" title="Discord">
+                    <a href="https://discord.zenuxs.in" target="_blank" title="Discord">
                         <i class="fab fa-discord"></i>
                     </a>
                     <a href="https://instagram.com/zenuxs" target="_blank" title="Instagram">
@@ -887,7 +887,7 @@
                         <i class="fab fa-youtube"></i>
                     </a>
                 </div>
-                <button class="btn btn-danger btn-sm" onclick="logout()">
+                <button class="btn btn-danger btn-sm" id="logoutBtn">
                     <i class="fas fa-sign-out-alt"></i> Logout
                 </button>
             </div>
@@ -895,16 +895,16 @@
 
         <!-- Navigation Tabs -->
         <div id="nav-tabs" class="nav-tabs" style="display: none;">
-            <div class="nav-tab active" onclick="showTab('dashboard')">
+            <div class="nav-tab active" data-tab="dashboard">
                 <i class="fas fa-chart-line"></i> Dashboard
             </div>
-            <div class="nav-tab" onclick="showTab('users')">
+            <div class="nav-tab" data-tab="users">
                 <i class="fas fa-users"></i> Users
             </div>
-            <div class="nav-tab" onclick="showTab('analytics')">
+            <div class="nav-tab" data-tab="analytics">
                 <i class="fas fa-chart-bar"></i> Analytics
             </div>
-            <div class="nav-tab" onclick="showTab('system')">
+            <div class="nav-tab" data-tab="system">
                 <i class="fas fa-cog"></i> System
             </div>
         </div>
@@ -1001,7 +1001,7 @@
                         <i class="fas fa-users"></i> User Management
                     </div>
                     <div class="table-actions">
-                        <button class="btn btn-success btn-sm" onclick="refreshUsers()">
+                        <button class="btn btn-success btn-sm" id="refreshUsersBtn">
                             <i class="fas fa-sync-alt"></i> Refresh
                         </button>
                     </div>
@@ -1132,7 +1132,7 @@
                         </tr>
                         <tr>
                             <td><strong>Website</strong></td>
-                            <td><a href="https://rs.zenuxs.xyz" target="_blank">https://rs.zenuxs.xyz</a></td>
+                            <td><a href="https://zenuxs.in" target="_blank">https://zenuxs.in</a></td>
                         </tr>
                         <tr>
                             <td><strong>Node.js Version</strong></td>
@@ -1154,9 +1154,9 @@
                     <p>&copy; 2025 <strong>Zenuxs</strong> - AdvanceAuth by DEVELOPER.RS (Rishabh)</p>
                 </div>
                 <div class="footer-links">
-                    <a href="https://rs.zenuxs.xyz" target="_blank">Website</a>
-                    <a href="https://discord.zenuxs.xyz" target="_blank">Support</a>
-                    <a href="https://rs.zenuxs.xyz/docs" target="_blank">Documentation</a>
+                    <a href="https://zenuxs.in" target="_blank">Website</a>
+                    <a href="https://discord.zenuxs.in" target="_blank">Support</a>
+                    <a href="https://zenuxs.in/docs" target="_blank">Documentation</a>
                 </div>
             </div>
         </div>
@@ -1184,8 +1184,8 @@
                 <input type="password" id="newPassword" class="form-control" placeholder="Enter new password">
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeModal('passwordModal')">Cancel</button>
-                <button class="btn btn-primary" onclick="changePassword()">Update Password</button>
+                <button class="btn btn-secondary" data-close="passwordModal">Cancel</button>
+                <button class="btn btn-primary" id="changePasswordBtn">Update Password</button>
             </div>
         </div>
     </div>
@@ -1206,8 +1206,8 @@
                 <textarea id="banMessage" class="form-control" rows="3" placeholder="Reason for ban (optional)"></textarea>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeModal('banModal')">Cancel</button>
-                <button class="btn btn-danger" onclick="banUser()">Ban User</button>
+                <button class="btn btn-secondary" data-close="banModal">Cancel</button>
+                <button class="btn btn-danger" id="banUserBtn">Ban User</button>
             </div>
         </div>
     </div>
@@ -1225,8 +1225,35 @@
         let loadedTabs = {}; // Track which tabs have been loaded
 
         // Initialize on page load
-        window.addEventListener('load', () => {
-            document.getElementById('loginBtn').addEventListener('click', login);
+        window.addEventListener('load', function() {
+            // Attach event listeners
+            const loginBtn = document.getElementById('loginBtn');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const refreshUsersBtn = document.getElementById('refreshUsersBtn');
+            const changePasswordBtn = document.getElementById('changePasswordBtn');
+            const banUserBtn = document.getElementById('banUserBtn');
+            
+            if (loginBtn) loginBtn.addEventListener('click', login);
+            if (logoutBtn) logoutBtn.addEventListener('click', logout);
+            if (refreshUsersBtn) refreshUsersBtn.addEventListener('click', refreshUsers);
+            if (changePasswordBtn) changePasswordBtn.addEventListener('click', changePassword);
+            if (banUserBtn) banUserBtn.addEventListener('click', banUser);
+            
+            // Tab navigation
+            document.querySelectorAll('.nav-tab').forEach(function(tab) {
+                tab.addEventListener('click', function() {
+                    const tabName = this.getAttribute('data-tab');
+                    showTab(tabName);
+                });
+            });
+            
+            // Modal close buttons
+            document.querySelectorAll('[data-close]').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    const modalId = this.getAttribute('data-close');
+                    closeModal(modalId);
+                });
+            });
 
             // Load saved settings
             const savedEndpoint = sessionStorage.getItem('apiEndpoint');
@@ -1428,6 +1455,10 @@
         // Dashboard Data Loading
         async function loadDashboardData() {
             try {
+                // Show placeholder charts immediately with zeros
+                createPlaceholderChart('loginChart24h', 'line');
+                createPlaceholderChart('registrationChart', 'bar');
+                
                 // Don't show loading overlay - let page be interactive
                 const response = await apiCall('/api/stats');
                 
@@ -1438,17 +1469,17 @@
                 document.getElementById('activeUsers').textContent = response.activeUsers || 0;
                 document.getElementById('bannedUsers').textContent = response.bannedUsers || 0;
 
-                // Load charts asynchronously with longer delays
+                // Load charts one by one with real data
                 if (response.last24hData) {
-                    setTimeout(() => createLoginChart24h(response.last24hData), 500);
+                    setTimeout(() => createLoginChart24h(response.last24hData), 800);
                 }
                 
                 if (response.registrationData) {
-                    setTimeout(() => createRegistrationChart(response.registrationData), 1000);
+                    setTimeout(() => createRegistrationChart(response.registrationData), 1600);
                 }
                 
                 if (response.loginHeatmap) {
-                    setTimeout(() => createLoginHeatmap(response.loginHeatmap), 1500);
+                    setTimeout(() => createLoginHeatmap(response.loginHeatmap), 2400);
                 }
                 
             } catch (error) {
@@ -1484,24 +1515,47 @@
                         </td>
                         <td>
                             <div class="action-buttons">
-                                <button class="btn btn-warning btn-xs" onclick="showPasswordModal('${escapeHtml(user.username)}')">
+                                <button class="btn btn-warning btn-xs" data-action="password" data-username="${escapeHtml(user.username)}">
                                     <i class="fas fa-key"></i> Password
                                 </button>
                                 ${user.isBanned ? 
-                                    `<button class="btn btn-success btn-xs" onclick="unbanUser('${escapeHtml(user.username)}')">
+                                    `<button class="btn btn-success btn-xs" data-action="unban" data-username="${escapeHtml(user.username)}">
                                         <i class="fas fa-unlock"></i> Unban
                                     </button>` :
-                                    `<button class="btn btn-warning btn-xs" onclick="showBanModal('${escapeHtml(user.username)}')">
+                                    `<button class="btn btn-warning btn-xs" data-action="ban" data-username="${escapeHtml(user.username)}">
                                         <i class="fas fa-ban"></i> Ban
                                     </button>`
                                 }
-                                <button class="btn btn-danger btn-xs" onclick="deleteUser('${escapeHtml(user.username)}')">
+                                <button class="btn btn-danger btn-xs" data-action="delete" data-username="${escapeHtml(user.username)}">
                                     <i class="fas fa-trash"></i> Delete
                                 </button>
                             </div>
                         </td>
                     `;
                     tbody.appendChild(row);
+                });
+                
+                // Attach event listeners to action buttons
+                document.querySelectorAll('[data-action]').forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        const action = this.getAttribute('data-action');
+                        const username = this.getAttribute('data-username');
+                        
+                        switch(action) {
+                            case 'password':
+                                showPasswordModal(username);
+                                break;
+                            case 'ban':
+                                showBanModal(username);
+                                break;
+                            case 'unban':
+                                unbanUser(username);
+                                break;
+                            case 'delete':
+                                deleteUser(username);
+                                break;
+                        }
+                    });
                 });
 
                 // Update pagination
@@ -1517,19 +1571,25 @@
         // Analytics Data Loading
         async function loadAnalyticsData() {
             try {
+                // Show placeholder charts immediately
+                createPlaceholderChart('weeklyChart', 'line');
+                createPlaceholderChart('monthlyChart', 'line');
+                createPlaceholderChart('countriesChart', 'doughnut');
+                createPlaceholderChart('statusChart', 'pie');
+                
                 const response = await apiCall('/api/stats');
                 
-                // Load charts asynchronously with longer delays
+                // Load charts one by one with real data
                 if (response.last7dData) {
-                    setTimeout(() => createWeeklyChart(response.last7dData), 500);
+                    setTimeout(() => createWeeklyChart(response.last7dData), 800);
                 }
                 
                 if (response.last30dData) {
-                    setTimeout(() => createMonthlyChart(response.last30dData), 1000);
+                    setTimeout(() => createMonthlyChart(response.last30dData), 1600);
                 }
                 
                 if (response.topCountries) {
-                    setTimeout(() => createCountriesChart(response.topCountries), 1500);
+                    setTimeout(() => createCountriesChart(response.topCountries), 2400);
                 }
                 
                 setTimeout(() => {
@@ -1537,7 +1597,7 @@
                         activeUsers: response.activeUsers || 0,
                         bannedUsers: response.bannedUsers || 0
                     });
-                }, 2000);
+                }, 3200);
                 
             } catch (error) {
                 showToast(`Failed to load analytics: ${error.message}`, 'error');
@@ -1658,19 +1718,67 @@
             await loadUsers(currentPage);
         }
 
+        // Create placeholder chart with zeros
+        function createPlaceholderChart(canvasId, type) {
+            const ctx = document.getElementById(canvasId);
+            if (!ctx || typeof Chart === 'undefined') return;
+            
+            const chartKey = canvasId.replace('Chart', '').replace('24h', '24h');
+            
+            if (charts[chartKey]) {
+                charts[chartKey].destroy();
+            }
+            
+            let config = {
+                type: type,
+                data: {},
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: type === 'doughnut' || type === 'pie'
+                        }
+                    }
+                }
+            };
+            
+            // Create zero data based on chart type
+            if (type === 'line' || type === 'bar') {
+                config.data = {
+                    labels: ['', '', '', '', ''],
+                    datasets: [{
+                        label: 'Loading...',
+                        data: [0, 0, 0, 0, 0],
+                        borderColor: '#e2e8f0',
+                        backgroundColor: 'rgba(226, 232, 240, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                };
+                config.options.scales = {
+                    y: { beginAtZero: true, grid: { color: '#e2e8f0' } },
+                    x: { grid: { display: false } }
+                };
+            } else if (type === 'doughnut' || type === 'pie') {
+                config.data = {
+                    labels: ['Loading...'],
+                    datasets: [{
+                        data: [1],
+                        backgroundColor: ['#e2e8f0']
+                    }]
+                };
+                config.options.plugins.legend.position = 'bottom';
+            }
+            
+            charts[chartKey] = new Chart(ctx, config);
+        }
+
         // Chart Creation Functions
         function createLoginChart24h(data) {
             const ctx = document.getElementById('loginChart24h');
             if (!ctx) return;
             
-            // Show loading state
-            const chartContainer = ctx.parentElement.parentElement;
-            const loadingDiv = document.createElement('div');
-            loadingDiv.className = 'chart-loading';
-            loadingDiv.innerHTML = '<div class="spinner"></div><span>Loading chart...</span>';
-            chartContainer.appendChild(loadingDiv);
-            
-            // Wait for Chart.js to be available
             const initChart = () => {
                 if (typeof Chart === 'undefined') {
                     setTimeout(initChart, 100);
@@ -1697,6 +1805,10 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        animation: {
+                            duration: 1000,
+                            easing: 'easeInOutQuart'
+                        },
                         plugins: {
                             legend: {
                                 display: false
@@ -1717,11 +1829,6 @@
                         }
                     }
                 });
-                
-                // Remove loading state
-                if (loadingDiv && loadingDiv.parentElement) {
-                    loadingDiv.remove();
-                }
             };
             
             initChart();
@@ -1730,12 +1837,6 @@
         function createRegistrationChart(data) {
             const ctx = document.getElementById('registrationChart');
             if (!ctx) return;
-            
-            const chartContainer = ctx.parentElement.parentElement;
-            const loadingDiv = document.createElement('div');
-            loadingDiv.className = 'chart-loading';
-            loadingDiv.innerHTML = '<div class="spinner"></div><span>Loading chart...</span>';
-            chartContainer.appendChild(loadingDiv);
             
             const initChart = () => {
                 if (typeof Chart === 'undefined') {
@@ -1761,6 +1862,10 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        animation: {
+                            duration: 1000,
+                            easing: 'easeInOutQuart'
+                        },
                         plugins: {
                             legend: {
                                 display: false
@@ -1781,244 +1886,332 @@
                         }
                     }
                 });
-                
-                if (loadingDiv && loadingDiv.parentElement) {
-                    loadingDiv.remove();
-                }
             };
             
             initChart();
         }
 
-        function createWeeklyChart(data) {
-            const ctx = document.getElementById('weeklyChart');
-            if (!ctx) return;
-            
-            const chartContainer = ctx.parentElement.parentElement;
-            const loadingDiv = document.createElement('div');
-            loadingDiv.className = 'chart-loading';
-            loadingDiv.innerHTML = '<div class="spinner"></div><span>Loading chart...</span>';
-            chartContainer.appendChild(loadingDiv);
-            
-            const initChart = () => {
-                if (typeof Chart === 'undefined') {
-                    setTimeout(initChart, 100);
-                    return;
-                }
-                
-                if (charts.weekly) {
-                    charts.weekly.destroy();
-                }
-                
-                charts.weekly = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: data.map(d => d.period),
-                        datasets: [{
-                            label: 'Logins',
-                            data: data.map(d => d.count),
-                            borderColor: '#8b5cf6',
-                            backgroundColor: 'rgba(139, 92, 246, 0.1)',
-                            tension: 0.4,
-                            fill: true
-                        }]
+        // Chart Creation Functions
+function createLoginChart24h(data) {
+    const ctx = document.getElementById('loginChart24h');
+    if (!ctx) return;
+    
+    const initChart = () => {
+        if (typeof Chart === 'undefined') {
+            setTimeout(initChart, 100);
+            return;
+        }
+        
+        if (charts.login24h) {
+            charts.login24h.destroy();
+        }
+        
+        charts.login24h = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.map(d => d.period),
+                datasets: [{
+                    label: 'Logins',
+                    data: data.map(d => d.count),
+                    borderColor: '#6366f1',
+                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 1000,
+                    easing: 'easeInOutQuart'
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: '#e2e8f0'
+                        }
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                grid: {
-                                    color: '#e2e8f0'
-                                }
-                            },
-                            x: {
-                                grid: {
-                                    display: false
-                                }
-                            }
+                    x: {
+                        grid: {
+                            display: false
                         }
                     }
-                });
-                
-                if (loadingDiv && loadingDiv.parentElement) {
-                    loadingDiv.remove();
                 }
-            };
-            
-            initChart();
-        }
+            }
+        });
+    };
+    
+    initChart();
+}
 
-        function createMonthlyChart(data) {
-            const ctx = document.getElementById('monthlyChart');
-            if (!ctx) return;
-            
-            const chartContainer = ctx.parentElement.parentElement;
-            const loadingDiv = document.createElement('div');
-            loadingDiv.className = 'chart-loading';
-            loadingDiv.innerHTML = '<div class="spinner"></div><span>Loading chart...</span>';
-            chartContainer.appendChild(loadingDiv);
-            
-            const initChart = () => {
-                if (typeof Chart === 'undefined') {
-                    setTimeout(initChart, 100);
-                    return;
-                }
-                
-                if (charts.monthly) {
-                    charts.monthly.destroy();
-                }
-                
-                charts.monthly = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: data.map(d => d.period),
-                        datasets: [{
-                            label: 'Daily Logins',
-                            data: data.map(d => d.count),
-                            borderColor: '#f59e0b',
-                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                            tension: 0.4,
-                            fill: true
-                        }]
+function createRegistrationChart(data) {
+    const ctx = document.getElementById('registrationChart');
+    if (!ctx) return;
+    
+    const initChart = () => {
+        if (typeof Chart === 'undefined') {
+            setTimeout(initChart, 100);
+            return;
+        }
+        
+        if (charts.registration) {
+            charts.registration.destroy();
+        }
+        
+        charts.registration = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.map(d => d.period),
+                datasets: [{
+                    label: 'Registrations',
+                    data: data.map(d => d.count),
+                    backgroundColor: '#10b981',
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 1000,
+                    easing: 'easeInOutQuart'
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: '#e2e8f0'
+                        }
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                grid: {
-                                    color: '#e2e8f0'
-                                }
-                            },
-                            x: {
-                                grid: {
-                                    display: false
-                                }
-                            }
+                    x: {
+                        grid: {
+                            display: false
                         }
                     }
-                });
-                
-                if (loadingDiv && loadingDiv.parentElement) {
-                    loadingDiv.remove();
                 }
-            };
-            
-            initChart();
-        }
+            }
+        });
+    };
+    
+    initChart();
+}
 
-        function createCountriesChart(data) {
-            const ctx = document.getElementById('countriesChart');
-            if (!ctx || !data || data.length === 0) return;
-            
-            const chartContainer = ctx.parentElement.parentElement;
-            const loadingDiv = document.createElement('div');
-            loadingDiv.className = 'chart-loading';
-            loadingDiv.innerHTML = '<div class="spinner"></div><span>Loading chart...</span>';
-            chartContainer.appendChild(loadingDiv);
-            
-            const initChart = () => {
-                if (typeof Chart === 'undefined') {
-                    setTimeout(initChart, 100);
-                    return;
-                }
-                
-                if (charts.countries) {
-                    charts.countries.destroy();
-                }
-                
-                charts.countries = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: data.map(d => d.country),
-                        datasets: [{
-                            data: data.map(d => d.count),
-                            backgroundColor: [
-                                '#6366f1', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444',
-                                '#3b82f6', '#ec4899', '#14b8a6', '#f97316', '#84cc16'
-                            ]
-                        }]
+function createWeeklyChart(data) {
+    const ctx = document.getElementById('weeklyChart');
+    if (!ctx) return;
+    
+    const initChart = () => {
+        if (typeof Chart === 'undefined') {
+            setTimeout(initChart, 100);
+            return;
+        }
+        
+        if (charts.weekly) {
+            charts.weekly.destroy();
+        }
+        
+        charts.weekly = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.map(d => d.period),
+                datasets: [{
+                    label: 'Logins',
+                    data: data.map(d => d.count),
+                    borderColor: '#8b5cf6',
+                    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 1000,
+                    easing: 'easeInOutQuart'
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: '#e2e8f0'
+                        }
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'bottom'
-                            }
+                    x: {
+                        grid: {
+                            display: false
                         }
                     }
-                });
-                
-                if (loadingDiv && loadingDiv.parentElement) {
-                    loadingDiv.remove();
                 }
-            };
-            
-            initChart();
-        }
+            }
+        });
+    };
+    
+    initChart();
+}
 
-        function createStatusChart(data) {
-            const ctx = document.getElementById('statusChart');
-            if (!ctx) return;
-            
-            const chartContainer = ctx.parentElement.parentElement;
-            const loadingDiv = document.createElement('div');
-            loadingDiv.className = 'chart-loading';
-            loadingDiv.innerHTML = '<div class="spinner"></div><span>Loading chart...</span>';
-            chartContainer.appendChild(loadingDiv);
-            
-            const initChart = () => {
-                if (typeof Chart === 'undefined') {
-                    setTimeout(initChart, 100);
-                    return;
-                }
-                
-                if (charts.status) {
-                    charts.status.destroy();
-                }
-                
-                charts.status = new Chart(ctx, {
-                    type: 'pie',
-                    data: {
-                        labels: ['Active Users', 'Banned Users'],
-                        datasets: [{
-                            data: [data.activeUsers || 0, data.bannedUsers || 0],
-                            backgroundColor: ['#10b981', '#ef4444']
-                        }]
+function createMonthlyChart(data) {
+    const ctx = document.getElementById('monthlyChart');
+    if (!ctx) return;
+    
+    const initChart = () => {
+        if (typeof Chart === 'undefined') {
+            setTimeout(initChart, 100);
+            return;
+        }
+        
+        if (charts.monthly) {
+            charts.monthly.destroy();
+        }
+        
+        charts.monthly = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.map(d => d.period),
+                datasets: [{
+                    label: 'Daily Logins',
+                    data: data.map(d => d.count),
+                    borderColor: '#f59e0b',
+                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 1000,
+                    easing: 'easeInOutQuart'
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: '#e2e8f0'
+                        }
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'bottom'
-                            }
+                    x: {
+                        grid: {
+                            display: false
                         }
                     }
-                });
-                
-                if (loadingDiv && loadingDiv.parentElement) {
-                    loadingDiv.remove();
                 }
-            };
-            
-            initChart();
-        }
+            }
+        });
+    };
+    
+    initChart();
+}
 
+function createCountriesChart(data) {
+    const ctx = document.getElementById('countriesChart');
+    if (!ctx || !data || data.length === 0) return;
+    
+    const initChart = () => {
+        if (typeof Chart === 'undefined') {
+            setTimeout(initChart, 100);
+            return;
+        }
+        
+        if (charts.countries) {
+            charts.countries.destroy();
+        }
+        
+        charts.countries = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: data.map(d => d.country),
+                datasets: [{
+                    data: data.map(d => d.count),
+                    backgroundColor: [
+                        '#6366f1', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444',
+                        '#3b82f6', '#ec4899', '#14b8a6', '#f97316', '#84cc16'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 1000,
+                    easing: 'easeInOutQuart'
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    };
+    
+    initChart();
+}
+
+function createStatusChart(data) {
+    const ctx = document.getElementById('statusChart');
+    if (!ctx) return;
+    
+    const initChart = () => {
+        if (typeof Chart === 'undefined') {
+            setTimeout(initChart, 100);
+            return;
+        }
+        
+        if (charts.status) {
+            charts.status.destroy();
+        }
+        
+        charts.status = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Active Users', 'Banned Users'],
+                datasets: [{
+                    data: [data.activeUsers || 0, data.bannedUsers || 0],
+                    backgroundColor: ['#10b981', '#ef4444']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 1000,
+                    easing: 'easeInOutQuart'
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    };
+    
+    initChart();
+}
         function createLoginHeatmap(data) {
             const heatmapContainer = document.getElementById('loginHeatmap');
             if (!heatmapContainer || !data || data.length === 0) return;
@@ -2155,24 +2348,31 @@
         }
 
         // Event Listeners
-        document.getElementById('serverKey').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                login();
-            }
-        });
+        const serverKeyInput = document.getElementById('serverKey');
+        const apiEndpointInput = document.getElementById('apiEndpoint');
+        
+        if (serverKeyInput) {
+            serverKeyInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    login();
+                }
+            });
+        }
 
-        document.getElementById('apiEndpoint').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                login();
-            }
-        });
+        if (apiEndpointInput) {
+            apiEndpointInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    login();
+                }
+            });
+        }
 
         // Close modals when clicking outside
-        window.onclick = function(event) {
+        window.addEventListener('click', function(event) {
             if (event.target.classList.contains('modal')) {
                 event.target.style.display = 'none';
             }
-        }
+        });
 
         // Handle tab navigation with keyboard
         document.addEventListener('keydown', function(e) {
@@ -2189,7 +2389,7 @@
                     showTab(tabMap[e.key]);
                     
                     // Update active nav tab
-                    document.querySelectorAll('.nav-tab').forEach((tab, index) => {
+                    document.querySelectorAll('.nav-tab').forEach(function(tab, index) {
                         tab.classList.toggle('active', index === parseInt(e.key) - 1);
                     });
                 }
@@ -2197,9 +2397,9 @@
         });
 
         // Initialize application
-        console.log('AdvanceAuth Admin Panel v2.0.0 - Optimized with Async Loading');
+        console.log('AdvanceAuth Admin Panel v2.0.0 - Optimized with Sequential Chart Loading');
         console.log('Developed by DEVELOPER.RS (Rishabh) for Zenuxs');
-        console.log('Visit: https://rs.zenuxs.xyz');
+        console.log('Visit: https://zenuxs.in');
     </script>
 </body>
 </html>
