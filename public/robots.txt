@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+
+Disallow: /advancedAuth/e-dash
+
+Sitemap: https://plugins.zenuxs.in/sitemap.xml

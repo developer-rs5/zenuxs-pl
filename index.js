@@ -1058,6 +1058,8 @@ async function initializeApp() {
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use('/plugins', express.static(path.join(__dirname, 'plugins')));
+app.use(express.static("public"));
+
 
 
 app.get('/advancedAuth/dash', (req, res) => {
@@ -1066,6 +1068,16 @@ app.get('/advancedAuth/dash', (req, res) => {
 
 app.get("/advancedAuth/e-dash", (req,res)=>{
     res.sendFile(path.join(__dirname, "admin.html"));
+})
+
+
+app.get("/team", (req,res)=>{
+    res.sendFile(path.join(__dirname, "team.html"));
+})
+
+
+app.get("/about", (req,res)=>{
+    res.sendFile(path.join(__dirname, "about.html"));
 })
 
 app.get('/advancedAuth/', (req, res) => {

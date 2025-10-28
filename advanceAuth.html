@@ -1,14 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AdvancedAuth - Minecraft Authentication Plugin</title>
-    <meta name="description" content="Advanced authentication plugin for Minecraft with admin dashboard and user management system.">
+        <link rel="shortcut icon" href="/images/zenux.png" type="image/x-icon">
+
+    <meta name="description"
+        content="Advanced authentication plugin for Minecraft with admin dashboard and user management system.">
     <meta name="keywords" content="minecraft plugin, authentication, secure login, user management, admin dashboard">
     <meta name="author" content="Zenuxs Plugins">
+    <meta name="robots" content="index, follow">
+
+    <!-- 🔥 SEO + Social Meta -->
+    <meta property="og:title" content="AdvancedAuth - Minecraft Authentication Plugin">
+    <meta property="og:description"
+        content="Secure and customizable Minecraft authentication plugin with dashboards and user management.">
+    <meta property="og:image" content="https://plugins.zenuxs.in/images/advancedauth.png">
+    <meta property="og:url" content="https://plugins.zenuxs.in/advancedAuth">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="canonical" href="https://plugins.zenuxs.in/advancedAuth">
+
+    <!-- Fonts & Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
     <style>
         :root {
             --primary: #1a1f36;
@@ -697,12 +714,12 @@
             .plugin-detail {
                 grid-template-columns: 1fr;
             }
-            
+
             .plugin-sidebar {
                 flex-direction: row;
                 flex-wrap: wrap;
             }
-            
+
             .sidebar-card {
                 flex: 1 1 300px;
             }
@@ -721,7 +738,7 @@
                 flex-direction: column;
                 text-align: center;
             }
-            
+
             .plugin-features {
                 grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             }
@@ -731,66 +748,68 @@
             nav {
                 padding: 1rem;
             }
-            
+
             .breadcrumb {
                 padding: 1rem;
             }
-            
+
             .plugin-detail {
                 padding: 0 1rem 2rem;
                 gap: 1.5rem;
             }
-            
+
             .plugin-main {
                 padding: 1.5rem;
             }
-            
+
             .plugin-features {
                 grid-template-columns: 1fr;
             }
-            
+
             .plugin-images {
                 grid-template-columns: 1fr;
             }
-            
+
             .plugin-sidebar {
                 flex-direction: column;
             }
-            
+
             .sidebar-card {
                 flex: 1 1 100%;
             }
-            
+
             .related-plugins {
                 padding: 0 1rem 2rem;
             }
-            
+
             .plugins-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             footer {
                 padding: 3rem 1rem 2rem;
             }
-            
+
             .footer-content {
                 grid-template-columns: 1fr;
                 gap: 2rem;
             }
-            
+
             /* Fix for horizontal scrolling on mobile */
-            body, html {
+            body,
+            html {
                 width: 100%;
                 overflow-x: hidden;
             }
-            
+
             .container {
                 width: 100%;
                 overflow: hidden;
             }
-            
+
             /* Ensure all elements stay within viewport */
-            .plugin-config, pre {
+            .plugin-config,
+            pre {
                 max-width: 100%;
                 overflow-x: auto;
             }
@@ -800,58 +819,59 @@
             .logo {
                 font-size: 1.3rem;
             }
-            
+
             .plugin-title {
                 font-size: 1.7rem;
             }
-            
+
             .plugin-icon {
                 width: 70px;
                 height: 70px;
             }
-            
+
             .section-title {
                 font-size: 1.3rem;
             }
-            
+
             .stats-box {
                 grid-template-columns: 1fr;
             }
-            
+
             .download-meta {
                 flex-direction: column;
                 gap: 0.5rem;
                 align-items: center;
             }
-            
-            .download-btn, .discord-btn {
+
+            .download-btn,
+            .discord-btn {
                 padding: 0.8rem 1.2rem;
                 font-size: 0.95rem;
             }
-            
+
             .plugin-card-footer {
                 flex-direction: column;
                 gap: 1rem;
                 align-items: stretch;
             }
-            
+
             .plugin-card-btn {
                 text-align: center;
             }
-            
+
             /* Additional fixes for very small screens */
             .plugin-header {
                 gap: 1rem;
             }
-            
+
             .plugin-feature {
                 padding: 1.2rem;
             }
-            
+
             .feature-icon {
                 font-size: 1.5rem;
             }
-            
+
             .sidebar-card {
                 padding: 1.2rem;
             }
@@ -862,33 +882,34 @@
                 flex-direction: column;
                 text-align: center;
             }
-            
+
             .plugin-title {
                 font-size: 1.5rem;
             }
-            
+
             .plugin-icon {
                 width: 60px;
                 height: 60px;
             }
-            
+
             .breadcrumb-content {
                 font-size: 0.8rem;
             }
-            
+
             .plugin-feature {
                 padding: 1rem;
             }
-            
+
             .feature-icon {
                 font-size: 1.3rem;
             }
-            
+
             .sidebar-card {
                 padding: 1rem;
             }
-            
-            .download-btn, .discord-btn {
+
+            .download-btn,
+            .discord-btn {
                 padding: 0.7rem 1rem;
                 font-size: 0.9rem;
             }
@@ -896,8 +917,13 @@
 
         /* Animations */
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         /* Loading Animation */
@@ -918,11 +944,17 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <!-- Navigation -->
@@ -981,7 +1013,8 @@
         <section class="plugin-detail">
             <div class="plugin-main">
                 <div class="plugin-header">
-                    <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="AdvancedAuth Plugin" class="plugin-icon">
+                    <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
+                        alt="AdvancedAuth Plugin" class="plugin-icon">
                     <div>
                         <h1 class="plugin-title" id="plugin-name">AdvancedAuth</h1>
                         <div class="plugin-author">Created by <a href="#" id="plugin-author">Rishabh</a></div>
@@ -995,7 +1028,9 @@
                 </div>
 
                 <p class="plugin-description" id="plugin-description">
-                    AdvancedAuth is a comprehensive authentication plugin for Minecraft servers. It provides a secure login system with features like encrypted passwords, admin dashboard, user management, and more. Perfect for server owners looking to enhance security and user experience.
+                    AdvancedAuth is a comprehensive authentication plugin for Minecraft servers. It provides a secure
+                    login system with features like encrypted passwords, admin dashboard, user management, and more.
+                    Perfect for server owners looking to enhance security and user experience.
                 </p>
 
                 <div class="plugin-section">
@@ -1172,7 +1207,8 @@ bypass:
             <div class="footer-content">
                 <div class="footer-column">
                     <h3>About Zenuxs Plugins</h3>
-                    <p>We provide high-quality Minecraft plugins to enhance your server experience. Our plugins are carefully crafted to ensure stability and performance.</p>
+                    <p>We provide high-quality Minecraft plugins to enhance your server experience. Our plugins are
+                        carefully crafted to ensure stability and performance.</p>
                     <div class="social-links">
                         <a href="#"><i class="fab fa-discord"></i></a>
                         <a href="#"><i class="fab fa-twitter"></i></a>
@@ -1204,7 +1240,8 @@ bypass:
                     <h3>Newsletter</h3>
                     <p>Subscribe to our newsletter to get updates on new plugins and features.</p>
                     <form>
-                        <input type="email" placeholder="Your Email" style="width: 100%; padding: 0.8rem; margin-bottom: 1rem; border-radius: 5px; border: none; background: var(--card-bg); color: var(--text);">
+                        <input type="email" placeholder="Your Email"
+                            style="width: 100%; padding: 0.8rem; margin-bottom: 1rem; border-radius: 5px; border: none; background: var(--card-bg); color: var(--text);">
                         <button type="submit" class="plugin-card-btn" style="width: 100%;">Subscribe</button>
                     </form>
                 </div>
@@ -1268,11 +1305,11 @@ bypass:
                     "/images/auth-2.png",
                     "/images/auth-3.png",
                     "/images/auth-4.png",
-                    "/images/auth-5.png"    
+                    "/images/auth-5.png"
                 ],
                 "config": "# ============================================================\n#                     ZENUXS PLUGINS\n# ============================================================\n# Website:   https://plugins.zenuxs.xyz\n# Developer: developer.rs (Rishabh)\n# Discord:   https://discord.zenuxs.xyz\n# ============================================================\n\n# ======================================\n#         AuthPlugin Configuration\n# ======================================\n\n# -------------------------------\n# API Settings (Do not modify)\n# -------------------------------\napi:\n  url: \"http://localhost:3000\"    # Do not change this unless necessary\n  timeout: 1000                   # Timeout in milliseconds\n\n# -------------------------------\n# License Key\n# -------------------------------\nlicense-key: \"\"                   # Your license key here\n\n# -------------------------------\n# Login Settings\n# -------------------------------\nlogin:\n  max-attempts: 3                 # Maximum allowed failed login attempts\n  timeout: 300                    # Timeout before retry (in seconds)\n  session-duration: 86400         # Session duration (in seconds)\n\n# -------------------------------\n# Protection Settings\n# -------------------------------\nprotection:\n  prevent-movement: true\n  prevent-block-break: true\n  prevent-block-place: true\n  prevent-interaction: true\n  prevent-chat: true\n  prevent-damage: true\n  prevent-item-drop: true\n  prevent-item-pickup: true\n\n# -------------------------------\n# Messages\n# -------------------------------\nmessages:\n  prefix: \"&8[&bAuth&8] &7\"\n  no-permission: \"&cYou don't have permission to use this command.\"\n  not-player: \"&cThis command can only be executed by players.\"\n  already-logged-in: \"&aYou are already logged in.\"\n  not-logged-in: \"&cPlease login first with /login <password>\"\n  not-registered: \"&cPlease register first with /register <password>\"\n  register-usage: \"&cUsage: /register <password>\"\n  login-usage: \"&cUsage: /login <password>\"\n  register-success: \"&aRegistration successful! You can now login with /login.\"\n  register-error: \"&cRegistration failed: %error%\"\n  login-success: \"&aLogin successful!\"\n  login-error: \"&cLogin failed: %error%\"\n  login-attempts: \"&cYou have %attempts% attempts remaining.\"\n  login-timeout: \"&cYou have been kicked for too many failed login attempts.\"\n  logout-success: \"&aYou have been logged out.\"\n  reload-success: \"&aConfiguration reloaded successfully.\"\n  api-error: \"&cCould not connect to authentication server. Please try again later.\"\n  license-error: \"&cInvalid license key. Please contact an administrator.\"\n\n# -------------------------------\n# Commands to Execute on Login\n# -------------------------------\non-login:\n  - \"msg %player% Welcome back!\"\n  - \"title %player% title {\\\"text\\\":\\\"Welcome!\\\",\\\"color\\\":\\\"green\\\"}\"\n\n# -------------------------------\n# Bypass Permissions\n# -------------------------------\nbypass:\n  movement: \"authplugin.bypass.movement\"\n  interaction: \"authplugin.bypass.interaction\"\n  chat: \"authplugin.bypass.chat\"\n  damage: \"authplugin.bypass.damage\"",
                 "versions": [
-                    {"version": "1.1.0", "date": "2025-08-31", "changes": "Added web dashboard, improved security"},
+                    { "version": "1.1.0", "date": "2025-08-31", "changes": "Added web dashboard, improved security" },
                 ],
                 "seo": {
                     "title": "AdvancedAuth - Advanced Authentication Plugin for Minecraft Servers",
@@ -1317,38 +1354,38 @@ bypass:
             document.getElementById('plugin-author').textContent = pluginData.plugin.author;
             document.getElementById('plugin-author').setAttribute('href', pluginData.plugin.authorLink);
             document.getElementById('plugin-description').textContent = pluginData.plugin.description;
-            
+
             // Set tags
             const tagsContainer = document.getElementById('plugin-tags');
             tagsContainer.innerHTML = '';
-            
+
             pluginData.plugin.tags.forEach(tag => {
                 const tagElement = document.createElement('span');
                 tagElement.className = 'plugin-tag';
                 tagElement.textContent = tag;
                 tagsContainer.appendChild(tagElement);
             });
-            
+
             // Set download info
             document.getElementById('download-btn').setAttribute('href', pluginData.plugin.downloadLink);
             document.getElementById('plugin-version').textContent = `v${pluginData.plugin.version}`;
             document.getElementById('plugin-size').textContent = pluginData.plugin.size;
             document.getElementById('plugin-downloads').textContent = `${pluginData.plugin.downloads} Downloads`;
             document.getElementById('plugin-rating').textContent = `${pluginData.plugin.rating}/5`;
-            
+
             // Set stats
             document.getElementById('stat-downloads').textContent = pluginData.plugin.downloads;
             document.getElementById('stat-rating').textContent = pluginData.plugin.rating;
             document.getElementById('stat-version').textContent = pluginData.plugin.version;
             document.getElementById('stat-size').textContent = pluginData.plugin.size;
-            
+
             // Set config
             document.getElementById('plugin-config').textContent = pluginData.plugin.config;
-            
+
             // Load features
             const featuresContainer = document.getElementById('plugin-features');
             featuresContainer.innerHTML = '';
-            
+
             pluginData.plugin.features.forEach(feature => {
                 const featureElement = document.createElement('div');
                 featureElement.className = 'plugin-feature';
@@ -1361,11 +1398,11 @@ bypass:
                 `;
                 featuresContainer.appendChild(featureElement);
             });
-            
+
             // Load images
             const imagesContainer = document.getElementById('plugin-images');
             imagesContainer.innerHTML = '';
-            
+
             pluginData.plugin.images.forEach(image => {
                 const imageElement = document.createElement('img');
                 imageElement.className = 'plugin-image';
@@ -1373,11 +1410,11 @@ bypass:
                 imageElement.alt = pluginData.plugin.name;
                 imagesContainer.appendChild(imageElement);
             });
-            
+
             // Load versions
             const versionsContainer = document.getElementById('version-list');
             versionsContainer.innerHTML = '';
-            
+
             pluginData.plugin.versions.forEach(version => {
                 const versionElement = document.createElement('li');
                 versionElement.innerHTML = `
@@ -1386,11 +1423,11 @@ bypass:
                 `;
                 versionsContainer.appendChild(versionElement);
             });
-            
+
             // Load related plugins
             const relatedContainer = document.getElementById('related-plugins');
             relatedContainer.innerHTML = '';
-            
+
             pluginData.relatedPlugins.forEach(plugin => {
                 const pluginElement = document.createElement('div');
                 pluginElement.className = 'plugin-card';
@@ -1440,16 +1477,16 @@ bypass:
         });
 
         // Initialize the page
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             loadPluginData();
-            
+
             // Add animation to elements when they come into view
             const observerOptions = {
                 root: null,
                 rootMargin: '0px',
                 threshold: 0.1
             };
-            
+
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
@@ -1458,7 +1495,7 @@ bypass:
                     }
                 });
             }, observerOptions);
-            
+
             // Observe all sections
             const sections = document.querySelectorAll('.plugin-section, .sidebar-card, .plugin-card');
             sections.forEach(section => {
@@ -1468,4 +1505,5 @@ bypass:
         });
     </script>
 </body>
+
 </html>
