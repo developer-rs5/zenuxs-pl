@@ -1002,7 +1002,6 @@ app.get('/api/system/info', async (req, res) => {
     }
 });
 
-// Utility function to generate license keys
 function generateLicenseKey() {
     const prefixes = ['GLOBAL', 'PREMIUM', 'STANDARD', 'TRIAL', 'ENTERPRISE'];
     const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
@@ -1018,7 +1017,7 @@ function generateLicenseKey() {
         }
         if (i < 1) result += '';
     }
-    return result;
+    return result
 }
 
 // Initialize application
