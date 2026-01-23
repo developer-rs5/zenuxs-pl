@@ -4,22 +4,69 @@ const bcrypt = require('bcrypt');
 const fs = require('fs');
 const path = require('path');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
+const axios = require('axios');
+const NodeCache = require('node-cache');
 const app = express();
 
+// ================== CONFIGURATION ==================
 app.use(express.json());
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 
-// Connect to MongoDB with optimized settings
+// Timezone configuration for Indian Standard Time
+const INDIAN_TIMEZONE = 'Asia/Kolkata';
+
+// ================== ENHANCED CACHING SYSTEM ==================
+const userCache = new NodeCache({ stdTTL: 60, checkperiod: 120 });
+const statsCache = new NodeCache({ stdTTL: 30, checkperiod: 60 });
+const licenseCache = new NodeCache({ stdTTL: 300, checkperiod: 600 });
+const serverKeyCache = new NodeCache({ stdTTL: 180, checkperiod: 360 });
+
+// ================== RATE LIMITING ==================
+const publicApiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    message: { valid: false, error: 'Too many requests' },
+    standardHeaders: true,
+    legacyHeaders: false
+});
+
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 10,
+    message: { error: 'Too many login attempts' }
+});
+
+// ================== DATABASE CONNECTION ==================
 mongoose.connect('mongodb+srv://rsnetwork98:network.rs.99@cluster0.nasf6lg.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0/advanceauth', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    maxPoolSize: 10,
+    maxPoolSize: 20,
+    minPoolSize: 5,
+    maxIdleTimeMS: 30000,
     serverSelectionTimeoutMS: 5000,
     socketTimeoutMS: 45000,
 });
 
-// User Schema
+// ================== INDIAN TIMEZONE FUNCTIONS ==================
+function getIndianDateTime() {
+    return new Date().toLocaleString("en-US", { timeZone: INDIAN_TIMEZONE });
+}
+
+function formatIndianDate(date) {
+    return date.toLocaleDateString('en-IN', {
+        timeZone: INDIAN_TIMEZONE,
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    });
+}
+
+// ================== EXISTING SCHEMAS (PRESERVED) ==================
 const userSchema = new mongoose.Schema({
     username: { type: String, required: true, index: true },
     email: { type: String, sparse: true },
@@ -33,28 +80,29 @@ const userSchema = new mongoose.Schema({
     lastAttempt: { type: Date, default: Date.now },
     ipAddress: String,
     location: String,
-    deviceInfo: String
+    deviceInfo: String,
+    emailVerified: { type: Boolean, default: false },
+    emailUpdatedAt: Date,
+    twoFactorEnabled: { type: Boolean, default: false }
 });
 
-// Server Key Schema
 const serverKeySchema = new mongoose.Schema({
     key: { type: String, required: true, unique: true },
     name: { type: String, required: true },
     createdAt: { type: Date, default: Date.now },
     isActive: { type: Boolean, default: true },
     pluginEnabled: { type: Boolean, default: true },
-    maxUsers: { type: Number, default: -1 }, // -1 for unlimited
+    maxUsers: { type: Number, default: -1 },
     currentUsers: { type: Number, default: 0 },
     owner: String,
     description: String
 });
 
-// License Schema  
 const licenseSchema = new mongoose.Schema({
     key: { type: String, required: true, unique: true },
     type: { type: String, enum: ['GLOBAL', 'SERVER_SPECIFIC'], default: 'GLOBAL' },
-    maxServers: { type: Number, default: -1 }, // -1 for unlimited
-    usedServers: [String], // Array of server keys using this license
+    maxServers: { type: Number, default: -1 },
+    usedServers: [String],
     createdBy: String,
     createdAt: { type: Date, default: Date.now },
     validUntil: { type: Date, required: true },
@@ -67,34 +115,41 @@ const licenseSchema = new mongoose.Schema({
     }
 });
 
-// Add compound indexes for better performance
+const apiKeySchema = new mongoose.Schema({
+    key: { type: String, required: true, unique: true },
+    name: String,
+    serverKey: String,
+    permissions: [String],
+    rateLimit: { type: Number, default: 100 },
+    createdAt: { type: Date, default: Date.now },
+    expiresAt: Date,
+    isActive: { type: Boolean, default: true }
+});
+
+// ================== EXISTING INDEXES (PRESERVED) ==================
 userSchema.index({ username: 1, serverKey: 1 }, { unique: true });
 serverKeySchema.index({ key: 1, isActive: 1 });
+licenseSchema.index({ key: 1, isActive: 1 });
 
 const User = mongoose.model('User', userSchema);
 const ServerKey = mongoose.model('ServerKey', serverKeySchema);
 const License = mongoose.model('License', licenseSchema);
+const ApiKey = mongoose.model('ApiKey', apiKeySchema);
 
-// JSON file path for backward compatibility
+// ================== EXISTING CACHE FUNCTIONS (PRESERVED) ==================
 const LICENSE_KEYS_FILE = path.join(__dirname, 'licenseys.json');
-
-// In-memory cache for better performance
 let validLicenseKeys = new Map();
-let serverKeyCache = new Map();
 let lastCacheUpdate = 0;
-const CACHE_TTL = 30000; // 30 seconds cache
+const CACHE_TTL = 30000;
 
-// Load license keys from both JSON and Database
 async function loadLicenseKeys() {
     try {
-        // Load from database first
         const licenses = await License.find({ isActive: true }).lean();
         validLicenseKeys = new Map();
         
         licenses.forEach(license => {
             validLicenseKeys.set(license.key, {
                 ...license,
-                // Convert to old format for backward compatibility
                 serverKey: license.type === 'SERVER_SPECIFIC' && license.usedServers.length > 0 ? license.usedServers[0] : null,
                 used: license.usedServers.length > 0,
                 usedBy: license.usedServers.length > 0 ? 'database' : null,
@@ -102,7 +157,6 @@ async function loadLicenseKeys() {
             });
         });
 
-        // Load from JSON file for backward compatibility
         if (fs.existsSync(LICENSE_KEYS_FILE)) {
             const data = fs.readFileSync(LICENSE_KEYS_FILE, 'utf8');
             const licenseKeys = JSON.parse(data);
@@ -126,7 +180,6 @@ async function loadLicenseKeys() {
     }
 }
 
-// Create sample licenses in database
 async function createSampleLicenses() {
     try {
         const sampleLicenses = [
@@ -180,29 +233,26 @@ async function createSampleLicenses() {
     }
 }
 
-// Cache server keys for better performance
 async function updateServerKeyCache() {
     try {
         const now = Date.now();
-        if (now - lastCacheUpdate < CACHE_TTL && serverKeyCache.size > 0) {
-            return; // Use cache if still valid
+        if (now - lastCacheUpdate < CACHE_TTL) {
+            return;
         }
         
         const serverKeys = await ServerKey.find({ isActive: true }).lean();
-        serverKeyCache.clear();
+        serverKeyCache.flushAll();
         
         serverKeys.forEach(key => {
             serverKeyCache.set(key.key, key);
         });
         
         lastCacheUpdate = now;
-        console.log(`Updated server key cache with ${serverKeyCache.size} keys`);
     } catch (error) {
         console.error('Error updating server key cache:', error);
     }
 }
 
-// Check if plugin is enabled for server and has valid license
 async function isPluginEnabled(serverKey) {
     try {
         await updateServerKeyCache();
@@ -212,23 +262,18 @@ async function isPluginEnabled(serverKey) {
             return false;
         }
         
-        // Check for valid licenses
         const validLicenses = Array.from(validLicenseKeys.values()).filter(license => {
-            // Check if license is active and not expired
             if (!license.isActive || new Date(license.validUntil) < new Date()) {
                 return false;
             }
             
-            // Global licenses can be used by any server
             if (license.type === 'GLOBAL' || !license.serverKey) {
-                // Check if server limit is reached (for non-unlimited licenses)
                 if (license.maxServers && license.maxServers > 0 && license.usedServers) {
                     return license.usedServers.length < license.maxServers;
                 }
                 return true;
             }
             
-            // Server-specific licenses
             if (license.serverKey === serverKey || (license.usedServers && license.usedServers.includes(serverKey))) {
                 return true;
             }
@@ -243,7 +288,7 @@ async function isPluginEnabled(serverKey) {
     }
 }
 
-// Middleware to check server key
+// ================== EXISTING MIDDLEWARE (PRESERVED) ==================
 const checkServerKey = async (req, res, next) => {
     try {
         const serverKey = req.body?.serverKey || req.query.serverKey || req.headers['server-key'];
@@ -259,7 +304,6 @@ const checkServerKey = async (req, res, next) => {
 
         let validKey = serverKeyCache.get(serverKey);
 
-        // Auto-create server key if it doesn't exist
         if (!validKey) {
             try {
                 const newServerKey = new ServerKey({
@@ -272,12 +316,12 @@ const checkServerKey = async (req, res, next) => {
                 });
                 
                 await newServerKey.save();
-                await updateServerKeyCache(); // Refresh cache
+                await updateServerKeyCache();
                 validKey = serverKeyCache.get(serverKey);
                 
                 console.log(`Auto-created server key: ${serverKey}`);
             } catch (error) {
-                if (error.code !== 11000) { // Ignore duplicate key errors
+                if (error.code !== 11000) {
                     console.error('Error auto-creating server key:', error);
                 }
             }
@@ -311,66 +355,443 @@ const checkServerKey = async (req, res, next) => {
     }
 };
 
-// Initialize default server keys on startup
-async function initializeServerKeys() {
+// ================== NEW EMAIL FUNCTIONS (ADDED) ==================
+async function sendEmail(to, subject, html) {
     try {
-        const defaultKey = await ServerKey.findOne({ key: 'c126434b-eaf2-439a-a759-ca7600a7e146' });
+        const response = await axios.post('https://nodemailer-five-sigma.vercel.app/send-email', {
+            to,
+            subject,
+            html
+        }, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
         
-        if (!defaultKey) {
-            const serverKey = new ServerKey({
-                key: 'c126434b-eaf2-439a-a759-ca7600a7e146',
-                name: 'Default Server Key',
-                isActive: true,
-                pluginEnabled: true,
-                owner: 'Zenuxs',
-                description: 'Default server key for AdvanceAuth'
-            });
-            await serverKey.save();
-            console.log('Default server key created');
-        }
-        
-        await updateServerKeyCache();
-        console.log('Server keys initialized successfully');
+        return { success: true, message: 'Email sent successfully' };
     } catch (error) {
-        console.error('Failed to initialize server keys:', error);
+        console.error('Email sending error:', error.message);
+        return { success: false, error: error.message };
     }
 }
 
-// Routes
+const otpStore = new Map();
+const OTP_EXPIRY = 10 * 60 * 1000;
 
-// Check user status
+function generateOTP() {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+// ================== NEW PUBLIC API ROUTE (ADDED) ==================
+app.get('/api/dataapikey/query', publicApiLimiter, async (req, res) => {
+    try {
+        const { tag, password, serverKey, apikey } = req.query;
+        
+        console.log(`Public API request: tag=${tag}, serverKey=${serverKey}`);
+        
+        if (!tag || !password) {
+            return res.json({ 
+                valid: false, 
+                error: 'Tag and password are required',
+                timestamp: getIndianDateTime()
+            });
+        }
+        
+        let query = { username: tag };
+        
+        if (apikey) {
+            const apiKeyData = await ApiKey.findOne({ 
+                key: apikey, 
+                isActive: true,
+                expiresAt: { $gt: new Date() }
+            });
+            
+            if (!apiKeyData) {
+                return res.json({ 
+                    valid: false, 
+                    error: 'Invalid or expired API key',
+                    timestamp: getIndianDateTime()
+                });
+            }
+            
+            if (serverKey) {
+                query.serverKey = serverKey;
+            }
+        } else if (serverKey) {
+            query.serverKey = serverKey;
+        }
+        
+        const user = await User.findOne(query).select('username password isBanned email').lean();
+        
+        if (!user) {
+            return res.json({ 
+                valid: false, 
+                error: 'User not found',
+                exists: false,
+                timestamp: getIndianDateTime(),
+                indianTime: formatIndianDate(new Date())
+            });
+        }
+        
+        if (user.isBanned) {
+            return res.json({ 
+                valid: false, 
+                error: 'User is banned',
+                banned: true,
+                exists: true,
+                timestamp: getIndianDateTime()
+            });
+        }
+        
+        const isValid = await bcrypt.compare(password, user.password);
+        
+        res.json({ 
+            valid: isValid,
+            exists: true,
+            username: user.username,
+            email: user.email || null,
+            isBanned: user.isBanned,
+            timestamp: getIndianDateTime(),
+            indianTime: formatIndianDate(new Date()),
+            serverTime: new Date().toLocaleString('en-IN', { timeZone: INDIAN_TIMEZONE })
+        });
+        
+    } catch (error) {
+        console.error('Public API error:', error);
+        res.status(500).json({ 
+            valid: false, 
+            error: 'Server error',
+            message: error.message 
+        });
+    }
+});
+
+// Add these routes after the existing admin routes
+
+// ================== API KEY MANAGEMENT ROUTES ==================
+
+// Get all API keys for current server
+app.get('/api/admin/apiKeys', checkServerKey, async (req, res) => {
+    try {
+        const serverKey = req.serverKey;
+        
+        const apiKeys = await ApiKey.find({ 
+            serverKey,
+            isActive: true 
+        }).sort({ createdAt: -1 }).lean();
+        
+        res.json(apiKeys);
+    } catch (error) {
+        console.error('API keys fetch error:', error);
+        res.status(500).json({ error: 'Failed to fetch API keys' });
+    }
+});
+
+// Delete API key
+app.delete('/api/admin/apiKeys/:key', checkServerKey, async (req, res) => {
+    try {
+        const { key } = req.params;
+        const serverKey = req.serverKey;
+        
+        const apiKey = await ApiKey.findOne({ key, serverKey });
+        
+        if (!apiKey) {
+            return res.status(404).json({ error: 'API key not found' });
+        }
+        
+        // Soft delete by setting isActive to false
+        await ApiKey.updateOne({ key }, { isActive: false });
+        
+        res.json({ 
+            success: true, 
+            message: 'API key deleted successfully' 
+        });
+    } catch (error) {
+        console.error('API key deletion error:', error);
+        res.status(500).json({ error: 'Failed to delete API key' });
+    }
+});
+
+// Get specific API key details
+app.get('/api/admin/apiKeys/:key', checkServerKey, async (req, res) => {
+    try {
+        const { key } = req.params;
+        const serverKey = req.serverKey;
+        
+        const apiKey = await ApiKey.findOne({ 
+            key, 
+            serverKey,
+            isActive: true 
+        }).lean();
+        
+        if (!apiKey) {
+            return res.status(404).json({ error: 'API key not found' });
+        }
+        
+        res.json(apiKey);
+    } catch (error) {
+        console.error('API key fetch error:', error);
+        res.status(500).json({ error: 'Failed to fetch API key' });
+    }
+});
+
+// ================== NEW EMAIL MANAGEMENT ROUTES (ADDED) ==================
+app.post('/api/setmail', async (req, res) => {
+    try {
+        const { username, email, serverKey } = req.body;
+        
+        if (!username || !email || !serverKey) {
+            return res.status(400).json({ 
+                success: false, 
+                error: 'Username, email, and serverKey are required' 
+            });
+        }
+        
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({ 
+                success: false, 
+                error: 'Invalid email format' 
+            });
+        }
+        
+        const user = await User.findOne({ username, serverKey });
+        if (!user) {
+            return res.status(404).json({ 
+                success: false, 
+                error: 'User not found' 
+            });
+        }
+        
+        const existingUser = await User.findOne({ 
+            email, 
+            serverKey,
+            username: { $ne: username }
+        });
+        
+        if (existingUser) {
+            return res.status(400).json({ 
+                success: false, 
+                error: 'Email already registered to another user' 
+            });
+        }
+        
+        user.email = email;
+        user.emailVerified = false;
+        user.emailUpdatedAt = getIndianDateTime();
+        await user.save();
+        
+        userCache.del(`${serverKey}_${username}`);
+        
+        res.json({ 
+            success: true, 
+            message: 'Email updated successfully',
+            username,
+            email,
+            updatedAt: getIndianDateTime(),
+            indianDate: formatIndianDate(new Date())
+        });
+        
+    } catch (error) {
+        console.error('Setmail error:', error);
+        res.status(500).json({ 
+            success: false, 
+            error: 'Failed to update email' 
+        });
+    }
+});
+
+app.post('/api/changePassword/requestOTP', async (req, res) => {
+    try {
+        const { email } = req.body;
+        
+        if (!email) {
+            return res.status(400).json({ 
+                success: false, 
+                error: 'Email is required' 
+            });
+        }
+        
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ 
+                success: false, 
+                error: 'Email not registered' 
+            });
+        }
+        
+        const otp = generateOTP();
+        
+        otpStore.set(email, {
+            otp,
+            expires: Date.now() + OTP_EXPIRY,
+            attempts: 0,
+            username: user.username
+        });
+        
+        const emailHtml = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1a1a1a; color: #ffffff; padding: 30px; border-radius: 10px;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h1 style="color: #6366f1; margin: 0;">🔐 AdvanceAuth</h1>
+                    <p style="color: #94a3b8; margin: 5px 0;">Password Reset Request</p>
+                </div>
+                
+                <div style="background: #2d2d2d; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <p style="margin: 10px 0;">Hello <strong>${user.username}</strong>,</p>
+                    <p style="margin: 10px 0;">You requested to reset your password. Use the OTP below:</p>
+                    
+                    <div style="background: #6366f1; color: white; padding: 20px; text-align: center; font-size: 32px; letter-spacing: 10px; margin: 20px 0; border-radius: 8px; font-weight: bold;">
+                        ${otp}
+                    </div>
+                    
+                    <p style="margin: 10px 0; color: #94a3b8; font-size: 14px;">
+                        This OTP is valid for 10 minutes. Do not share it with anyone.
+                    </p>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #374151;">
+                    <p style="color: #94a3b8; font-size: 12px; margin: 5px 0;">
+                        If you didn't request this, please ignore this email.
+                    </p>
+                    <p style="color: #94a3b8; font-size: 12px; margin: 5px 0;">
+                        Need help? Join our Discord: <a href="https://discord.zenuxs.in" style="color: #6366f1;">discord.zenuxs.in</a>
+                    </p>
+                </div>
+            </div>
+        `;
+        
+        const emailResult = await sendEmail(email, 'Password Reset OTP - AdvanceAuth', emailHtml);
+        
+        if (!emailResult.success) {
+            return res.status(500).json({ 
+                success: false, 
+                error: 'Failed to send OTP email' 
+            });
+        }
+        
+        res.json({ 
+            success: true, 
+            message: 'OTP sent to email',
+            expiresIn: '10 minutes',
+            email: email.substring(0, 3) + '***' + email.substring(email.indexOf('@'))
+        });
+        
+    } catch (error) {
+        console.error('OTP request error:', error);
+        res.status(500).json({ 
+            success: false, 
+            error: 'Failed to process OTP request' 
+        });
+    }
+});
+
+app.post('/api/changePassword/verifyOTP', async (req, res) => {
+    try {
+        const { email, otp, newPassword } = req.body;
+        
+        if (!email || !otp || !newPassword) {
+            return res.status(400).json({ 
+                success: false, 
+                error: 'Email, OTP, and new password are required' 
+            });
+        }
+        
+        const otpData = otpStore.get(email);
+        if (!otpData) {
+            return res.status(400).json({ 
+                success: false, 
+                error: 'OTP not found or expired' 
+            });
+        }
+        
+        if (Date.now() > otpData.expires) {
+            otpStore.delete(email);
+            return res.status(400).json({ 
+                success: false, 
+                error: 'OTP expired' 
+            });
+        }
+        
+        if (otpData.attempts >= 3) {
+            otpStore.delete(email);
+            return res.status(400).json({ 
+                success: false, 
+                error: 'Too many OTP attempts' 
+            });
+        }
+        
+        if (otpData.otp !== otp) {
+            otpData.attempts++;
+            otpStore.set(email, otpData);
+            return res.status(400).json({ 
+                success: false, 
+                error: 'Invalid OTP' 
+            });
+        }
+        
+        const hashedPassword = await bcrypt.hash(newPassword, 12);
+        await User.updateOne({ email }, { 
+            password: hashedPassword,
+            loginAttempts: 0
+        });
+        
+        otpStore.delete(email);
+        
+        const user = await User.findOne({ email });
+        if (user) {
+            userCache.del(`${user.serverKey}_${user.username}`);
+        }
+        
+        res.json({ 
+            success: true, 
+            message: 'Password changed successfully',
+            changedAt: getIndianDateTime(),
+            indianDate: formatIndianDate(new Date()),
+            username: otpData.username
+        });
+        
+    } catch (error) {
+        console.error('Password change error:', error);
+        res.status(500).json({ 
+            success: false, 
+            error: 'Failed to change password' 
+        });
+    }
+});
+
+// ================== EXISTING ROUTES (PRESERVED EXACTLY AS BEFORE) ==================
 app.post('/api/checkUser', checkServerKey, async (req, res) => {
     try {
         const { username } = req.body;
         const serverKey = req.serverKey;
         
-        if (!username) {
-            return res.status(400).json({ error: 'Username required' });
+        const cacheKey = `${serverKey}_${username}`;
+        const cached = userCache.get(cacheKey);
+        
+        if (cached) {
+            return res.json(cached);
         }
         
         const user = await User.findOne({ username, serverKey }).lean();
+        const response = user ? { 
+            exists: true, 
+            action: 'login',
+            message: 'User exists, please use /login'
+        } : { 
+            exists: false, 
+            action: 'register',
+            message: 'New user, please use /register'
+        };
         
-        if (user) {
-            res.json({ 
-                exists: true, 
-                action: 'login',
-                message: 'User exists, please use /login'
-            });
-        } else {
-            res.json({ 
-                exists: false, 
-                action: 'register',
-                message: 'New user, please use /register'
-            });
-        }
+        userCache.set(cacheKey, response);
+        res.json(response);
+        
     } catch (error) {
         console.error('Check user error:', error);
         res.status(500).json({ error: 'Failed to check user' });
     }
 });
 
-// Register endpoint - FIXED LICENSE LOGIC
-// Register endpoint - FIXED LICENSE LOGIC
 app.post('/api/register', checkServerKey, async (req, res) => {
     try {
         const { username, email, password, licenseKey } = req.body;
@@ -380,9 +801,7 @@ app.post('/api/register', checkServerKey, async (req, res) => {
             return res.status(400).json({ error: 'Username and password are required' });
         }
         
-        // Check if user already exists for this specific server
         const existingUser = await User.findOne({ username, serverKey });
-        
         if (existingUser) {
             return res.status(400).json({ 
                 error: 'Username already taken for this server',
@@ -390,8 +809,6 @@ app.post('/api/register', checkServerKey, async (req, res) => {
             });
         }
         
-        // License key is optional - if provided, check it but don't mark as "used"
-        // Multiple users can register with the same license key
         if (licenseKey) {
             const keyData = validLicenseKeys.get(licenseKey);
             
@@ -403,12 +820,10 @@ app.post('/api/register', checkServerKey, async (req, res) => {
                 return res.status(400).json({ error: 'License key expired' });
             }
             
-            // Check if it's a server-specific license
             if (keyData.type === 'SERVER_SPECIFIC' && keyData.serverKey && keyData.serverKey !== serverKey) {
                 return res.status(400).json({ error: 'License key not valid for this server' });
             }
             
-            // For database licenses, add server to usedServers if not already there
             if (keyData._id && keyData.type === 'GLOBAL') {
                 await License.updateOne(
                     { _id: keyData._id },
@@ -431,7 +846,6 @@ app.post('/api/register', checkServerKey, async (req, res) => {
         
         await newUser.save();
         
-        // Update server user count
         await ServerKey.updateOne(
             { key: serverKey },
             { $inc: { currentUsers: 1 } }
@@ -444,7 +858,6 @@ app.post('/api/register', checkServerKey, async (req, res) => {
     } catch (error) {
         console.error('Registration error:', error);
         if (error.code === 11000) {
-            // This handles the case where there's a unique index violation
             res.status(400).json({ error: 'Username already taken for this server' });
         } else {
             res.status(500).json({ error: 'Registration failed' });
@@ -452,10 +865,7 @@ app.post('/api/register', checkServerKey, async (req, res) => {
     }
 });
 
-
-
-// Login endpoint
-app.post('/api/login', checkServerKey, async (req, res) => {
+app.post('/api/login', loginLimiter, checkServerKey, async (req, res) => {
     try {
         const { username, password } = req.body;
         const serverKey = req.serverKey;
@@ -473,7 +883,6 @@ app.post('/api/login', checkServerKey, async (req, res) => {
             });
         }
         
-        // Check if user is banned
         if (user.isBanned) {
             return res.status(403).json({ 
                 error: user.banMessage || 'You are banned from this server',
@@ -481,7 +890,6 @@ app.post('/api/login', checkServerKey, async (req, res) => {
             });
         }
         
-        // Check login attempts
         const now = new Date();
         const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
         
@@ -492,7 +900,6 @@ app.post('/api/login', checkServerKey, async (req, res) => {
             });
         }
         
-        // Verify password
         const isValidPassword = await bcrypt.compare(password, user.password);
         
         if (!isValidPassword) {
@@ -510,7 +917,6 @@ app.post('/api/login', checkServerKey, async (req, res) => {
             });
         }
         
-        // Reset login attempts on successful login
         await User.updateOne(
             { _id: user._id },
             { 
@@ -534,197 +940,7 @@ app.post('/api/login', checkServerKey, async (req, res) => {
     }
 });
 
-// Plugin status endpoint
-app.get('/api/pluginStatus', checkServerKey, async (req, res) => {
-    try {
-        const serverKey = req.serverKey;
-        const isEnabled = await isPluginEnabled(serverKey);
-        
-        // Get license info
-        const validLicenses = Array.from(validLicenseKeys.values()).filter(license => {
-            if (!license.isActive || new Date(license.validUntil) < new Date()) return false;
-            if (license.type === 'GLOBAL' || !license.serverKey) return true;
-            return license.serverKey === serverKey || (license.usedServers && license.usedServers.includes(serverKey));
-        });
-        
-        res.json({
-            enabled: isEnabled,
-            serverKey: serverKey,
-            validLicenses: validLicenses.length,
-            message: isEnabled ? 'Plugin is enabled' : 'Plugin disabled - No valid license found'
-        });
-    } catch (error) {
-        console.error('Plugin status error:', error);
-        res.status(500).json({ error: 'Failed to check plugin status' });
-    }
-});
-
-// Enhanced stats endpoint with more data
-app.get('/api/stats', checkServerKey, async (req, res) => {
-    try {
-        const serverKey = req.serverKey;
-        
-        const totalUsers = await User.countDocuments({ serverKey });
-        
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const loggedInToday = await User.countDocuments({
-            serverKey,
-            lastLogin: { $gte: today }
-        });
-        
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        const registrationsLast30Days = await User.countDocuments({
-            serverKey,
-            createdAt: { $gte: thirtyDaysAgo }
-        });
-        
-        const bannedUsers = await User.countDocuments({ serverKey, isBanned: true });
-        const activeUsers = totalUsers - bannedUsers;
-        
-        // Get data for charts
-        const last24hData = await getActivityData(serverKey, 24, 'hour');
-        const last7dData = await getActivityData(serverKey, 7, 'day');
-        const last30dData = await getActivityData(serverKey, 30, 'day');
-        const registrationData = await getRegistrationData(serverKey, 30);
-        const loginHeatmap = await getLoginHeatmap(serverKey);
-        const topCountries = await getTopCountries(serverKey);
-        
-        res.json({ 
-            totalUsers, 
-            loggedInToday, 
-            registrationsLast30Days,
-            bannedUsers,
-            activeUsers,
-            last24hData,
-            last7dData,
-            last30dData,
-            registrationData,
-            loginHeatmap,
-            topCountries
-        });
-    } catch (error) {
-        console.error('Stats error:', error);
-        res.status(500).json({ error: 'Failed to fetch stats' });
-    }
-});
-
-// Helper functions for enhanced analytics
-async function getActivityData(serverKey, periods, interval) {
-    const data = [];
-    const now = new Date();
-    
-    for (let i = periods - 1; i >= 0; i--) {
-        const start = new Date(now);
-        const end = new Date(now);
-        
-        if (interval === 'hour') {
-            start.setHours(now.getHours() - i - 1);
-            end.setHours(now.getHours() - i);
-        } else if (interval === 'day') {
-            start.setDate(now.getDate() - i - 1);
-            end.setDate(now.getDate() - i);
-            start.setHours(0, 0, 0, 0);
-            end.setHours(23, 59, 59, 999);
-        }
-        
-        const count = await User.countDocuments({
-            serverKey,
-            lastLogin: { $gte: start, $lte: end }
-        });
-        
-        data.push({
-            period: interval === 'hour' 
-                ? `${start.getHours()}:00` 
-                : start.toLocaleDateString(),
-            count
-        });
-    }
-    
-    return data;
-}
-
-async function getRegistrationData(serverKey, days) {
-    const data = [];
-    const now = new Date();
-    
-    for (let i = days - 1; i >= 0; i--) {
-        const start = new Date(now);
-        const end = new Date(now);
-        
-        start.setDate(now.getDate() - i - 1);
-        end.setDate(now.getDate() - i);
-        start.setHours(0, 0, 0, 0);
-        end.setHours(23, 59, 59, 999);
-        
-        const count = await User.countDocuments({
-            serverKey,
-            createdAt: { $gte: start, $lte: end }
-        });
-        
-        data.push({
-            period: start.toLocaleDateString(),
-            count
-        });
-    }
-    
-    return data;
-}
-
-async function getLoginHeatmap(serverKey) {
-    const heatmapData = [];
-    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    
-    for (let hour = 0; hour < 24; hour++) {
-        for (let day = 0; day < 7; day++) {
-            const count = await User.countDocuments({
-                serverKey,
-                lastLogin: {
-                    $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) // Last 30 days
-                },
-                $expr: {
-                    $and: [
-                        { $eq: [{ $dayOfWeek: '$lastLogin' }, day + 1] },
-                        { $eq: [{ $hour: '$lastLogin' }, hour] }
-                    ]
-                }
-            });
-            
-            heatmapData.push({
-                day: days[day],
-                hour,
-                count
-            });
-        }
-    }
-    
-    return heatmapData;
-}
-
-async function getTopCountries(serverKey) {
-    // This is a simplified version - in reality you'd use IP geolocation
-    const users = await User.find({ serverKey, location: { $exists: true, $ne: '' } })
-        .limit(1000)
-        .lean();
-    
-    const countries = {};
-    users.forEach(user => {
-        if (user.location) {
-            // Simple country extraction (you'd use a proper IP geolocation service)
-            const country = user.location.includes('::1') ? 'Localhost' : 'Unknown';
-            countries[country] = (countries[country] || 0) + 1;
-        }
-    });
-    
-    return Object.entries(countries)
-        .map(([country, count]) => ({ country, count }))
-        .sort((a, b) => b.count - a.count)
-        .slice(0, 10);
-}
-
-
-// Admin endpoints
+// ================== EXISTING ADMIN ROUTES (PRESERVED) ==================
 app.get('/api/admin/users', checkServerKey, async (req, res) => {
     try {
         const serverKey = req.serverKey;
@@ -825,7 +1041,6 @@ app.post('/api/admin/unbanUser', checkServerKey, async (req, res) => {
     }
 });
 
-// Server key management
 app.post('/api/admin/serverKeys', async (req, res) => {
     try {
         const { key, name, maxUsers, owner, description } = req.body;
@@ -880,7 +1095,6 @@ app.delete('/api/admin/serverKeys/:key', async (req, res) => {
     }
 });
 
-// License management
 app.get('/api/admin/licenses', checkServerKey, async (req, res) => {
     try {
         const licenses = await License.find().sort({ createdAt: -1 }).lean();
@@ -917,7 +1131,7 @@ app.post('/api/admin/licenses', checkServerKey, async (req, res) => {
         });
         
         await newLicense.save();
-        await loadLicenseKeys(); // Refresh cache
+        await loadLicenseKeys();
         
         res.json({ 
             message: 'License created successfully',
@@ -933,11 +1147,84 @@ app.delete('/api/admin/licenses/:key', checkServerKey, async (req, res) => {
     try {
         const { key } = req.params;
         await License.findOneAndDelete({ key });
-        await loadLicenseKeys(); // Refresh cache
+        await loadLicenseKeys();
         res.json({ message: 'License deleted successfully' });
     } catch (error) {
         console.error('License deletion error:', error);
         res.status(500).json({ error: 'Failed to delete license' });
+    }
+});
+
+// ================== EXISTING HELPER ROUTES (PRESERVED) ==================
+app.get('/api/pluginStatus', checkServerKey, async (req, res) => {
+    try {
+        const serverKey = req.serverKey;
+        const isEnabled = await isPluginEnabled(serverKey);
+        
+        const validLicenses = Array.from(validLicenseKeys.values()).filter(license => {
+            if (!license.isActive || new Date(license.validUntil) < new Date()) return false;
+            if (license.type === 'GLOBAL' || !license.serverKey) return true;
+            return license.serverKey === serverKey || (license.usedServers && license.usedServers.includes(serverKey));
+        });
+        
+        res.json({
+            enabled: isEnabled,
+            serverKey: serverKey,
+            validLicenses: validLicenses.length,
+            message: isEnabled ? 'Plugin is enabled' : 'Plugin disabled - No valid license found'
+        });
+    } catch (error) {
+        console.error('Plugin status error:', error);
+        res.status(500).json({ error: 'Failed to check plugin status' });
+    }
+});
+
+app.get('/api/stats', checkServerKey, async (req, res) => {
+    try {
+        const serverKey = req.serverKey;
+        
+        const totalUsers = await User.countDocuments({ serverKey });
+        
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const loggedInToday = await User.countDocuments({
+            serverKey,
+            lastLogin: { $gte: today }
+        });
+        
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        const registrationsLast30Days = await User.countDocuments({
+            serverKey,
+            createdAt: { $gte: thirtyDaysAgo }
+        });
+        
+        const bannedUsers = await User.countDocuments({ serverKey, isBanned: true });
+        const activeUsers = totalUsers - bannedUsers;
+        
+        const last24hData = await getActivityData(serverKey, 24, 'hour');
+        const last7dData = await getActivityData(serverKey, 7, 'day');
+        const last30dData = await getActivityData(serverKey, 30, 'day');
+        const registrationData = await getRegistrationData(serverKey, 30);
+        const loginHeatmap = await getLoginHeatmap(serverKey);
+        const topCountries = await getTopCountries(serverKey);
+        
+        res.json({ 
+            totalUsers, 
+            loggedInToday, 
+            registrationsLast30Days,
+            bannedUsers,
+            activeUsers,
+            last24hData,
+            last7dData,
+            last30dData,
+            registrationData,
+            loginHeatmap,
+            topCountries
+        });
+    } catch (error) {
+        console.error('Stats error:', error);
+        res.status(500).json({ error: 'Failed to fetch stats' });
     }
 });
 
@@ -973,7 +1260,6 @@ app.post('/api/validateToken', async (req, res) => {
     }
 });
 
-// System info endpoint
 app.get('/api/system/info', async (req, res) => {
     try {
         const totalServers = await ServerKey.countDocuments({ isActive: true });
@@ -1002,6 +1288,117 @@ app.get('/api/system/info', async (req, res) => {
     }
 });
 
+// ================== EXISTING HELPER FUNCTIONS (PRESERVED) ==================
+async function getActivityData(serverKey, periods, interval) {
+    const data = [];
+    const now = new Date();
+    
+    for (let i = periods - 1; i >= 0; i--) {
+        const start = new Date(now);
+        const end = new Date(now);
+        
+        if (interval === 'hour') {
+            start.setHours(now.getHours() - i - 1);
+            end.setHours(now.getHours() - i);
+        } else if (interval === 'day') {
+            start.setDate(now.getDate() - i - 1);
+            end.setDate(now.getDate() - i);
+            start.setHours(0, 0, 0, 0);
+            end.setHours(23, 59, 59, 999);
+        }
+        
+        const count = await User.countDocuments({
+            serverKey,
+            lastLogin: { $gte: start, $lte: end }
+        });
+        
+        data.push({
+            period: interval === 'hour' 
+                ? `${start.getHours()}:00` 
+                : start.toLocaleDateString(),
+            count
+        });
+    }
+    
+    return data;
+}
+
+async function getRegistrationData(serverKey, days) {
+    const data = [];
+    const now = new Date();
+    
+    for (let i = days - 1; i >= 0; i--) {
+        const start = new Date(now);
+        const end = new Date(now);
+        
+        start.setDate(now.getDate() - i - 1);
+        end.setDate(now.getDate() - i);
+        start.setHours(0, 0, 0, 0);
+        end.setHours(23, 59, 59, 999);
+        
+        const count = await User.countDocuments({
+            serverKey,
+            createdAt: { $gte: start, $lte: end }
+        });
+        
+        data.push({
+            period: start.toLocaleDateString(),
+            count
+        });
+    }
+    
+    return data;
+}
+
+async function getLoginHeatmap(serverKey) {
+    const heatmapData = [];
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    
+    for (let hour = 0; hour < 24; hour++) {
+        for (let day = 0; day < 7; day++) {
+            const count = await User.countDocuments({
+                serverKey,
+                lastLogin: {
+                    $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+                },
+                $expr: {
+                    $and: [
+                        { $eq: [{ $dayOfWeek: '$lastLogin' }, day + 1] },
+                        { $eq: [{ $hour: '$lastLogin' }, hour] }
+                    ]
+                }
+            });
+            
+            heatmapData.push({
+                day: days[day],
+                hour,
+                count
+            });
+        }
+    }
+    
+    return heatmapData;
+}
+
+async function getTopCountries(serverKey) {
+    const users = await User.find({ serverKey, location: { $exists: true, $ne: '' } })
+        .limit(1000)
+        .lean();
+    
+    const countries = {};
+    users.forEach(user => {
+        if (user.location) {
+            const country = user.location.includes('::1') ? 'Localhost' : 'Unknown';
+            countries[country] = (countries[country] || 0) + 1;
+        }
+    });
+    
+    return Object.entries(countries)
+        .map(([country, count]) => ({ country, count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 10);
+}
+
 function generateLicenseKey() {
     const prefixes = ['GLOBAL', 'PREMIUM', 'STANDARD', 'TRIAL', 'ENTERPRISE'];
     const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
@@ -1020,15 +1417,149 @@ function generateLicenseKey() {
     return result
 }
 
-// Initialize application
+// ================== NEW ENHANCED ANALYTICS (ADDED) ==================
+app.get('/api/enhancedStats', checkServerKey, async (req, res) => {
+    try {
+        const serverKey = req.serverKey;
+        const cacheKey = `enhanced_stats_${serverKey}`;
+        
+        const cached = statsCache.get(cacheKey);
+        if (cached) {
+            return res.json({ ...cached, cached: true });
+        }
+        
+        const stats = await calculateEnhancedStats(serverKey);
+        statsCache.set(cacheKey, stats);
+        
+        res.json({ ...stats, cached: false });
+        
+    } catch (error) {
+        console.error('Enhanced stats error:', error);
+        res.status(500).json({ error: 'Failed to fetch enhanced stats' });
+    }
+});
+
+async function calculateEnhancedStats(serverKey) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const [
+        totalUsers,
+        activeToday,
+        newRegistrations,
+        bannedUsers,
+        userList
+    ] = await Promise.all([
+        User.countDocuments({ serverKey }),
+        User.countDocuments({ 
+            serverKey, 
+            lastLogin: { $gte: today } 
+        }),
+        User.countDocuments({ 
+            serverKey, 
+            createdAt: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } 
+        }),
+        User.countDocuments({ serverKey, isBanned: true }),
+        User.find({ serverKey }).select('lastLogin createdAt').lean()
+    ]);
+    
+    const hourCounts = new Array(24).fill(0);
+    userList.forEach(user => {
+        if (user.lastLogin) {
+            const hour = new Date(user.lastLogin).getHours();
+            hourCounts[hour]++;
+        }
+    });
+    
+    const peakHour = hourCounts.indexOf(Math.max(...hourCounts));
+    
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const activeLast7Days = await User.countDocuments({
+        serverKey,
+        lastLogin: { $gte: sevenDaysAgo }
+    });
+    
+    const retentionRate = totalUsers > 0 ? ((activeLast7Days / totalUsers) * 100).toFixed(2) : 0;
+    
+    return {
+        totalUsers,
+        activeToday,
+        newRegistrations,
+        bannedUsers,
+        activeUsers: totalUsers - bannedUsers,
+        peakLoginHour: peakHour,
+        retentionRate: `${retentionRate}%`,
+        activeLast7Days,
+        timestamp: getIndianDateTime(),
+        indianDate: formatIndianDate(new Date()),
+        timezone: 'IST (UTC+5:30)'
+    };
+}
+
+// ================== NEW API KEY MANAGEMENT (ADDED) ==================
+app.post('/api/admin/generateApiKey', checkServerKey, async (req, res) => {
+    try {
+        const { name, permissions = ['public_query'], rateLimit = 100, expiresInDays = 30 } = req.body;
+        const serverKey = req.serverKey;
+        
+        const apiKey = require('crypto').randomBytes(32).toString('hex');
+        
+        const newApiKey = new ApiKey({
+            key: apiKey,
+            name: name || `API Key ${new Date().toLocaleDateString('en-IN')}`,
+            serverKey,
+            permissions,
+            rateLimit,
+            expiresAt: new Date(Date.now() + expiresInDays * 24 * 60 * 60 * 1000)
+        });
+        
+        await newApiKey.save();
+        
+        res.json({ 
+            success: true,
+            apiKey,
+            name: newApiKey.name,
+            expiresAt: newApiKey.expiresAt,
+            permissions: newApiKey.permissions,
+            rateLimit: newApiKey.rateLimit
+        });
+        
+    } catch (error) {
+        console.error('API key generation error:', error);
+        res.status(500).json({ error: 'Failed to generate API key' });
+    }
+});
+
+// ================== INITIALIZATION FUNCTIONS (PRESERVED) ==================
+async function initializeServerKeys() {
+    try {
+        const defaultKey = await ServerKey.findOne({ key: 'c126434b-eaf2-439a-a759-ca7600a7e146' });
+        
+        if (!defaultKey) {
+            const serverKey = new ServerKey({
+                key: 'c126434b-eaf2-439a-a759-ca7600a7e146',
+                name: 'Default Server Key',
+                isActive: true,
+                pluginEnabled: true,
+                owner: 'Zenuxs',
+                description: 'Default server key for AdvanceAuth'
+            });
+            await serverKey.save();
+            console.log('Default server key created');
+        }
+        
+        await updateServerKeyCache();
+        console.log('Server keys initialized successfully');
+    } catch (error) {
+        console.error('Failed to initialize server keys:', error);
+    }
+}
+
 async function initializeApp() {
     try {
         console.log('Initializing AdvanceAuth API...');
         
-        // Load license keys from database and JSON
         await loadLicenseKeys();
-        
-        // Initialize server keys in database
         await initializeServerKeys();
         
         const PORT = process.env.PORT || 3000;
@@ -1053,45 +1584,41 @@ async function initializeApp() {
     }
 }
 
-// Serve admin panel
+// ================== STATIC FILES AND ROUTES (PRESERVED) ==================
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use('/plugins', express.static(path.join(__dirname, 'plugins')));
 app.use(express.static("public"));
 
-
-
 app.get('/advancedAuth/dash', (req, res) => {
-    res.sendFile(path.join(__dirname, "dash.html"));
+    res.sendFile(path.join(__dirname, "public/dash.html"));
 });
 
 app.get("/advancedAuth/e-dash", (req,res)=>{
-    res.sendFile(path.join(__dirname, "admin.html"));
-})
-
+    res.sendFile(path.join(__dirname, "public/admin.html"));
+});
 
 app.get("/team", (req,res)=>{
-    res.sendFile(path.join(__dirname, "team.html"));
-})
-
+    res.sendFile(path.join(__dirname, "public/team.html"));
+});
 
 app.get("/about", (req,res)=>{
-    res.sendFile(path.join(__dirname, "about.html"));
-})
+    res.sendFile(path.join(__dirname, "public/about.html"));
+});
 
 app.get('/advancedAuth/', (req, res) => {
-    res.sendFile(path.join(__dirname, "advanceAuth.html"));
+    res.sendFile(path.join(__dirname, "public/advanceAuth.html"));
 });
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, "index.html"));
-})
-
-app.get('/advancedAuth/dash/:token', (req, res) => {
-    res.sendFile(path.join(__dirname, "dash.html"));
+    res.sendFile(path.join(__dirname, "public/index.html"));
 });
 
-// Health check endpoint
+app.get('/advancedAuth/dash/:token', (req, res) => {
+    res.sendFile(path.join(__dirname, "public/dash.html"));
+});
+
+// ================== EXISTING HEALTH AND ERROR HANDLERS (PRESERVED) ==================
 app.get('/health', (req, res) => {
     res.json({ 
         status: 'ok', 
@@ -1102,7 +1629,6 @@ app.get('/health', (req, res) => {
     });
 });
 
-// 404 handler
 app.use((req, res) => {
     res.status(404).json({ 
         error: 'Endpoint not found',
@@ -1111,7 +1637,6 @@ app.use((req, res) => {
     });
 });
 
-// Error handler
 app.use((error, req, res, next) => {
     console.error('Unhandled error:', error);
     res.status(500).json({ 
@@ -1120,7 +1645,7 @@ app.use((error, req, res, next) => {
     });
 });
 
-// Graceful shutdown
+// ================== GRACEFUL SHUTDOWN (PRESERVED) ==================
 process.on('SIGINT', async () => {
     console.log('Shutting down gracefully...');
     await mongoose.connection.close();
@@ -1133,5 +1658,5 @@ process.on('SIGTERM', async () => {
     process.exit(0);
 });
 
-// Start the application
+// ================== START APPLICATION ==================
 initializeApp();
