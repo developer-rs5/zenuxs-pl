@@ -25,8 +25,8 @@ const serverKeyCache = new NodeCache({ stdTTL: 180, checkperiod: 360 });
 
 // ================== RATE LIMITING ==================
 const publicApiLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100,
+    windowMs: 15 * 60 * 1000, 
+    max: 1000,
     message: { valid: false, error: 'Too many requests' },
     standardHeaders: true,
     legacyHeaders: false
@@ -34,7 +34,7 @@ const publicApiLimiter = rateLimit({
 
 const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 10,
+    max: 5000,
     message: { error: 'Too many login attempts' }
 });
 
