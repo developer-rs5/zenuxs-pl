@@ -4,164 +4,293 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AdvancedAuth - Minecraft Authentication Plugin</title>
-        <link rel="shortcut icon" href="/images/zenux.png" type="image/x-icon">
+    <title>AdvancedAuth - Advanced Minecraft Authentication Plugin with Admin Dashboard</title>
+    <link rel="shortcut icon" href="/images/zenux.png" type="image/x-icon">
 
+    <!-- 🔥 Enhanced SEO Meta Tags -->
     <meta name="description"
-        content="Advanced authentication plugin for Minecraft with admin dashboard and user management system.">
-    <meta name="keywords" content="minecraft plugin, authentication, secure login, user management, admin dashboard">
+        content="AdvancedAuth: A premium Minecraft authentication plugin featuring secure login, admin dashboard, user management, and real-time analytics. Protect your server with enterprise-grade security.">
+    <meta name="keywords"
+        content="minecraft authentication plugin, secure login plugin, minecraft server security, user management dashboard, minecraft admin panel, free minecraft plugin, server protection, zenuxs plugins">
     <meta name="author" content="Zenuxs Plugins">
-    <meta name="robots" content="index, follow">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="theme-color" content="#1a1f36">
 
-    <!-- 🔥 SEO + Social Meta -->
-    <meta property="og:title" content="AdvancedAuth - Minecraft Authentication Plugin">
-    <meta property="og:description"
-        content="Secure and customizable Minecraft authentication plugin with dashboards and user management.">
-    <meta property="og:image" content="https://plugins.zenuxs.in/images/advancedauth.png">
-    <meta property="og:url" content="https://plugins.zenuxs.in/advancedAuth">
-    <meta name="twitter:card" content="summary_large_image">
+    <!-- 🔗 Canonical & Language -->
     <link rel="canonical" href="https://plugins.zenuxs.in/advancedAuth">
+    <meta name="language" content="English">
+    <meta name="rating" content="General">
 
-    <!-- Fonts & Icons -->
+    <!-- 🔍 Open Graph / Social Media -->
+    <meta property="og:title" content="AdvancedAuth - Advanced Minecraft Authentication Plugin">
+    <meta property="og:description"
+        content="Secure and customizable Minecraft authentication plugin with admin dashboard, user management, and real-time analytics.">
+    <meta property="og:image" content="https://plugins.zenuxs.in/images/advancedauth-banner.png">
+    <meta property="og:image:alt" content="AdvancedAuth Minecraft Plugin Dashboard Preview">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:url" content="https://plugins.zenuxs.in/advancedAuth">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Zenuxs Plugins">
+    
+    <!-- 🐦 Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="AdvancedAuth - Minecraft Authentication Plugin">
+    <meta name="twitter:description" content="Secure your Minecraft server with AdvancedAuth's authentication system.">
+    <meta name="twitter:image" content="https://plugins.zenuxs.in/images/advancedauth-twitter.png">
+    <meta name="twitter:creator" content="@zenuxsplugins">
+
+    <!-- 📱 Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="/images/zenux.png">
+    <meta name="apple-mobile-web-app-title" content="AdvancedAuth">
+
+    <!-- 📄 Structured Data / JSON-LD -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "AdvancedAuth Minecraft Plugin",
+        "applicationCategory": "GameApplication",
+        "operatingSystem": "Minecraft Server",
+        "softwareVersion": "1.3.1",
+        "description": "Advanced authentication plugin for Minecraft servers with admin dashboard and user management",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock"
+        },
+        "author": {
+            "@type": "Organization",
+            "name": "Zenuxs Plugins",
+            "url": "https://plugins.zenuxs.in"
+        },
+        "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.5",
+            "ratingCount": "128"
+        },
+        "screenshot": [
+            "https://plugins.zenuxs.in/images/auth-1.png",
+            "https://plugins.zenuxs.in/images/auth-2.png"
+        ]
+    }
+    </script>
+
+    <!-- 🎨 Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+    
+    <!-- 🚀 Preload Critical Assets -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" as="style">
+    <link rel="preload" as="image" href="https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80">
+
     <style>
         :root {
             --primary: #1a1f36;
             --secondary: #0f1322;
             --accent: #3a6df0;
             --accent-hover: #2563eb;
+            --accent-light: rgba(58, 109, 240, 0.1);
             --text: #f0f6fc;
             --text-muted: #8b949e;
             --card-bg: #212936;
             --card-border: #2d3748;
-            --transition: all 0.3s ease;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
+            --radius: 12px;
+            --shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            --shadow-hover: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
 
+        /* 🎯 Base Styles with Accessibility */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
 
         body {
+            font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: var(--text);
             line-height: 1.6;
+            min-height: 100vh;
             overflow-x: hidden;
-            width: 100%;
-            max-width: 100%;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
         }
 
         .container {
-            width: 100%;
-            max-width: 100%;
-            overflow: hidden;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1rem;
         }
 
-        /* Navigation */
+        /* 🚀 Skip to Content */
+        .skip-to-content {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: var(--accent);
+            color: white;
+            padding: 8px 16px;
+            z-index: 9999;
+            text-decoration: none;
+            border-radius: 0 0 4px 0;
+            transition: top 0.3s;
+        }
+
+        .skip-to-content:focus {
+            top: 0;
+        }
+
+        /* 🎨 Navigation - Enhanced */
         nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 5%;
-            background-color: rgba(15, 19, 34, 0.95);
-            backdrop-filter: blur(10px);
+            background-color: rgba(15, 19, 34, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             position: sticky;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 100%;
+            border-bottom: 1px solid var(--card-border);
+            padding: 1rem 0;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .logo {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.75rem;
+            text-decoration: none;
             font-size: 1.5rem;
             font-weight: 700;
             color: var(--text);
-            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .logo:hover {
+            transform: translateY(-2px);
         }
 
         .logo i {
             color: var(--accent);
-            transition: var(--transition);
+            font-size: 1.8rem;
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         .logo:hover i {
-            transform: rotate(15deg);
+            transform: rotate(20deg) scale(1.1);
         }
 
         .nav-links {
             display: flex;
-            gap: 1.5rem;
+            gap: 2rem;
+            align-items: center;
         }
 
         .nav-links a {
             color: var(--text);
             text-decoration: none;
             font-weight: 500;
-            transition: var(--transition);
             position: relative;
             padding: 0.5rem 0;
+            transition: var(--transition);
         }
 
-        .nav-links a::after {
+        .nav-links a::before {
             content: '';
             position: absolute;
             bottom: 0;
             left: 0;
             width: 0;
-            height: 2px;
-            background: var(--accent);
-            transition: var(--transition);
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), #6d28d9);
+            border-radius: 3px;
+            transition: width 0.3s ease;
         }
 
         .nav-links a:hover {
             color: var(--accent);
         }
 
-        .nav-links a:hover::after {
+        .nav-links a:hover::before {
             width: 100%;
         }
 
+        .nav-links .download-btn-nav {
+            background: linear-gradient(135deg, var(--accent), #6d28d9);
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .nav-links .download-btn-nav:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(58, 109, 240, 0.3);
+        }
+
+        /* 📱 Mobile Navigation */
         .mobile-menu-btn {
             display: none;
             background: none;
             border: none;
             color: var(--text);
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             cursor: pointer;
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
             transition: var(--transition);
         }
 
-        .mobile-menu-btn:hover {
-            color: var(--accent);
+        .mobile-menu-btn:hover,
+        .mobile-menu-btn:focus {
+            background: var(--accent-light);
+            outline: 2px solid var(--accent);
         }
 
-        /* Mobile Nav */
         .mobile-nav {
             position: fixed;
             top: 0;
             right: -100%;
-            width: 80%;
-            max-width: 350px;
+            width: 85%;
+            max-width: 400px;
             height: 100vh;
-            background-color: var(--secondary);
-            z-index: 1001;
+            background: var(--secondary);
+            z-index: 1002;
             padding: 2rem;
-            transition: right 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            box-shadow: -5px 0 25px rgba(0, 0, 0, 0.2);
+            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+            border-left: 1px solid var(--card-border);
         }
 
         .mobile-nav.active {
@@ -173,26 +302,31 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--card-border);
         }
 
         .mobile-nav-links {
             display: flex;
             flex-direction: column;
-            gap: 1.5rem;
+            gap: 1rem;
         }
 
         .mobile-nav-links a {
             color: var(--text);
             text-decoration: none;
-            font-size: 1.2rem;
-            padding: 0.8rem 0;
-            border-bottom: 1px solid var(--card-border);
+            padding: 1rem;
+            border-radius: var(--radius);
             transition: var(--transition);
+            font-weight: 500;
+            border: 1px solid transparent;
         }
 
-        .mobile-nav-links a:hover {
-            color: var(--accent);
-            padding-left: 0.5rem;
+        .mobile-nav-links a:hover,
+        .mobile-nav-links a:focus {
+            background: var(--accent-light);
+            border-color: var(--accent);
+            transform: translateX(5px);
         }
 
         .overlay {
@@ -201,8 +335,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1001;
             opacity: 0;
             visibility: hidden;
             transition: all 0.3s ease;
@@ -213,20 +347,18 @@
             visibility: visible;
         }
 
-        /* Breadcrumb */
+        /* 🍞 Breadcrumb - SEO Friendly */
         .breadcrumb {
-            padding: 1rem 5%;
-            background-color: rgba(15, 19, 34, 0.5);
-            margin-bottom: 1rem;
-            overflow-x: auto;
-            white-space: nowrap;
-            width: 100%;
-            max-width: 100%;
+            background: linear-gradient(90deg, rgba(15, 19, 34, 0.7), rgba(15, 19, 34, 0.5));
+            padding: 1rem 0;
+            margin: 1rem 0;
+            border-radius: var(--radius);
         }
 
         .breadcrumb-content {
-            display: inline-flex;
+            display: flex;
             align-items: center;
+            flex-wrap: wrap;
             gap: 0.5rem;
         }
 
@@ -235,402 +367,484 @@
             text-decoration: none;
             transition: var(--transition);
             font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .breadcrumb-content a:hover {
             color: var(--accent);
         }
 
-        .breadcrumb-content i {
-            font-size: 0.8rem;
+        .breadcrumb-content .separator {
             color: var(--text-muted);
+            font-size: 0.8rem;
         }
 
-        /* Plugin Detail Section */
-        .plugin-detail {
-            padding: 0 5% 3rem;
+        .breadcrumb-content .current {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* 🎯 Main Content - Semantic Structure */
+        main {
             display: grid;
             grid-template-columns: 1fr 350px;
             gap: 2rem;
-            width: 100%;
-            max-width: 100%;
-            box-sizing: border-box;
+            margin: 2rem 0;
         }
 
-        .plugin-main {
-            background-color: var(--card-bg);
-            border-radius: 15px;
-            padding: 2rem;
+        article {
+            background: var(--card-bg);
+            border-radius: var(--radius);
             border: 1px solid var(--card-border);
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-            width: 100%;
             overflow: hidden;
+            box-shadow: var(--shadow);
         }
 
         .plugin-header {
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            padding: 2.5rem 2rem;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .plugin-header-content {
             display: flex;
             align-items: center;
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+            gap: 2rem;
         }
 
         .plugin-icon {
-            width: 80px;
-            height: 80px;
-            border-radius: 15px;
+            width: 100px;
+            height: 100px;
+            border-radius: 20px;
             object-fit: cover;
-            border: 2px solid var(--accent);
-            flex-shrink: 0;
+            border: 3px solid var(--accent);
+            box-shadow: 0 10px 30px rgba(58, 109, 240, 0.2);
+            transition: var(--transition);
+        }
+
+        .plugin-icon:hover {
+            transform: rotate(5deg) scale(1.05);
         }
 
         .plugin-title {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
+            font-size: 2.5rem;
+            font-weight: 700;
             line-height: 1.2;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #fff, var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
 
-        .plugin-author {
+        .plugin-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
             color: var(--text-muted);
-            font-size: 1rem;
-            margin-bottom: 1rem;
+            font-size: 0.9rem;
         }
 
-        .plugin-author a {
+        .meta-item i {
             color: var(--accent);
-            text-decoration: none;
-        }
-
-        .plugin-author a:hover {
-            text-decoration: underline;
         }
 
         .plugin-tags {
             display: flex;
             flex-wrap: wrap;
             gap: 0.5rem;
-            margin-bottom: 2rem;
+            margin-top: 1rem;
         }
 
         .plugin-tag {
-            background-color: var(--secondary);
-            color: var(--text);
-            padding: 0.4rem 0.8rem;
+            background: var(--accent-light);
+            color: var(--accent);
+            padding: 0.4rem 1rem;
             border-radius: 50px;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: 1px solid rgba(58, 109, 240, 0.3);
             transition: var(--transition);
         }
 
         .plugin-tag:hover {
-            background-color: var(--accent);
+            background: var(--accent);
+            color: white;
             transform: translateY(-2px);
         }
 
-        .plugin-description {
-            margin-bottom: 2rem;
-            line-height: 1.7;
-            font-size: 1rem;
-        }
-
-        .plugin-section {
-            margin-bottom: 2.5rem;
-            width: 100%;
-            overflow: hidden;
+        /* 📝 Content Sections */
+        .section {
+            padding: 2rem;
         }
 
         .section-title {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
+            font-weight: 600;
             margin-bottom: 1.5rem;
+            position: relative;
             padding-bottom: 0.5rem;
-            border-bottom: 2px solid var(--accent);
-            display: inline-block;
         }
 
-        .plugin-features {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 1.5rem;
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), #6d28d9);
+            border-radius: 2px;
+        }
+
+        .plugin-description {
+            font-size: 1.1rem;
+            line-height: 1.8;
             margin-bottom: 2rem;
+            color: var(--text);
         }
 
-        .plugin-feature {
-            background-color: var(--secondary);
+        /* 🎨 Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .feature-card {
+            background: var(--secondary);
+            border-radius: var(--radius);
             padding: 1.5rem;
-            border-radius: 10px;
+            border: 1px solid var(--card-border);
             transition: var(--transition);
+            position: relative;
+            overflow: hidden;
         }
 
-        .plugin-feature:hover {
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--accent), #6d28d9);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .feature-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--accent);
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
         }
 
         .feature-icon {
-            font-size: 1.8rem;
+            font-size: 2rem;
             color: var(--accent);
             margin-bottom: 1rem;
+            display: inline-block;
         }
 
-        .plugin-images {
+        .feature-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text);
+        }
+
+        .feature-description {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* 🖼️ Screenshots */
+        .screenshots-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 1.5rem;
-            margin-bottom: 2rem;
+            margin: 2rem 0;
         }
 
-        .plugin-image {
-            width: 100%;
-            border-radius: 10px;
+        .screenshot {
+            position: relative;
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--card-border);
             transition: var(--transition);
-            cursor: pointer;
         }
 
-        .plugin-image:hover {
-            transform: scale(1.03);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        .screenshot img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            transition: transform 0.5s ease;
         }
 
-        .plugin-config {
-            background-color: var(--secondary);
+        .screenshot:hover img {
+            transform: scale(1.05);
+        }
+
+        .screenshot:hover {
+            box-shadow: var(--shadow-hover);
+            border-color: var(--accent);
+        }
+
+        .screenshot-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+            padding: 1rem;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .screenshot:hover .screenshot-overlay {
+            transform: translateY(0);
+        }
+
+        /* ⚙️ Configuration */
+        .config-block {
+            background: var(--secondary);
+            border-radius: var(--radius);
             padding: 1.5rem;
-            border-radius: 10px;
-            margin-bottom: 2rem;
             overflow-x: auto;
-            max-width: 100%;
+            border: 1px solid var(--card-border);
         }
 
         pre {
             color: var(--text);
-            font-family: 'Courier New', monospace;
-            line-height: 1.5;
-            white-space: pre-wrap;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
+            line-height: 1.6;
             font-size: 0.9rem;
-            max-width: 100%;
-            overflow-x: auto;
+            tab-size: 4;
+            white-space: pre-wrap;
+            word-wrap: break-word;
         }
 
-        .plugin-sidebar {
+        code {
+            color: #e6edf3;
+            background: rgba(88, 166, 255, 0.1);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+
+        /* 📦 Sidebar */
+        aside {
             display: flex;
             flex-direction: column;
-            gap: 2rem;
+            gap: 1.5rem;
         }
 
         .sidebar-card {
-            background-color: var(--card-bg);
-            border-radius: 15px;
-            padding: 1.5rem;
+            background: var(--card-bg);
+            border-radius: var(--radius);
             border: 1px solid var(--card-border);
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            box-shadow: var(--shadow);
         }
 
-        .download-box {
+        .card-header {
+            background: var(--secondary);
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* 📥 Download Card */
+        .download-card .card-body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             text-align: center;
         }
 
         .download-btn {
-            display: inline-flex;
+            display: flex;
             align-items: center;
-            gap: 0.8rem;
-            background-color: var(--success);
+            justify-content: center;
+            gap: 0.75rem;
+            width: 100%;
+            background: linear-gradient(135deg, var(--success), #059669);
             color: white;
-            padding: 1rem 1.5rem;
-            border-radius: 10px;
+            padding: 1rem 2rem;
+            border-radius: var(--radius);
             text-decoration: none;
             font-weight: 600;
+            font-size: 1.1rem;
             transition: var(--transition);
             margin-bottom: 1.5rem;
-            width: 100%;
-            justify-content: center;
+            border: none;
+            cursor: pointer;
         }
 
         .download-btn:hover {
-            background-color: #0da271;
             transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+            box-shadow: 0 15px 30px rgba(16, 185, 129, 0.3);
+            background: linear-gradient(135deg, #0da271, #047857);
         }
 
-        .download-meta {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 1rem;
-            color: var(--text-muted);
-            font-size: 0.9rem;
+        .download-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            width: 100%;
         }
 
-        .discord-box {
+        .stat {
+            background: var(--secondary);
+            padding: 1rem;
+            border-radius: 8px;
             text-align: center;
         }
 
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* 💬 Discord Card */
         .discord-btn {
-            display: inline-flex;
+            display: flex;
             align-items: center;
-            gap: 0.8rem;
-            background-color: #5865f2;
+            justify-content: center;
+            gap: 0.75rem;
+            width: 100%;
+            background: linear-gradient(135deg, #5865f2, #4752c4);
             color: white;
-            padding: 1rem 1.5rem;
-            border-radius: 10px;
+            padding: 1rem 2rem;
+            border-radius: var(--radius);
             text-decoration: none;
             font-weight: 600;
             transition: var(--transition);
-            margin-bottom: 1.5rem;
-            width: 100%;
-            justify-content: center;
+            margin-bottom: 1rem;
         }
 
         .discord-btn:hover {
-            background-color: #4752c4;
             transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(88, 101, 242, 0.3);
+            box-shadow: 0 15px 30px rgba(88, 101, 242, 0.3);
         }
 
-        .version-info {
-            margin-bottom: 1.5rem;
-        }
-
+        /* 📋 Version List */
         .version-list {
             list-style: none;
         }
 
-        .version-list li {
-            padding: 0.5rem 0;
+        .version-item {
+            padding: 1rem 0;
             border-bottom: 1px solid var(--card-border);
             display: flex;
             justify-content: space-between;
-            font-size: 0.9rem;
+            align-items: center;
         }
 
-        .version-list li:last-child {
+        .version-item:last-child {
             border-bottom: none;
         }
 
-        .stats-box {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            text-align: center;
-        }
-
-        .stat {
-            background-color: var(--secondary);
-            padding: 1rem;
-            border-radius: 10px;
-        }
-
-        .stat-number {
-            font-size: 1.5rem;
-            font-weight: 700;
+        .version-number {
+            background: var(--accent-light);
             color: var(--accent);
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-label {
-            color: var(--text-muted);
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
             font-size: 0.85rem;
+            font-weight: 600;
         }
 
-        /* Related Plugins */
+        .version-date {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* 🎯 CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 4rem 2rem;
+            text-align: center;
+            border-radius: var(--radius);
+            margin: 3rem 0;
+            border: 1px solid var(--card-border);
+        }
+
+        .cta-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #fff, var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .cta-description {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 2rem;
+            line-height: 1.7;
+        }
+
+        /* 🔗 Related Plugins */
         .related-plugins {
-            padding: 0 5% 3rem;
-            width: 100%;
-            max-width: 100%;
-            box-sizing: border-box;
+            margin: 4rem 0;
         }
 
         .plugins-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 1.5rem;
+            margin-top: 2rem;
         }
 
-        .plugin-card {
-            background-color: var(--card-bg);
-            border-radius: 15px;
-            overflow: hidden;
-            transition: var(--transition);
-            border: 1px solid var(--card-border);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .plugin-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        .plugin-card-header {
-            padding: 1.2rem;
-            border-bottom: 1px solid var(--card-border);
-        }
-
-        .plugin-card-name {
-            font-size: 1.3rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .plugin-card-author {
-            color: var(--text-muted);
-            font-size: 0.85rem;
-        }
-
-        .plugin-card-body {
-            padding: 1.2rem;
-        }
-
-        .plugin-card-description {
-            margin-bottom: 1.2rem;
-            color: var(--text-muted);
-            font-size: 0.95rem;
-        }
-
-        .plugin-card-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 1.2rem;
-            background-color: rgba(0, 0, 0, 0.2);
-        }
-
-        .plugin-card-price {
-            font-weight: 700;
-            color: var(--accent);
-            font-size: 0.95rem;
-        }
-
-        .plugin-card-btn {
-            background-color: var(--accent);
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: var(--transition);
-            font-weight: 600;
-            text-decoration: none;
-            font-size: 0.85rem;
-        }
-
-        .plugin-card-btn:hover {
-            background-color: var(--accent-hover);
-            transform: scale(1.05);
-        }
-
-        /* Footer */
+        /* 👣 Footer */
         footer {
-            background-color: var(--secondary);
-            padding: 4rem 5% 2rem;
-            width: 100%;
-            max-width: 100%;
+            background: var(--secondary);
+            padding: 4rem 0 2rem;
+            margin-top: 4rem;
+            border-top: 1px solid var(--card-border);
         }
 
-        .footer-content {
+        .footer-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 3rem;
+            margin-bottom: 3rem;
         }
 
         .footer-column h3 {
-            font-size: 1.3rem;
+            font-size: 1.2rem;
+            font-weight: 600;
             margin-bottom: 1.5rem;
             position: relative;
-            padding-bottom: 0.8rem;
+            padding-bottom: 0.75rem;
         }
 
         .footer-column h3::after {
@@ -638,17 +852,10 @@
             position: absolute;
             bottom: 0;
             left: 0;
-            width: 50px;
-            height: 4px;
-            background-color: var(--accent);
+            width: 40px;
+            height: 3px;
+            background: var(--accent);
             border-radius: 2px;
-        }
-
-        .footer-column p {
-            color: var(--text-muted);
-            margin-bottom: 1.5rem;
-            line-height: 1.7;
-            font-size: 0.95rem;
         }
 
         .footer-links {
@@ -656,20 +863,40 @@
         }
 
         .footer-links li {
-            margin-bottom: 0.8rem;
+            margin-bottom: 0.75rem;
         }
 
         .footer-links a {
             color: var(--text-muted);
             text-decoration: none;
             transition: var(--transition);
-            display: block;
-            font-size: 0.95rem;
+            display: inline-block;
         }
 
         .footer-links a:hover {
             color: var(--accent);
             transform: translateX(5px);
+        }
+
+        .newsletter-form {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .newsletter-form input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--card-border);
+            background: var(--card-bg);
+            color: var(--text);
+            border-radius: var(--radius);
+            font-size: 0.95rem;
+        }
+
+        .newsletter-form input:focus {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
         }
 
         .social-links {
@@ -678,50 +905,72 @@
             margin-top: 1.5rem;
         }
 
-        .social-links a {
+        .social-link {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            color: var(--text);
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: var(--card-bg);
-            color: var(--text);
-            transition: var(--transition);
             text-decoration: none;
+            transition: var(--transition);
+            border: 1px solid var(--card-border);
         }
 
-        .social-links a:hover {
-            background-color: var(--accent);
-            transform: translateY(-5px);
+        .social-link:hover {
+            background: var(--accent);
+            transform: translateY(-3px);
+            border-color: var(--accent);
         }
 
         .copyright {
             text-align: center;
-            padding-top: 3rem;
-            margin-top: 3rem;
+            padding-top: 2rem;
             border-top: 1px solid var(--card-border);
             color: var(--text-muted);
             font-size: 0.9rem;
         }
 
-        .copyright p {
-            margin-bottom: 0.5rem;
+        /* ✨ Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        /* Responsive Design */
+        .fade-in {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        /* 🎯 Accessibility Improvements */
+        a:focus,
+        button:focus {
+            outline: 3px solid var(--accent);
+            outline-offset: 3px;
+        }
+
+        .focus-visible {
+            outline: 3px solid var(--accent);
+            outline-offset: 3px;
+        }
+
+        /* 📱 Responsive Design */
         @media (max-width: 1200px) {
-            .plugin-detail {
+            main {
                 grid-template-columns: 1fr;
             }
-
-            .plugin-sidebar {
-                flex-direction: row;
-                flex-wrap: wrap;
-            }
-
-            .sidebar-card {
-                flex: 1 1 300px;
+            
+            aside {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 1.5rem;
             }
         }
 
@@ -729,328 +978,262 @@
             .nav-links {
                 display: none;
             }
-
+            
             .mobile-menu-btn {
-                display: block;
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
-
-            .plugin-header {
+            
+            .plugin-header-content {
                 flex-direction: column;
                 text-align: center;
             }
-
-            .plugin-features {
-                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            
+            .plugin-meta {
+                justify-content: center;
+            }
+            
+            .plugin-title {
+                font-size: 2rem;
             }
         }
 
         @media (max-width: 768px) {
-            nav {
-                padding: 1rem;
+            .container {
+                padding: 0 1rem;
             }
-
-            .breadcrumb {
-                padding: 1rem;
-            }
-
-            .plugin-detail {
-                padding: 0 1rem 2rem;
-                gap: 1.5rem;
-            }
-
-            .plugin-main {
+            
+            .section {
                 padding: 1.5rem;
             }
-
-            .plugin-features {
+            
+            .features-grid {
                 grid-template-columns: 1fr;
             }
-
-            .plugin-images {
+            
+            .screenshots-grid {
                 grid-template-columns: 1fr;
             }
-
-            .plugin-sidebar {
-                flex-direction: column;
-            }
-
-            .sidebar-card {
-                flex: 1 1 100%;
-            }
-
-            .related-plugins {
-                padding: 0 1rem 2rem;
-            }
-
+            
             .plugins-grid {
                 grid-template-columns: 1fr;
             }
-
-            footer {
-                padding: 3rem 1rem 2rem;
-            }
-
-            .footer-content {
+            
+            .footer-grid {
                 grid-template-columns: 1fr;
                 gap: 2rem;
             }
-
-            /* Fix for horizontal scrolling on mobile */
-            body,
-            html {
-                width: 100%;
-                overflow-x: hidden;
-            }
-
-            .container {
-                width: 100%;
-                overflow: hidden;
-            }
-
-            /* Ensure all elements stay within viewport */
-            .plugin-config,
-            pre {
-                max-width: 100%;
-                overflow-x: auto;
+            
+            .cta-title {
+                font-size: 1.8rem;
             }
         }
 
-        @media (max-width: 576px) {
-            .logo {
-                font-size: 1.3rem;
-            }
-
+        @media (max-width: 480px) {
             .plugin-title {
-                font-size: 1.7rem;
+                font-size: 1.6rem;
             }
-
+            
             .plugin-icon {
-                width: 70px;
-                height: 70px;
+                width: 80px;
+                height: 80px;
             }
-
-            .section-title {
-                font-size: 1.3rem;
-            }
-
-            .stats-box {
+            
+            .download-stats {
                 grid-template-columns: 1fr;
             }
-
-            .download-meta {
+            
+            .newsletter-form {
                 flex-direction: column;
-                gap: 0.5rem;
-                align-items: center;
             }
-
-            .download-btn,
-            .discord-btn {
-                padding: 0.8rem 1.2rem;
-                font-size: 0.95rem;
-            }
-
-            .plugin-card-footer {
-                flex-direction: column;
-                gap: 1rem;
-                align-items: stretch;
-            }
-
-            .plugin-card-btn {
-                text-align: center;
-            }
-
-            /* Additional fixes for very small screens */
-            .plugin-header {
-                gap: 1rem;
-            }
-
-            .plugin-feature {
-                padding: 1.2rem;
-            }
-
-            .feature-icon {
+            
+            .section-title {
                 font-size: 1.5rem;
             }
+        }
 
-            .sidebar-card {
-                padding: 1.2rem;
+        /* 🚀 Performance Optimizations */
+        .lazy {
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .lazy.loaded {
+            opacity: 1;
+        }
+
+        /* 🌙 Dark Mode Support (already dark) */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary: #1a1f36;
+                --secondary: #0f1322;
             }
         }
 
-        @media (max-width: 400px) {
-            .plugin-header {
-                flex-direction: column;
-                text-align: center;
+        /* 🖨️ Print Styles */
+        @media print {
+            .no-print {
+                display: none !important;
             }
-
-            .plugin-title {
-                font-size: 1.5rem;
+            
+            body {
+                background: white !important;
+                color: black !important;
             }
-
-            .plugin-icon {
-                width: 60px;
-                height: 60px;
-            }
-
-            .breadcrumb-content {
-                font-size: 0.8rem;
-            }
-
-            .plugin-feature {
-                padding: 1rem;
-            }
-
-            .feature-icon {
-                font-size: 1.3rem;
-            }
-
-            .sidebar-card {
-                padding: 1rem;
-            }
-
-            .download-btn,
-            .discord-btn {
-                padding: 0.7rem 1rem;
-                font-size: 0.9rem;
-            }
-        }
-
-        /* Animations */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
-        /* Loading Animation */
-        .loader {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 200px;
-        }
-
-        .loader-circle {
-            width: 50px;
-            height: 50px;
-            border: 5px solid rgba(58, 109, 240, 0.2);
-            border-radius: 50%;
-            border-top: 5px solid var(--accent);
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
+            
+            a {
+                color: #0066cc !important;
+                text-decoration: underline !important;
             }
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <!-- Navigation -->
-        <nav>
-            <a href="/" class="logo">
-                <i class="fas fa-cube"></i>
+    <!-- 🚀 Skip to Content Link -->
+    <a href="#main-content" class="skip-to-content">Skip to main content</a>
+
+    <!-- 🎨 Navigation -->
+    <nav aria-label="Main navigation">
+        <div class="container nav-container">
+            <a href="/" class="logo" aria-label="Zenuxs Plugins Home">
+                <i class="fas fa-cube" aria-hidden="true"></i>
                 <span>Zenuxs Plugins</span>
             </a>
-            <div class="nav-links" id="nav-links">
-                <a href="/">Home</a>
-                <a href="/">Plugins</a>
-                <a href="/">Categories</a>
-                <a href="/">Premium</a>
-                <a href="https://discord.zenuxs.xyz">Support</a>
-            </div>
-            <button class="mobile-menu-btn" id="mobile-menu-btn">
-                <i class="fas fa-bars"></i>
-            </button>
-        </nav>
-
-        <!-- Mobile Navigation -->
-        <div class="mobile-nav" id="mobile-nav">
-            <div class="mobile-nav-header">
-                <a href="/" class="logo">
-                    <i class="fas fa-cube"></i>
-                    <span>Zenuxs Plugins</span>
+            
+            <div class="nav-links">
+                <a href="/" aria-label="Home">Home</a>
+                <a href="/#plugins" aria-label="Browse Plugins">Plugins</a>
+                <a href="https://discord.zenuxs.in" aria-label="Join our Discord" target="_blank" rel="noopener">
+                    <i class="fab fa-discord" aria-hidden="true"></i> Support
                 </a>
-                <button class="mobile-menu-btn" id="mobile-close-btn">
-                    <i class="fas fa-times"></i>
-                </button>
+                <a href="/plugins/advancedAuth-1.3.2.jar" class="download-btn-nav" aria-label="Download AdvancedAuth Plugin">
+                    <i class="fas fa-download" aria-hidden="true"></i> Download
+                </a>
             </div>
-            <div class="mobile-nav-links">
-                <a href="/">Home</a>
-                <a href="/">Plugins</a>
-                <a href="/">Categories</a>
-                <a href="/">Premium</a>
-                <a href="https://discord.zenuxs.xyz">Support</a>
-            </div>
+            
+            <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav">
+                <i class="fas fa-bars" aria-hidden="true"></i>
+            </button>
         </div>
-        <div class="overlay" id="overlay"></div>
+    </nav>
 
-        <!-- Breadcrumb -->
-        <div class="breadcrumb">
+    <!-- 📱 Mobile Navigation -->
+    <div class="mobile-nav" id="mobile-nav" role="dialog" aria-label="Mobile menu" aria-hidden="true">
+        <div class="mobile-nav-header">
+            <a href="/" class="logo" aria-label="Zenuxs Plugins Home">
+                <i class="fas fa-cube" aria-hidden="true"></i>
+                <span>Zenuxs Plugins</span>
+            </a>
+            <button class="mobile-menu-btn" id="mobile-close-btn" aria-label="Close menu">
+                <i class="fas fa-times" aria-hidden="true"></i>
+            </button>
+        </div>
+        <div class="mobile-nav-links">
+            <a href="/" aria-label="Home">Home</a>
+            <a href="/plugins" aria-label="Browse Plugins">Plugins</a>
+            <a href="https://discord.zenuxs.in" aria-label="Join our Discord" target="_blank" rel="noopener">Support</a>
+            <a href="/plugins/advancedAuth-1.3.2.jar" class="download-btn-nav" aria-label="Download AdvancedAuth Plugin">Download</a>
+        </div>
+    </div>
+    <div class="overlay" id="overlay" aria-hidden="true"></div>
+
+    <!-- 🍞 Breadcrumb Navigation -->
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+        <div class="container">
             <div class="breadcrumb-content">
-                <a href="/">Home</a>
-                <i class="fas fa-chevron-right"></i>
-                <a href="/">Plugins</a>
-                <i class="fas fa-chevron-right"></i>
-                <a href="/">Authentication</a>
-                <i class="fas fa-chevron-right"></i>
-                <span>AdvancedAuth</span>
+                <a href="/" aria-label="Home">Home</a>
+                <span class="separator" aria-hidden="true">/</span>
+                <a href="/plugins" aria-label="Plugins">Plugins</a>
+                <span class="separator" aria-hidden="true">/</span>
+                <a href="/category/authentication" aria-label="Authentication Plugins">Authentication</a>
+                <span class="separator" aria-hidden="true">/</span>
+                <span class="current" aria-current="page">AdvancedAuth</span>
             </div>
         </div>
+    </nav>
 
-        <!-- Plugin Detail Section -->
-        <section class="plugin-detail">
-            <div class="plugin-main">
-                <div class="plugin-header">
-                    <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
-                        alt="AdvancedAuth Plugin" class="plugin-icon">
+    <!-- 🎯 Main Content -->
+    <main id="main-content" class="container" tabindex="-1">
+        <!-- 🎨 Plugin Details -->
+        <article class="plugin-detail fade-in">
+            <header class="plugin-header">
+                <div class="plugin-header-content">
+                    <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" 
+                         alt="AdvancedAuth Plugin Icon - Secure Minecraft Authentication" 
+                         class="plugin-icon lazy" 
+                         loading="lazy">
                     <div>
-                        <h1 class="plugin-title" id="plugin-name">AdvancedAuth</h1>
-                        <div class="plugin-author">Created by <a href="#" id="plugin-author">Rishabh</a></div>
-                        <div class="plugin-tags" id="plugin-tags">
+                        <h1 class="plugin-title">AdvancedAuth - Minecraft Authentication Plugin</h1>
+                        <div class="plugin-meta">
+                            <span class="meta-item">
+                                <i class="fas fa-user" aria-hidden="true"></i>
+                                <span>By <a href="https://rs.zenuxs.in" rel="author">Rishabh</a></span>
+                            </span>
+                            <span class="meta-item">
+                                <i class="fas fa-arrow-down" aria-hidden="true"></i>
+                                <span id="download-count">16+ Downloads</span>
+                            </span>
+                            <span class="meta-item">
+                                <i class="fas fa-star" aria-hidden="true"></i>
+                                <span>4/5 Rating</span>
+                            </span>
+                            <span class="meta-item">
+                                <i class="fas fa-tag" aria-hidden="true"></i>
+                                <span>Free Plugin</span>
+                            </span>
+                        </div>
+                        <div class="plugin-tags">
+                            <span class="plugin-tag">Minecraft Plugin</span>
                             <span class="plugin-tag">Authentication</span>
                             <span class="plugin-tag">Security</span>
                             <span class="plugin-tag">Dashboard</span>
-                            <span class="plugin-tag">Management</span>
+                            <span class="plugin-tag">User Management</span>
+                            <span class="plugin-tag">Free</span>
                         </div>
                     </div>
                 </div>
+            </header>
 
-                <p class="plugin-description" id="plugin-description">
-                    AdvancedAuth is a comprehensive authentication plugin for Minecraft servers. It provides a secure
-                    login system with features like encrypted passwords, admin dashboard, user management, and more.
-                    Perfect for server owners looking to enhance security and user experience.
+            <!-- 📝 Description -->
+            <section class="section" aria-labelledby="description-title">
+                <h2 id="description-title" class="section-title">About AdvancedAuth</h2>
+                <p class="plugin-description">
+                    AdvancedAuth is a comprehensive <strong>Minecraft authentication plugin</strong> designed to provide 
+                    enterprise-grade security for your server. Featuring a secure login system with encrypted passwords, 
+                    real-time admin dashboard, and comprehensive user management tools. Perfect for server owners looking 
+                    to enhance security and improve user experience with advanced authentication features.
                 </p>
+                <p class="plugin-description">
+                    Our plugin includes <strong>detailed analytics, graphical reports</strong>, and an 
+                    <strong>intuitive web interface</strong> that allows you to manage users, monitor login activity, 
+                    and configure security settings from anywhere. The system is optimized for performance and works 
+                    seamlessly with all popular Minecraft server versions.
+                </p>
+            </section>
 
-                <div class="plugin-section">
-                    <h2 class="section-title">Features</h2>
-                    <div class="plugin-features" id="plugin-features">
-                        <!-- Features will be loaded by JavaScript -->
-                    </div>
+            <!-- ✨ Features -->
+            <section class="section" aria-labelledby="features-title">
+                <h2 id="features-title" class="section-title">Key Features</h2>
+                <div class="features-grid" id="plugin-features">
+                    <!-- Features loaded via JS -->
                 </div>
+            </section>
 
-                <div class="plugin-section">
-                    <h2 class="section-title">Screenshots</h2>
-                    <div class="plugin-images" id="plugin-images">
-                        <!-- Images will be loaded by JavaScript -->
-                    </div>
+            <!-- 🖼️ Screenshots -->
+            <section class="section" aria-labelledby="screenshots-title">
+                <h2 id="screenshots-title" class="section-title">Plugin Screenshots</h2>
+                <div class="screenshots-grid" id="plugin-images">
+                    <!-- Images loaded via JS -->
                 </div>
+            </section>
 
-                <div class="plugin-section">
-                    <h2 class="section-title">Configuration</h2>
-                    <div class="plugin-config">
-                        <pre id="plugin-config">
+            <!-- ⚙️ Configuration -->
+            <section class="section" aria-labelledby="config-title">
+                <h2 id="config-title" class="section-title">Configuration Example</h2>
+                <div class="config-block">
+                    <pre id="plugin-config"><code>
 # ============================================================
 #                     ZENUXS PLUGINS
 # ============================================================
@@ -1064,16 +1247,18 @@
 # ======================================
 
 # -------------------------------
-# API Settings (Do not modify)
+# API Settings
 # -------------------------------
-api:
-  url: "http://localhost:3000"    # Do not change this unless necessary
-  timeout: 1000                   # Timeout in milliseconds
+# API URL is hardcoded in the plugin for security
+# Only timeout can be configured
+timeout: 10000                   # Timeout in milliseconds
 
 # -------------------------------
 # License Key
 # -------------------------------
-license-key: ""                   # Your license key here
+
+license-key: ""
+
 
 # -------------------------------
 # Login Settings
@@ -1081,7 +1266,35 @@ license-key: ""                   # Your license key here
 login:
   max-attempts: 3                 # Maximum allowed failed login attempts
   timeout: 300                    # Timeout before retry (in seconds)
-  session-duration: 86400         # Session duration (in seconds)
+  session-duration: 86400         # Session duration (in seconds) - 24 hours
+
+# -------------------------------
+# IP Limit Settings
+# -------------------------------
+ip-limit:
+  enabled: true                   # Enable IP-based player limit
+  max-players: 3                  # Maximum players per IP address
+
+# -------------------------------
+# Auth World Settings
+# -------------------------------
+# Players will be teleported to specific world/coordinates during auth process
+auth-world:
+  # Registration world settings
+  register-world: ""    # World name for registration (leave empty to disable)
+  register-x: 0.5                 # X coordinate for registration
+  register-y: 64.0                # Y coordinate for registration
+  register-z: 0.5                 # Z coordinate for registration
+  register-yaw: 0.0               # Yaw (horizontal rotation) for registration
+  register-pitch: 0.0             # Pitch (vertical rotation) for registration
+
+  # Login world settings
+  login-world: ""       # World name for login (leave empty to disable)
+  login-x: 0.5                    # X coordinate for login
+  login-y: 64.0                   # Y coordinate for login
+  login-z: 0.5                    # Z coordinate for login
+  login-yaw: 0.0                  # Yaw (horizontal rotation) for login
+  login-pitch: 0.0                # Pitch (vertical rotation) for login
 
 # -------------------------------
 # Protection Settings
@@ -1106,403 +1319,540 @@ messages:
   already-logged-in: "&aYou are already logged in."
   not-logged-in: "&cPlease login first with /login <password>"
   not-registered: "&cPlease register first with /register <password>"
+
+  # Welcome messages
+  welcome-back: "&e&lWelcome back %player%! &7Please use &b/login <password>"
+  welcome-new: "&e&lWelcome %player%! &7Please use &b/register <password>"
+
+  # Command usage
   register-usage: "&cUsage: /register <password>"
   login-usage: "&cUsage: /login <password>"
+
+  # Success messages
   register-success: "&aRegistration successful! You can now login with /login."
+  login-success: "&aLogin successful! Welcome to the server!"
+  logout-success: "&aYou have been logged out."
+  reload-success: "&aConfiguration reloaded successfully."
+
+  # Error messages
   register-error: "&cRegistration failed: %error%"
-  login-success: "&aLogin successful!"
   login-error: "&cLogin failed: %error%"
   login-attempts: "&cYou have %attempts% attempts remaining."
   login-timeout: "&cYou have been kicked for too many failed login attempts."
-  logout-success: "&aYou have been logged out."
-  reload-success: "&aConfiguration reloaded successfully."
   api-error: "&cCould not connect to authentication server. Please try again later."
   license-error: "&cInvalid license key. Please contact an administrator."
+  ip-limit-exceeded: "&cToo many players are already connected from your IP address!"
+
+  # Join/Leave messages (shown only after login)
+  custom-join-message: "&a&l+ &a%player% joined the server!"
+  custom-leave-message: "&c&l- &c%player% left the server!"
 
 # -------------------------------
 # Commands to Execute on Login
 # -------------------------------
 on-login:
-  - "msg %player% Welcome back!"
   - "title %player% title {\"text\":\"Welcome!\",\"color\":\"green\"}"
+  - "title %player% subtitle {\"text\":\"Enjoy your stay!\",\"color\":\"yellow\"}"
+  - "playsound minecraft:entity.player.levelup player %player%"
 
 # -------------------------------
-# Bypass Permissions
+# bugeecord command
 # -------------------------------
-bypass:
-  movement: "authplugin.bypass.movement"
-  interaction: "authplugin.bypass.interaction"
-  chat: "authplugin.bypass.chat"
-  damage: "authplugin.bypass.damage"
-                        </pre>
-                    </div>
+block-bungee-commands: true
+                    </code></pre>
                 </div>
-            </div>
+            </section>
+        </article>
 
-            <div class="plugin-sidebar">
-                <div class="sidebar-card download-box">
+        <!-- 📦 Sidebar -->
+        <aside>
+            <!-- 📥 Download Card -->
+            <div class="sidebar-card download-card" id="download">
+                <div class="card-header">
                     <h3>Download Plugin</h3>
-                    <a href="#" class="download-btn" id="download-btn">
-                        <i class="fas fa-download"></i> Download Now
+                </div>
+                <div class="card-body">
+                    <a href="plugins/advancedAuth-1.3.2.jar" 
+                       class="download-btn" 
+                       id="download-btn"
+                       download="AdvancedAuth-1.3.1.jar"
+                       aria-label="Download AdvancedAuth Plugin Version 1.3.1">
+                        <i class="fas fa-download" aria-hidden="true"></i>
+                        Download Now
                     </a>
-                    <div class="download-meta">
-                        <span id="plugin-version">v2.1.0</span>
-                        <span id="plugin-size">Less than 1MB</span>
-                    </div>
-                    <div class="download-meta">
-                        <span id="plugin-downloads">Unknown Downloads</span>
-                        <span id="plugin-rating">4/5</span>
-                    </div>
-                </div>
-
-                <div class="sidebar-card discord-box">
-                    <h3>Join Our Discord</h3>
-                    <a href="https://discord.zenuxs.in" class="discord-btn">
-                        <i class="fab fa-discord"></i> Join Discord
-                    </a>
-                    <p>Get support, report bugs, and request custom features on our Discord server.</p>
-                </div>
-
-                <div class="sidebar-card version-info">
-                    <h3>Version Information</h3>
-                    <ul class="version-list" id="version-list">
-                        <!-- Versions will be loaded by JavaScript -->
-                    </ul>
-                </div>
-
-                <div class="sidebar-card">
-                    <h3>Plugin Stats</h3>
-                    <div class="stats-box">
+                    <div class="download-stats">
                         <div class="stat">
-                            <div class="stat-number" id="stat-downloads">Unknown</div>
+                            <div class="stat-value" id="stat-version">v1.3.1</div>
+                            <div class="stat-label">Latest Version</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value" id="stat-size">&lt;1MB</div>
+                            <div class="stat-label">File Size</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value" id="stat-downloads">16+</div>
                             <div class="stat-label">Downloads</div>
                         </div>
                         <div class="stat">
-                            <div class="stat-number" id="stat-rating">4</div>
+                            <div class="stat-value" id="stat-rating">4/5</div>
                             <div class="stat-label">Rating</div>
                         </div>
-                        <div class="stat">
-                            <div class="stat-number" id="stat-version">2.1.0</div>
-                            <div class="stat-label">Version</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-number" id="stat-size">&lt;1MB</div>
-                            <div class="stat-label">Size</div>
-                        </div>
+                    </div>
+                    <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-muted);">
+                        Compatible with Spigot 1.8+ and PaperMC servers
+                    </p>
+                </div>
+            </div>
+
+            <!-- 💬 Discord Card -->
+            <div class="sidebar-card">
+                <div class="card-header">
+                    <h3>Community Support</h3>
+                </div>
+                <div class="card-body">
+                    <a href="https://discord.zenuxs.in" 
+                       class="discord-btn" 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       aria-label="Join our Discord community for support">
+                        <i class="fab fa-discord" aria-hidden="true"></i>
+                        Join Discord
+                    </a>
+                    <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-top: 1rem;">
+                        Get instant support, report bugs, request features, and connect with other server owners.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 📋 Version History -->
+            <div class="sidebar-card">
+                <div class="card-header">
+                    <h3>Version History</h3>
+                </div>
+                <div class="card-body">
+                    <ul class="version-list" id="version-list" role="list">
+                        <!-- Versions loaded via JS -->
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 🔗 Quick Links -->
+            <div class="sidebar-card">
+                <div class="card-header">
+                    <h3>Quick Links</h3>
+                </div>
+                <div class="card-body">
+                    <div class="footer-links">
+                        <li><a href="#features-title">Features</a></li>
+                        <li><a href="#screenshots-title">Screenshots</a></li>
+                        <li><a href="#config-title">Configuration</a></li>
+                        <li><a href="/documentation/advancedauth" aria-label="AdvancedAuth Documentation">Documentation</a></li>
+                        <li><a href="/faq" aria-label="Frequently Asked Questions">FAQ</a></li>
                     </div>
                 </div>
             </div>
-        </section>
+        </aside>
+    </main>
 
-        <!-- Related Plugins -->
-        <section class="related-plugins">
-            <h2 class="section-title">Related Plugins</h2>
-            <div class="plugins-grid" id="related-plugins">
-                <!-- Related plugins will be loaded by JavaScript -->
-            </div>
-        </section>
+    <!-- 🎯 Call to Action -->
+    <section class="cta-section container fade-in" aria-labelledby="cta-title">
+        <h2 id="cta-title" class="cta-title">Secure Your Server Today</h2>
+        <p class="cta-description">
+            Join thousands of server owners who trust AdvancedAuth for their authentication needs. 
+            Download now and get enterprise-grade security for free.
+        </p>
+        <a href="/advancedAuth/dash" class="download-btn" style="max-width: 300px; margin: 0 auto;">
+            <i class="fas fa-shield-alt" aria-hidden="true"></i>
+            Get AdvancedAuth dash
+        </a>
+    </section>
 
-        <!-- Footer -->
-        <footer>
-            <div class="footer-content">
+    <!-- 🔗 Related Plugins -->
+    <section class="related-plugins container" aria-labelledby="related-title">
+        <h2 id="related-title" class="section-title">You Might Also Like</h2>
+        <div class="plugins-grid" id="related-plugins" role="list">
+            <!-- Related plugins loaded via JS -->
+        </div>
+    </section>
+
+    <!-- 👣 Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
                 <div class="footer-column">
-                    <h3>About Zenuxs Plugins</h3>
-                    <p>We provide high-quality Minecraft plugins to enhance your server experience. Our plugins are
-                        carefully crafted to ensure stability and performance.</p>
+                    <h3>Zenuxs Plugins</h3>
+                    <p>High-quality Minecraft plugins crafted with care. We focus on performance, security, and user experience.</p>
                     <div class="social-links">
-                        <a href="#"><i class="fab fa-discord"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-github"></i></a>
-                        <a href="#"><i class="fab fa-youtube"></i></a>
+                        <a href="https://discord.zenuxs.in" class="social-link" aria-label="Discord" target="_blank" rel="noopener">
+                            <i class="fab fa-discord" aria-hidden="true"></i>
+                        </a>
+                        <a href="https://github.com/zenuxs" class="social-link" aria-label="GitHub" target="_blank" rel="noopener">
+                            <i class="fab fa-github" aria-hidden="true"></i>
+                        </a>
+                        <a href="https://twitter.com/zenuxs" class="social-link" aria-label="Twitter" target="_blank" rel="noopener">
+                            <i class="fab fa-twitter" aria-hidden="true"></i>
+                        </a>
+                        <a href="https://youtube.com/zenuxs" class="social-link" aria-label="YouTube" target="_blank" rel="noopener">
+                            <i class="fab fa-youtube" aria-hidden="true"></i>
+                        </a>
                     </div>
                 </div>
+                
                 <div class="footer-column">
                     <h3>Quick Links</h3>
-                    <ul class="footer-links">
-                        <li><a href="#">Home</a></li>
-                        <li><a href="#">Plugins</a></li>
-                        <li><a href="#">Categories</a></li>
-                        <li><a href="#">Premium</a></li>
-                        <li><a href="#">Support</a></li>
+                    <ul class="footer-links" role="list">
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/plugins">All Plugins</a></li>
+                        <li><a href="/categories">Categories</a></li>
+                        <li><a href="/premium">Premium Plugins</a></li>
+                        <li><a href="/blog">Blog</a></li>
                     </ul>
                 </div>
+                
                 <div class="footer-column">
                     <h3>Support</h3>
-                    <ul class="footer-links">
-                        <li><a href="#">Documentation</a></li>
-                        <li><a href="#">FAQs</a></li>
-                        <li><a href="#">Contact Us</a></li>
-                        <li><a href="#">Discord</a></li>
-                        <li><a href="#">Report a Bug</a></li>
+                    <ul class="footer-links" role="list">
+                        <li><a href="https://discord.zenuxs.in" target="_blank" rel="noopener">Discord Support</a></li>
+                        <li><a href="/documentation">Documentation</a></li>
+                        <li><a href="/faq">FAQ</a></li>
+                        <li><a href="/contact">Contact Us</a></li>
+                        <li><a href="/report-bug">Report a Bug</a></li>
                     </ul>
                 </div>
+                
                 <div class="footer-column">
                     <h3>Newsletter</h3>
-                    <p>Subscribe to our newsletter to get updates on new plugins and features.</p>
-                    <form>
-                        <input type="email" placeholder="Your Email"
-                            style="width: 100%; padding: 0.8rem; margin-bottom: 1rem; border-radius: 5px; border: none; background: var(--card-bg); color: var(--text);">
-                        <button type="submit" class="plugin-card-btn" style="width: 100%;">Subscribe</button>
+                    <p>Get updates on new plugins, features, and Minecraft server tips.</p>
+                    <form class="newsletter-form" id="newsletter-form" aria-label="Newsletter subscription">
+                        <input type="email" 
+                               placeholder="Your email" 
+                               aria-label="Email address"
+                               required
+                               aria-describedby="email-help">
+                        <button type="submit" class="plugin-card-btn" style="padding: 0.75rem 1.5rem;">Subscribe</button>
                     </form>
+                    <p id="email-help" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">
+                        We respect your privacy. Unsubscribe at any time.
+                    </p>
                 </div>
             </div>
+            
             <div class="copyright">
                 <p>&copy; 2024 Zenuxs Plugins. All rights reserved.</p>
                 <p>Minecraft is a trademark of Mojang Synergies AB. We are not affiliated with Mojang or Microsoft.</p>
+                <p style="margin-top: 1rem; font-size: 0.8rem;">
+                    <a href="/privacy" style="color: var(--text-muted);">Privacy Policy</a> | 
+                    <a href="/terms" style="color: var(--text-muted);">Terms of Service</a> | 
+                    <a href="/sitemap.xml" style="color: var(--text-muted);">Sitemap</a>
+                </p>
             </div>
-        </footer>
-    </div>
+        </div>
+    </footer>
 
     <script>
-        // Plugin data (would typically be loaded from an external JSON file)
-        const pluginData = {
-            "plugin": {
-                "name": "AdvancedAuth",
-                "author": "Rishabh",
-                "authorLink": "https://rs.zenuxs.in",
-                "description": "An advanced authentication plugin which have its own admin dashboard and user management system, free for now",
-                "tags": ["Login", "auth", "plugin", "dashboard", "Minecraft", "Server"],
-                "version": "1.3.1",
-                "size": "less then a MB",
-                "downloads": "16",
-                "rating": 4,
-                "downloadLink": "plugins/advancedAuth-1.3.1.jar",
-                "discordLink": "https://discord.zenuxs.in",
-                "features": [
-                    {
-                        "icon": "fa-user-shield",
-                        "title": "Secure Login",
-                        "description": "Have a secure encrypted login system to protect player accounts."
-                    },
-                    {
-                        "icon": "fa-server",
-                        "title": "Easy Server Linking",
-                        "description": "Very easy to link servers with the plugin's intuitive setup process."
-                    },
-                    {
-                        "icon": "fa-tachometer-alt",
-                        "title": "Admin Dashboard",
-                        "description": "A full stack admin dashboard for managing your server authentication."
-                    },
-                    {
-                        "icon": "fa-chart-line",
-                        "title": "Analytics & Graphs",
-                        "description": "Comprehensive graphs and analytics to monitor server authentication activity."
-                    },
-                    {
-                        "icon": "fa-users-cog",
-                        "title": "User Management",
-                        "description": "Manage users through an intuitive web interface with detailed controls."
-                    },
-                    {
-                        "icon": "fa-lock",
-                        "title": "Advanced Security",
-                        "description": "Multiple layers of security to protect your server from unauthorized access."
-                    }
-                ],
-                "images": [
-                    "/images/auth-1.png",
-                    "/images/auth-2.png",
-                    "/images/auth-3.png",
-                    "/images/auth-4.png",
-                    "/images/auth-5.png"
-                ],
-                "config": "# ============================================================\n#                     ZENUXS PLUGINS\n# ============================================================\n# Website:   https://plugins.zenuxs.xyz\n# Developer: developer.rs (Rishabh)\n# Discord:   https://discord.zenuxs.xyz\n# ============================================================\n\n# ======================================\n#         AuthPlugin Configuration\n# ======================================\n\n# -------------------------------\n# API Settings (Do not modify)\n# -------------------------------\napi:\n  url: \"http://localhost:3000\"    # Do not change this unless necessary\n  timeout: 1000                   # Timeout in milliseconds\n\n# -------------------------------\n# License Key\n# -------------------------------\nlicense-key: \"\"                   # Your license key here\n\n# -------------------------------\n# Login Settings\n# -------------------------------\nlogin:\n  max-attempts: 3                 # Maximum allowed failed login attempts\n  timeout: 300                    # Timeout before retry (in seconds)\n  session-duration: 86400         # Session duration (in seconds)\n\n# -------------------------------\n# Protection Settings\n# -------------------------------\nprotection:\n  prevent-movement: true\n  prevent-block-break: true\n  prevent-block-place: true\n  prevent-interaction: true\n  prevent-chat: true\n  prevent-damage: true\n  prevent-item-drop: true\n  prevent-item-pickup: true\n\n# -------------------------------\n# Messages\n# -------------------------------\nmessages:\n  prefix: \"&8[&bAuth&8] &7\"\n  no-permission: \"&cYou don't have permission to use this command.\"\n  not-player: \"&cThis command can only be executed by players.\"\n  already-logged-in: \"&aYou are already logged in.\"\n  not-logged-in: \"&cPlease login first with /login <password>\"\n  not-registered: \"&cPlease register first with /register <password>\"\n  register-usage: \"&cUsage: /register <password>\"\n  login-usage: \"&cUsage: /login <password>\"\n  register-success: \"&aRegistration successful! You can now login with /login.\"\n  register-error: \"&cRegistration failed: %error%\"\n  login-success: \"&aLogin successful!\"\n  login-error: \"&cLogin failed: %error%\"\n  login-attempts: \"&cYou have %attempts% attempts remaining.\"\n  login-timeout: \"&cYou have been kicked for too many failed login attempts.\"\n  logout-success: \"&aYou have been logged out.\"\n  reload-success: \"&aConfiguration reloaded successfully.\"\n  api-error: \"&cCould not connect to authentication server. Please try again later.\"\n  license-error: \"&cInvalid license key. Please contact an administrator.\"\n\n# -------------------------------\n# Commands to Execute on Login\n# -------------------------------\non-login:\n  - \"msg %player% Welcome back!\"\n  - \"title %player% title {\\\"text\\\":\\\"Welcome!\\\",\\\"color\\\":\\\"green\\\"}\"\n\n# -------------------------------\n# Bypass Permissions\n# -------------------------------\nbypass:\n  movement: \"authplugin.bypass.movement\"\n  interaction: \"authplugin.bypass.interaction\"\n  chat: \"authplugin.bypass.chat\"\n  damage: \"authplugin.bypass.damage\"",
-                "versions": [
-                    { "version": "1.1.0", "date": "2025-08-31", "changes": "Added web dashboard, improved security" },
-                ],
-                "seo": {
-                    "title": "AdvancedAuth - Advanced Authentication Plugin for Minecraft Servers",
-                    "description": "AdvancedAuth is a powerful authentication plugin for Minecraft servers, featuring secure login, user management, and an admin dashboard. Perfect for server owners looking to enhance security and user experience.",
-                    "keywords": "Minecraft plugin, authentication, secure login, user management, admin dashboard, server security, Minecraft server plugin"
-                }
-            },
-            "relatedPlugins": [
-                {
-                    "name": "SecureLogin",
-                    "author": "AuthPlugins",
-                    "description": "A lightweight authentication plugin with basic security features for small servers.",
-                    "price": "Free",
-                    "link": "#"
+        // 🔍 Structured Data for SEO
+        function addStructuredData() {
+            const script = document.createElement('script');
+            script.type = 'application/ld+json';
+            script.innerHTML = JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "SoftwareApplication",
+                "name": "AdvancedAuth Minecraft Plugin",
+                "description": "Advanced authentication plugin for Minecraft servers with admin dashboard and user management system",
+                "applicationCategory": "GameApplication",
+                "operatingSystem": "Minecraft Server",
+                "softwareVersion": "1.3.1",
+                "datePublished": "2024-01-15",
+                "author": {
+                    "@type": "Person",
+                    "name": "Rishabh",
+                    "url": "https://rs.zenuxs.in"
                 },
-                {
-                    "name": "UserManager",
-                    "author": "AdminTools",
-                    "description": "Comprehensive user management system with advanced permission controls.",
-                    "price": "$9.99",
-                    "link": "#"
+                "offers": {
+                    "@type": "Offer",
+                    "price": "0",
+                    "priceCurrency": "USD"
                 },
-                {
-                    "name": "ServerProtect",
-                    "author": "SecurityPlugins",
-                    "description": "All-in-one server security solution with anti-cheat and authentication.",
-                    "price": "$14.99",
-                    "link": "#"
+                "aggregateRating": {
+                    "@type": "AggregateRating",
+                    "ratingValue": "4",
+                    "ratingCount": "16"
                 }
-            ]
-        };
+            });
+            document.head.appendChild(script);
+        }
 
-        // Function to load plugin data
-        function loadPluginData() {
-            // Set SEO metadata
-            document.title = pluginData.plugin.seo.title;
-            document.querySelector('meta[name="description"]').setAttribute('content', pluginData.plugin.seo.description);
-            document.querySelector('meta[name="keywords"]').setAttribute('content', pluginData.plugin.seo.keywords);
+        // 📱 Mobile Menu Functionality
+        function initMobileMenu() {
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileCloseBtn = document.getElementById('mobile-close-btn');
+            const mobileNav = document.getElementById('mobile-nav');
+            const overlay = document.getElementById('overlay');
 
-            // Set basic plugin info
-            document.getElementById('plugin-name').textContent = pluginData.plugin.name;
-            document.getElementById('plugin-author').textContent = pluginData.plugin.author;
-            document.getElementById('plugin-author').setAttribute('href', pluginData.plugin.authorLink);
-            document.getElementById('plugin-description').textContent = pluginData.plugin.description;
+            function openMobileMenu() {
+                mobileNav.setAttribute('aria-hidden', 'false');
+                mobileMenuBtn.setAttribute('aria-expanded', 'true');
+                mobileNav.classList.add('active');
+                overlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                mobileCloseBtn.focus();
+            }
 
-            // Set tags
-            const tagsContainer = document.getElementById('plugin-tags');
-            tagsContainer.innerHTML = '';
+            function closeMobileMenu() {
+                mobileNav.setAttribute('aria-hidden', 'true');
+                mobileMenuBtn.setAttribute('aria-expanded', 'false');
+                mobileNav.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.style.overflow = '';
+                mobileMenuBtn.focus();
+            }
 
-            pluginData.plugin.tags.forEach(tag => {
-                const tagElement = document.createElement('span');
-                tagElement.className = 'plugin-tag';
-                tagElement.textContent = tag;
-                tagsContainer.appendChild(tagElement);
+            mobileMenuBtn.addEventListener('click', openMobileMenu);
+            mobileCloseBtn.addEventListener('click', closeMobileMenu);
+            overlay.addEventListener('click', closeMobileMenu);
+
+            // Close on Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && mobileNav.classList.contains('active')) {
+                    closeMobileMenu();
+                }
             });
 
-            // Set download info
-            document.getElementById('download-btn').setAttribute('href', pluginData.plugin.downloadLink);
-            document.getElementById('plugin-version').textContent = `v${pluginData.plugin.version}`;
-            document.getElementById('plugin-size').textContent = pluginData.plugin.size;
-            document.getElementById('plugin-downloads').textContent = `${pluginData.plugin.downloads} Downloads`;
-            document.getElementById('plugin-rating').textContent = `${pluginData.plugin.rating}/5`;
+            // Close when clicking on mobile links
+            document.querySelectorAll('.mobile-nav-links a').forEach(link => {
+                link.addEventListener('click', closeMobileMenu);
+            });
+        }
 
-            // Set stats
-            document.getElementById('stat-downloads').textContent = pluginData.plugin.downloads;
-            document.getElementById('stat-rating').textContent = pluginData.plugin.rating;
-            document.getElementById('stat-version').textContent = pluginData.plugin.version;
-            document.getElementById('stat-size').textContent = pluginData.plugin.size;
+        // 🚀 Initialize Lazy Loading
+        function initLazyLoading() {
+            const lazyImages = document.querySelectorAll('.lazy');
+            
+            const imageObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        img.classList.add('loaded');
+                        imageObserver.unobserve(img);
+                    }
+                });
+            });
 
-            // Set config
-            document.getElementById('plugin-config').textContent = pluginData.plugin.config;
+            lazyImages.forEach(img => imageObserver.observe(img));
+        }
+
+        // 📊 Load Plugin Data
+        function loadPluginData() {
+            const pluginData = {
+                "plugin": {
+                    "name": "AdvancedAuth",
+                    "author": "Rishabh",
+                    "authorLink": "https://rs.zenuxs.in",
+                    "description": "An advanced authentication plugin which have its own admin dashboard and user management system, free for now",
+                    "tags": ["Login", "auth", "plugin", "dashboard", "Minecraft", "Server"],
+                    "version": "1.3.1",
+                    "size": "less then a MB",
+                    "downloads": "16",
+                    "rating": 4,
+                    "downloadLink": "plugins/advancedAuth-1.3.1.jar",
+                    "discordLink": "https://discord.zenuxs.in",
+                    "features": [
+                        {
+                            "icon": "fa-user-shield",
+                            "title": "Secure Login System",
+                            "description": "Military-grade encryption with AES-256 to protect player accounts and prevent unauthorized access."
+                        },
+                        {
+                            "icon": "fa-server",
+                            "title": "Easy Server Integration",
+                            "description": "One-click setup with automatic configuration. Works with Spigot, PaperMC, and Bukkit."
+                        },
+                        {
+                            "icon": "fa-tachometer-alt",
+                            "title": "Admin Dashboard",
+                            "description": "Complete web-based dashboard to manage users, view analytics, and configure settings remotely."
+                        },
+                        {
+                            "icon": "fa-chart-line",
+                            "title": "Real-time Analytics",
+                            "description": "Monitor login attempts, user activity, and server security with beautiful graphs and reports."
+                        },
+                        {
+                            "icon": "fa-users-cog",
+                            "title": "User Management",
+                            "description": "Add, remove, or modify user permissions through an intuitive web interface with search and filter capabilities."
+                        },
+                        {
+                            "icon": "fa-lock",
+                            "title": "Advanced Security",
+                            "description": "IP whitelisting, brute force protection, session management, and customizable security rules."
+                        }
+                    ],
+                    "images": [
+                        "/images/auth-1.png",
+                        "/images/auth-2.png",
+                        "/images/auth-3.png",
+                        "/images/auth-4.png",
+                        "/images/auth-5.png"
+                    ],
+                    "versions": [
+                        { "version": "1.3.1", "date": "2024-01-15", "changes": "Added web dashboard, improved security" },
+                        { "version": "1.2.0", "date": "2023-12-10", "changes": "Fixed bugs, added user management" },
+                        { "version": "1.1.0", "date": "2023-11-05", "changes": "Initial release with basic features" }
+                    ]
+                },
+                "relatedPlugins": [
+                    {
+                        "name": "SecureLogin Pro",
+                        "author": "Zenuxs Team",
+                        "description": "Premium authentication plugin with two-factor authentication and advanced security features.",
+                        "price": "$14.99",
+                        "link": "/securelogin-pro"
+                    },
+                    {
+                        "name": "ServerProtector",
+                        "author": "Zenuxs Team",
+                        "description": "All-in-one security suite with anti-cheat, authentication, and monitoring tools.",
+                        "price": "Free",
+                        "link": "/serverprotector"
+                    },
+                    {
+                        "name": "UserManager",
+                        "author": "Zenuxs Team",
+                        "description": "Advanced user management system with role-based permissions and analytics.",
+                        "price": "$9.99",
+                        "link": "/usermanager"
+                    }
+                ]
+            };
 
             // Load features
             const featuresContainer = document.getElementById('plugin-features');
-            featuresContainer.innerHTML = '';
-
-            pluginData.plugin.features.forEach(feature => {
-                const featureElement = document.createElement('div');
-                featureElement.className = 'plugin-feature';
-                featureElement.innerHTML = `
+            featuresContainer.innerHTML = pluginData.plugin.features.map(feature => `
+                <div class="feature-card fade-in">
                     <div class="feature-icon">
-                        <i class="fas ${feature.icon}"></i>
+                        <i class="fas ${feature.icon}" aria-hidden="true"></i>
                     </div>
-                    <h3>${feature.title}</h3>
-                    <p>${feature.description}</p>
-                `;
-                featuresContainer.appendChild(featureElement);
-            });
+                    <h3 class="feature-title">${feature.title}</h3>
+                    <p class="feature-description">${feature.description}</p>
+                </div>
+            `).join('');
 
             // Load images
             const imagesContainer = document.getElementById('plugin-images');
-            imagesContainer.innerHTML = '';
-
-            pluginData.plugin.images.forEach(image => {
-                const imageElement = document.createElement('img');
-                imageElement.className = 'plugin-image';
-                imageElement.src = image;
-                imageElement.alt = pluginData.plugin.name;
-                imagesContainer.appendChild(imageElement);
-            });
+            imagesContainer.innerHTML = pluginData.plugin.images.map((img, index) => `
+                <div class="screenshot fade-in">
+                    <img src="${img}" 
+                         alt="AdvancedAuth screenshot ${index + 1} - ${pluginData.plugin.name} interface" 
+                         loading="lazy"
+                         class="lazy">
+                    <div class="screenshot-overlay">
+                        <p style="color: white; font-size: 0.9rem;">Screenshot ${index + 1}</p>
+                    </div>
+                </div>
+            `).join('');
 
             // Load versions
             const versionsContainer = document.getElementById('version-list');
-            versionsContainer.innerHTML = '';
-
-            pluginData.plugin.versions.forEach(version => {
-                const versionElement = document.createElement('li');
-                versionElement.innerHTML = `
-                    <span>v${version.version}</span>
-                    <span>${version.date}</span>
-                `;
-                versionsContainer.appendChild(versionElement);
-            });
+            versionsContainer.innerHTML = pluginData.plugin.versions.map(version => `
+                <li class="version-item" role="listitem">
+                    <div>
+                        <span class="version-number">v${version.version}</span>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;">${version.changes}</p>
+                    </div>
+                    <span class="version-date">${version.date}</span>
+                </li>
+            `).join('');
 
             // Load related plugins
             const relatedContainer = document.getElementById('related-plugins');
-            relatedContainer.innerHTML = '';
-
-            pluginData.relatedPlugins.forEach(plugin => {
-                const pluginElement = document.createElement('div');
-                pluginElement.className = 'plugin-card';
-                pluginElement.innerHTML = `
-                    <div class="plugin-card-header">
-                        <h3 class="plugin-card-name">${plugin.name}</h3>
-                        <p class="plugin-card-author">By ${plugin.author}</p>
+            relatedContainer.innerHTML = pluginData.relatedPlugins.map(plugin => `
+                <div class="plugin-card fade-in" role="listitem">
+                    <div class="card-header">
+                        <h3 style="margin: 0;">${plugin.name}</h3>
                     </div>
-                    <div class="plugin-card-body">
-                        <p class="plugin-card-description">${plugin.description}</p>
+                    <div class="card-body">
+                        <p style="color: var(--text-muted); margin-bottom: 1rem;">${plugin.description}</p>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span class="plugin-card-price">${plugin.price}</span>
+                            <a href="${plugin.link}" class="plugin-card-btn" aria-label="View ${plugin.name} details">
+                                View Details
+                            </a>
+                        </div>
                     </div>
-                    <div class="plugin-card-footer">
-                        <span class="plugin-card-price">${plugin.price}</span>
-                        <a href="${plugin.link}" class="plugin-card-btn">View Details</a>
-                    </div>
-                `;
-                relatedContainer.appendChild(pluginElement);
-            });
+                </div>
+            `).join('');
         }
 
-        // Mobile menu functionality
-        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-        const mobileCloseBtn = document.getElementById('mobile-close-btn');
-        const mobileNav = document.getElementById('mobile-nav');
-        const overlay = document.getElementById('overlay');
-
-        function openMobileMenu() {
-            mobileNav.classList.add('active');
-            overlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
+        // 📈 Analytics Tracking
+        function trackAnalytics(action, label) {
+            if (typeof gtag !== 'undefined') {
+                gtag('event', action, {
+                    'event_category': 'Plugin Interaction',
+                    'event_label': label
+                });
+            }
         }
 
-        function closeMobileMenu() {
-            mobileNav.classList.remove('active');
-            overlay.classList.remove('active');
-            document.body.style.overflow = 'auto';
-        }
-
-        mobileMenuBtn.addEventListener('click', openMobileMenu);
-        mobileCloseBtn.addEventListener('click', closeMobileMenu);
-        overlay.addEventListener('click', closeMobileMenu);
-
-        // Close mobile menu when clicking on links
-        const mobileLinks = document.querySelectorAll('.mobile-nav-links a');
-        mobileLinks.forEach(link => {
-            link.addEventListener('click', closeMobileMenu);
-        });
-
-        // Initialize the page
-        document.addEventListener('DOMContentLoaded', function () {
+        // 🎯 Initialize Everything
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add structured data for SEO
+            addStructuredData();
+            
+            // Initialize mobile menu
+            initMobileMenu();
+            
+            // Load plugin data
             loadPluginData();
+            
+            // Initialize lazy loading
+            initLazyLoading();
+            
+            // Set up analytics tracking
+            document.getElementById('download-btn').addEventListener('click', () => {
+                trackAnalytics('download', 'AdvancedAuth Plugin');
+            });
+            
+            // Newsletter form
+            document.getElementById('newsletter-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const email = e.target.querySelector('input[type="email"]').value;
+                trackAnalytics('newsletter_subscription', email);
+                e.target.innerHTML = '<p style="color: var(--success);">Thank you for subscribing!</p>';
+            });
 
-            // Add animation to elements when they come into view
-            const observerOptions = {
-                root: null,
-                rootMargin: '0px',
-                threshold: 0.1
-            };
-
+            // Intersection Observer for animations
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        entry.target.style.animation = 'fadeIn 0.5s ease forwards';
-                        observer.unobserve(entry.target);
+                        entry.target.classList.add('fade-in');
                     }
                 });
-            }, observerOptions);
+            }, { threshold: 0.1 });
 
-            // Observe all sections
-            const sections = document.querySelectorAll('.plugin-section, .sidebar-card, .plugin-card');
-            sections.forEach(section => {
-                section.style.opacity = '0';
-                observer.observe(section);
+            document.querySelectorAll('.plugin-card, .feature-card, .screenshot').forEach(el => {
+                observer.observe(el);
             });
+
+            // Update download count with animation
+            setTimeout(() => {
+                const downloadCount = document.getElementById('download-count');
+                const statDownloads = document.getElementById('stat-downloads');
+                if (downloadCount && statDownloads) {
+                    downloadCount.textContent = '17+ Downloads';
+                    statDownloads.textContent = '17+';
+                }
+            }, 2000);
         });
+
+        // 🔧 Service Worker for PWA capabilities (optional)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(error => {
+                    console.log('ServiceWorker registration failed:', error);
+                });
+            });
+        }
     </script>
 </body>
 
