@@ -66,7 +66,7 @@ function formatIndianDate(date) {
     });
 }
 
-// ================== EXISTING SCHEMAS (PRESERVED) ==================
+// Update the userSchema to include IP history and sessions
 const userSchema = new mongoose.Schema({
     username: { type: String, required: true, index: true },
     email: { type: String, sparse: true },
@@ -79,12 +79,51 @@ const userSchema = new mongoose.Schema({
     loginAttempts: { type: Number, default: 0 },
     lastAttempt: { type: Date, default: Date.now },
     ipAddress: String,
+    // Store IP history
+    ipHistory: [{
+        ip: String,
+        loginTime: { type: Date, default: Date.now },
+        deviceInfo: String,
+        location: String,
+        sessionToken: String
+    }],
     location: String,
     deviceInfo: String,
     emailVerified: { type: Boolean, default: false },
     emailUpdatedAt: Date,
-    twoFactorEnabled: { type: Boolean, default: false }
+    twoFactorEnabled: { type: Boolean, default: false },
+    // Active sessions
+    activeSessions: [{
+        sessionToken: String,
+        ipAddress: String,
+        deviceInfo: String,
+        createdAt: { type: Date, default: Date.now },
+        expiresAt: Date,
+        lastActivity: Date
+    }]
 });
+
+// Create session schema for better session management
+const sessionSchema = new mongoose.Schema({
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    sessionToken: { type: String, required: true, unique: true },
+    serverKey: String,
+    ipAddress: String,
+    userAgent: String,
+    location: String,
+    createdAt: { type: Date, default: Date.now },
+    expiresAt: { type: Date, required: true },
+    lastActivity: { type: Date, default: Date.now },
+    isValid: { type: Boolean, default: true }
+});
+
+const Session = mongoose.model('Session', sessionSchema);
+
+// Add index for sessions
+sessionSchema.index({ sessionToken: 1 });
+sessionSchema.index({ userId: 1 });
+sessionSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+sessionSchema.index({ serverKey: 1, userId: 1 });
 
 const serverKeySchema = new mongoose.Schema({
     key: { type: String, required: true, unique: true },
@@ -287,6 +326,259 @@ async function isPluginEnabled(serverKey) {
         return false;
     }
 }
+// Add session cleanup middleware
+async function cleanupExpiredSessions() {
+    try {
+        const result = await Session.deleteMany({ expiresAt: { $lt: new Date() } });
+        console.log(`Cleaned up ${result.deletedCount} expired sessions`);
+    } catch (error) {
+        console.error('Session cleanup error:', error);
+    }
+}
+
+// Run cleanup every hour
+setInterval(cleanupExpiredSessions, 60 * 60 * 1000);
+
+// Run on startup
+setTimeout(cleanupExpiredSessions, 5000);
+
+
+// Generate session token
+function generateSessionToken() {
+    return require('crypto').randomBytes(32).toString('hex');
+}
+
+// Validate session token
+async function validateSession(sessionToken, serverKey = null) {
+    try {
+        const session = await Session.findOne({
+            sessionToken,
+            isValid: true,
+            expiresAt: { $gt: new Date() }
+        }).populate('userId').lean();
+
+        if (!session) return null;
+
+        // Update last activity
+        await Session.updateOne(
+            { _id: session._id },
+            { $set: { lastActivity: new Date() } }
+        );
+
+        // If serverKey is provided, verify it matches
+        if (serverKey && session.serverKey !== serverKey) {
+            return null;
+        }
+
+        return session;
+    } catch (error) {
+        console.error('Session validation error:', error);
+        return null;
+    }
+}
+
+// Create new session
+async function createSession(user, req, sessionDurationHours = 24) {
+    try {
+        const sessionToken = generateSessionToken();
+        const expiresAt = new Date(Date.now() + sessionDurationHours * 60 * 60 * 1000);
+
+        const session = new Session({
+            userId: user._id,
+            sessionToken,
+            serverKey: user.serverKey,
+            ipAddress: req.ip,
+            userAgent: req.headers['user-agent'],
+            location: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+            expiresAt,
+            lastActivity: new Date()
+        });
+
+        await session.save();
+
+        // Add session to user's active sessions
+        await User.updateOne(
+            { _id: user._id },
+            {
+                $push: {
+                    activeSessions: {
+                        sessionToken,
+                        ipAddress: req.ip,
+                        deviceInfo: req.headers['user-agent'],
+                        createdAt: new Date(),
+                        expiresAt,
+                        lastActivity: new Date()
+                    }
+                }
+            }
+        );
+
+        return sessionToken;
+    } catch (error) {
+        console.error('Session creation error:', error);
+        return null;
+    }
+}
+
+// Logout/invalidate session
+async function invalidateSession(sessionToken) {
+    try {
+        const session = await Session.findOne({ sessionToken });
+        if (session) {
+            // Invalidate session
+            await Session.updateOne(
+                { _id: session._id },
+                { $set: { isValid: false } }
+            );
+
+            // Remove from user's active sessions
+            await User.updateOne(
+                { _id: session.userId },
+                { $pull: { activeSessions: { sessionToken } } }
+            );
+
+            return true;
+        }
+        return false;
+    } catch (error) {
+        console.error('Session invalidation error:', error);
+        return false;
+    }
+}
+
+// Invalidate all sessions for a user
+async function invalidateAllSessions(userId, serverKey = null) {
+    try {
+        const query = { userId, isValid: true };
+        if (serverKey) {
+            query.serverKey = serverKey;
+        }
+
+        await Session.updateMany(query, { $set: { isValid: false } });
+        await User.updateOne(
+            { _id: userId },
+            { $set: { activeSessions: [] } }
+        );
+
+        return true;
+    } catch (error) {
+        console.error('Invalidate all sessions error:', error);
+        return false;
+    }
+}
+
+// Track IP login
+async function trackIPLogin(userId, ipAddress, deviceInfo = null, sessionToken = null) {
+    try {
+        const ipEntry = {
+            ip: ipAddress,
+            loginTime: new Date(),
+            deviceInfo: deviceInfo || 'Unknown',
+            location: ipAddress.includes('::1') ? 'Localhost' : 'Unknown',
+            sessionToken: sessionToken || null
+        };
+
+        await User.updateOne(
+            { _id: userId },
+            {
+                $push: {
+                    ipHistory: {
+                        $each: [ipEntry],
+                        $slice: -100 // Keep last 100 entries
+                    }
+                },
+                $set: {
+                    ipAddress,
+                    lastLogin: new Date()
+                }
+            }
+        );
+
+        return true;
+    } catch (error) {
+        console.error('IP tracking error:', error);
+        return false;
+    }
+}
+
+// Get users by IP
+async function getUsersByIP(ipAddress, serverKey = null) {
+    try {
+        const query = {
+            'ipHistory.ip': ipAddress
+        };
+
+        if (serverKey) {
+            query.serverKey = serverKey;
+        }
+
+        const users = await User.find(query)
+            .select('username email serverKey lastLogin ipHistory')
+            .lean();
+
+        // Count logins per user for this IP
+        const result = users.map(user => {
+            const logins = user.ipHistory.filter(entry => entry.ip === ipAddress);
+            return {
+                username: user.username,
+                email: user.email,
+                serverKey: user.serverKey,
+                lastLogin: user.lastLogin,
+                totalLoginsWithIP: logins.length,
+                firstLoginWithIP: logins[0]?.loginTime || null,
+                lastLoginWithIP: logins[logins.length - 1]?.loginTime || null
+            };
+        });
+
+        return result;
+    } catch (error) {
+        console.error('Get users by IP error:', error);
+        return [];
+    }
+}
+
+// Get IP statistics for a user
+async function getUserIPStats(userId) {
+    try {
+        const user = await User.findById(userId)
+            .select('ipHistory username')
+            .lean();
+
+        if (!user) return null;
+
+        // Count unique IPs
+        const uniqueIPs = [...new Set(user.ipHistory.map(entry => entry.ip))];
+        
+        // Get IP frequency
+        const ipFrequency = {};
+        user.ipHistory.forEach(entry => {
+            ipFrequency[entry.ip] = (ipFrequency[entry.ip] || 0) + 1;
+        });
+
+        // Get most frequent IP
+        let mostFrequentIP = null;
+        let maxCount = 0;
+        Object.entries(ipFrequency).forEach(([ip, count]) => {
+            if (count > maxCount) {
+                maxCount = count;
+                mostFrequentIP = ip;
+            }
+        });
+
+        return {
+            username: user.username,
+            totalLogins: user.ipHistory.length,
+            uniqueIPs: uniqueIPs.length,
+            ipList: uniqueIPs,
+            mostFrequentIP,
+            loginCountByIP: ipFrequency,
+            recentIPs: user.ipHistory.slice(-10).reverse()
+        };
+    } catch (error) {
+        console.error('Get user IP stats error:', error);
+        return null;
+    }
+}
 
 // ================== EXISTING MIDDLEWARE (PRESERVED) ==================
 const checkServerKey = async (req, res, next) => {
@@ -383,16 +675,46 @@ function generateOTP() {
 }
 
 // ================== NEW PUBLIC API ROUTE (ADDED) ==================
+// Enhanced public API with session support
 app.get('/api/dataapikey/query', publicApiLimiter, async (req, res) => {
     try {
-        const { tag, password, serverKey, apikey } = req.query;
+        const { tag, password, serverKey, apikey, sessionToken } = req.query;
 
-        console.log(`Public API request: tag=${tag}, serverKey=${serverKey}`);
+        console.log(`Public API request: tag=${tag}, serverKey=${serverKey}, session=${!!sessionToken}`);
 
+        // Check if using session token
+        if (sessionToken) {
+            const session = await validateSession(sessionToken, serverKey);
+            if (session) {
+                const user = session.userId;
+                
+                // Update session activity
+                await Session.updateOne(
+                    { _id: session._id },
+                    { $set: { lastActivity: new Date() } }
+                );
+
+                return res.json({
+                    valid: true,
+                    exists: true,
+                    username: user.username,
+                    email: user.email || null,
+                    isBanned: user.isBanned,
+                    usingSession: true,
+                    sessionToken: sessionToken.substring(0, 10) + '...',
+                    expiresAt: session.expiresAt,
+                    timestamp: getIndianDateTime(),
+                    indianTime: formatIndianDate(new Date()),
+                    serverTime: new Date().toLocaleString('en-IN', { timeZone: INDIAN_TIMEZONE })
+                });
+            }
+        }
+
+        // Fall back to password authentication
         if (!tag || !password) {
             return res.json({
                 valid: false,
-                error: 'Tag and password are required',
+                error: 'Tag and password are required (or valid session token)',
                 timestamp: getIndianDateTime()
             });
         }
@@ -420,9 +742,6 @@ app.get('/api/dataapikey/query', publicApiLimiter, async (req, res) => {
         } else if (serverKey) {
             query.serverKey = serverKey;
         }
-        const test = await bcrypt.compare("12346785", "$2b$12$0/znxFXP2m1SeVoPEYaCy.oBmzayg9Pt5hCx2RP2kNDDjqPA7kwH.");
-        console.log("MANUAL TEST:", test);
-
 
         const user = await User.findOne(query).select('username password isBanned email').lean();
 
@@ -458,9 +777,6 @@ app.get('/api/dataapikey/query', publicApiLimiter, async (req, res) => {
             indianTime: formatIndianDate(new Date()),
             serverTime: new Date().toLocaleString('en-IN', { timeZone: INDIAN_TIMEZONE })
         });
-        console.log("Input password:", password);
-        console.log("DB password:", user.password);
-
 
     } catch (error) {
         console.error('Public API error:', error);
@@ -469,6 +785,171 @@ app.get('/api/dataapikey/query', publicApiLimiter, async (req, res) => {
             error: 'Server error',
             message: error.message
         });
+    }
+});
+
+
+// Get user profile with IP history
+app.get('/api/user/profile', checkServerKey, async (req, res) => {
+    try {
+        const { username } = req.query;
+        const serverKey = req.serverKey;
+
+        if (!username) {
+            return res.status(400).json({ error: 'Username is required' });
+        }
+
+        const user = await User.findOne({ username, serverKey })
+            .select('username email createdAt lastLogin ipAddress ipHistory emailVerified')
+            .lean();
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Count unique IPs
+        const uniqueIPs = user.ipHistory ? [...new Set(user.ipHistory.map(entry => entry.ip))] : [];
+        
+        res.json({
+            username: user.username,
+            email: user.email,
+            createdAt: user.createdAt,
+            lastLogin: user.lastLogin,
+            emailVerified: user.emailVerified,
+            currentIP: user.ipAddress,
+            totalLogins: user.ipHistory ? user.ipHistory.length : 0,
+            uniqueIPs: uniqueIPs.length,
+            ipHistory: user.ipHistory ? user.ipHistory.slice(-10).reverse() : [],
+            accountAge: Math.floor((new Date() - new Date(user.createdAt)) / (1000 * 60 * 60 * 24)) + ' days'
+        });
+    } catch (error) {
+        console.error('Profile fetch error:', error);
+        res.status(500).json({ error: 'Failed to fetch profile' });
+    }
+});
+
+// Get user's active sessions
+app.get('/api/user/sessions', checkServerKey, async (req, res) => {
+    try {
+        const { username } = req.query;
+        const serverKey = req.serverKey;
+
+        if (!username) {
+            return res.status(400).json({ error: 'Username is required' });
+        }
+
+        const user = await User.findOne({ username, serverKey });
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const sessions = await Session.find({
+            userId: user._id,
+            serverKey,
+            isValid: true,
+            expiresAt: { $gt: new Date() }
+        }).sort({ lastActivity: -1 });
+
+        res.json({
+            username,
+            totalActiveSessions: sessions.length,
+            sessions: sessions.map(s => ({
+                sessionId: s._id,
+                ipAddress: s.ipAddress,
+                device: s.userAgent,
+                createdAt: s.createdAt,
+                lastActivity: s.lastActivity,
+                expiresAt: s.expiresAt,
+                timeRemaining: Math.max(0, s.expiresAt - Date.now()) / 1000 / 60 // Minutes
+            }))
+        });
+    } catch (error) {
+        console.error('Sessions fetch error:', error);
+        res.status(500).json({ error: 'Failed to fetch sessions' });
+    }
+});
+
+
+// Check if IP is suspicious (used by multiple accounts)
+app.get('/api/security/ipCheck/:ip', checkServerKey, async (req, res) => {
+    try {
+        const { ip } = req.params;
+        const serverKey = req.serverKey;
+
+        const users = await getUsersByIP(ip, serverKey);
+
+        const isSuspicious = users.length > 3; // More than 3 accounts from same IP
+
+        res.json({
+            ip,
+            totalAccounts: users.length,
+            isSuspicious,
+            riskLevel: isSuspicious ? 'HIGH' : users.length > 1 ? 'MEDIUM' : 'LOW',
+            accounts: users.map(u => ({
+                username: u.username,
+                lastLogin: u.lastLogin,
+                totalLoginsWithIP: u.totalLoginsWithIP
+            })),
+            recommendation: isSuspicious 
+                ? 'Consider investigating this IP for potential abuse'
+                : 'IP appears normal'
+        });
+    } catch (error) {
+        console.error('IP check error:', error);
+        res.status(500).json({ error: 'Failed to check IP' });
+    }
+});
+
+// Get login statistics by IP range
+app.get('/api/admin/ipStats', checkServerKey, async (req, res) => {
+    try {
+        const serverKey = req.serverKey;
+
+        // Get all users for this server
+        const users = await User.find({ serverKey })
+            .select('ipHistory username')
+            .lean();
+
+        // Aggregate IP statistics
+        const ipStats = {};
+        users.forEach(user => {
+            if (user.ipHistory) {
+                user.ipHistory.forEach(entry => {
+                    if (!ipStats[entry.ip]) {
+                        ipStats[entry.ip] = {
+                            ip: entry.ip,
+                            uniqueUsers: new Set(),
+                            totalLogins: 0,
+                            firstSeen: entry.loginTime,
+                            lastSeen: entry.loginTime
+                        };
+                    }
+                    ipStats[entry.ip].uniqueUsers.add(user.username);
+                    ipStats[entry.ip].totalLogins++;
+                    ipStats[entry.ip].lastSeen = entry.loginTime;
+                    
+                    if (entry.loginTime < ipStats[entry.ip].firstSeen) {
+                        ipStats[entry.ip].firstSeen = entry.loginTime;
+                    }
+                });
+            }
+        });
+
+        // Convert to array and sort
+        const statsArray = Object.values(ipStats).map(stat => ({
+            ...stat,
+            uniqueUserCount: stat.uniqueUsers.size,
+            uniqueUsers: Array.from(stat.uniqueUsers)
+        })).sort((a, b) => b.uniqueUserCount - a.uniqueUserCount);
+
+        res.json({
+            totalUniqueIPs: statsArray.length,
+            suspiciousIPs: statsArray.filter(stat => stat.uniqueUserCount > 3).length,
+            stats: statsArray.slice(0, 50) // Top 50 IPs
+        });
+    } catch (error) {
+        console.error('IP stats error:', error);
+        res.status(500).json({ error: 'Failed to fetch IP statistics' });
     }
 });
 
@@ -871,9 +1352,10 @@ app.post('/api/register', checkServerKey, async (req, res) => {
     }
 });
 
+// Update the login endpoint to include sessions
 app.post('/api/login', loginLimiter, checkServerKey, async (req, res) => {
     try {
-        const { username, password } = req.body;
+        const { username, password, sessionDuration = 24 } = req.body;
         const serverKey = req.serverKey;
 
         if (!username || !password) {
@@ -923,6 +1405,12 @@ app.post('/api/login', loginLimiter, checkServerKey, async (req, res) => {
             });
         }
 
+        // Create session
+        const sessionToken = await createSession(user, req, sessionDuration);
+        
+        // Track IP login
+        await trackIPLogin(user._id, req.ip, req.headers['user-agent'], sessionToken);
+
         await User.updateOne(
             { _id: user._id },
             {
@@ -930,7 +1418,8 @@ app.post('/api/login', loginLimiter, checkServerKey, async (req, res) => {
                     loginAttempts: 0,
                     lastLogin: now,
                     ipAddress: req.ip,
-                    location: req.headers['x-forwarded-for'] || req.connection.remoteAddress
+                    location: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+                    deviceInfo: req.headers['user-agent']
                 }
             }
         );
@@ -938,11 +1427,617 @@ app.post('/api/login', loginLimiter, checkServerKey, async (req, res) => {
         res.json({
             message: 'Login successful',
             username: username,
-            lastLogin: user.lastLogin
+            lastLogin: user.lastLogin,
+            sessionToken,
+            expiresIn: `${sessionDuration} hours`,
+            ipAddress: req.ip,
+            timestamp: getIndianDateTime()
         });
     } catch (error) {
         console.error('Login error:', error);
         res.status(500).json({ error: 'Login failed' });
+    }
+});
+
+// Session validation endpoint
+app.post('/api/validateSession', checkServerKey, async (req, res) => {
+    try {
+        const { sessionToken } = req.body;
+        const serverKey = req.serverKey;
+
+        if (!sessionToken) {
+            return res.status(400).json({
+                valid: false,
+                error: 'Session token is required'
+            });
+        }
+
+        const session = await validateSession(sessionToken, serverKey);
+
+        if (!session) {
+            return res.json({
+                valid: false,
+                error: 'Invalid or expired session'
+            });
+        }
+
+        const user = session.userId;
+
+        res.json({
+            valid: true,
+            username: user.username,
+            email: user.email,
+            sessionToken,
+            expiresAt: session.expiresAt,
+            lastActivity: session.lastActivity,
+            ipAddress: session.ipAddress,
+            timeRemaining: Math.max(0, session.expiresAt - Date.now()) / 1000 / 60 / 60 // Hours
+        });
+    } catch (error) {
+        console.error('Session validation error:', error);
+        res.status(500).json({
+            valid: false,
+            error: 'Session validation failed'
+        });
+    }
+});
+
+
+// Logout endpoint
+app.post('/api/logout', checkServerKey, async (req, res) => {
+    try {
+        const { sessionToken } = req.body;
+        const serverKey = req.serverKey;
+
+        if (!sessionToken) {
+            return res.status(400).json({
+                success: false,
+                error: 'Session token is required'
+            });
+        }
+
+        const session = await Session.findOne({
+            sessionToken,
+            serverKey
+        });
+
+        if (!session) {
+            return res.json({
+                success: false,
+                error: 'Session not found'
+            });
+        }
+
+        const invalidated = await invalidateSession(sessionToken);
+
+        if (invalidated) {
+            res.json({
+                success: true,
+                message: 'Logged out successfully',
+                timestamp: getIndianDateTime()
+            });
+        } else {
+            res.json({
+                success: false,
+                error: 'Failed to logout'
+            });
+        }
+    } catch (error) {
+        console.error('Logout error:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Logout failed'
+        });
+    }
+});
+
+// Password reset by username (sends OTP to email if set)
+app.post('/api/resetPassword/requestOTPByUsername', async (req, res) => {
+    try {
+        const { username, serverKey } = req.body;
+
+        if (!username || !serverKey) {
+            return res.status(400).json({
+                success: false,
+                error: 'Username and serverKey are required'
+            });
+        }
+
+        const user = await User.findOne({ username, serverKey });
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                error: 'User not found'
+            });
+        }
+
+        if (!user.email) {
+            return res.status(400).json({
+                success: false,
+                error: 'No email set for this user. Please contact administrator.'
+            });
+        }
+
+        const otp = generateOTP();
+
+        otpStore.set(user.email, {
+            otp,
+            expires: Date.now() + OTP_EXPIRY,
+            attempts: 0,
+            username: user.username,
+            serverKey: user.serverKey
+        });
+
+        const emailHtml = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1a1a1a; color: #ffffff; padding: 30px; border-radius: 10px;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h1 style="color: #6366f1; margin: 0;">🔐 AdvanceAuth</h1>
+                    <p style="color: #94a3b8; margin: 5px 0;">Password Reset Request</p>
+                </div>
+                
+                <div style="background: #2d2d2d; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <p style="margin: 10px 0;">Hello <strong>${user.username}</strong>,</p>
+                    <p style="margin: 10px 0;">You requested to reset your password. Use the OTP below:</p>
+                    
+                    <div style="background: #6366f1; color: white; padding: 20px; text-align: center; font-size: 32px; letter-spacing: 10px; margin: 20px 0; border-radius: 8px; font-weight: bold;">
+                        ${otp}
+                    </div>
+                    
+                    <p style="margin: 10px 0; color: #94a3b8; font-size: 14px;">
+                        Username: ${user.username}<br>
+                        Server: ${serverKey.substring(0, 8)}...
+                    </p>
+                    
+                    <p style="margin: 10px 0; color: #94a3b8; font-size: 14px;">
+                        This OTP is valid for 10 minutes. Do not share it with anyone.
+                    </p>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #374151;">
+                    <p style="color: #94a3b8; font-size: 12px; margin: 5px 0;">
+                        If you didn't request this, please ignore this email.
+                    </p>
+                    <p style="color: #94a3b8; font-size: 12px; margin: 5px 0;">
+                        Need help? Join our Discord: <a href="https://discord.zenuxs.in" style="color: #6366f1;">discord.zenuxs.in</a>
+                    </p>
+                </div>
+            </div>
+        `;
+
+        const emailResult = await sendEmail(user.email, 'Password Reset OTP - AdvanceAuth', emailHtml);
+
+        if (!emailResult.success) {
+            return res.status(500).json({
+                success: false,
+                error: 'Failed to send OTP email'
+            });
+        }
+
+        res.json({
+            success: true,
+            message: 'OTP sent to registered email',
+            email: user.email.substring(0, 3) + '***' + user.email.substring(user.email.indexOf('@')),
+            expiresIn: '10 minutes'
+        });
+
+    } catch (error) {
+        console.error('Username OTP request error:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to process OTP request'
+        });
+    }
+});
+
+// Verify OTP and reset password by username
+app.post('/api/resetPassword/verifyOTPByUsername', async (req, res) => {
+    try {
+        const { username, serverKey, otp, newPassword } = req.body;
+
+        if (!username || !serverKey || !otp || !newPassword) {
+            return res.status(400).json({
+                success: false,
+                error: 'All fields are required'
+            });
+        }
+
+        const user = await User.findOne({ username, serverKey });
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                error: 'User not found'
+            });
+        }
+
+        if (!user.email) {
+            return res.status(400).json({
+                success: false,
+                error: 'No email set for this user'
+            });
+        }
+
+        const otpData = otpStore.get(user.email);
+        if (!otpData) {
+            return res.status(400).json({
+                success: false,
+                error: 'OTP not found or expired'
+            });
+        }
+
+        if (Date.now() > otpData.expires) {
+            otpStore.delete(user.email);
+            return res.status(400).json({
+                success: false,
+                error: 'OTP expired'
+            });
+        }
+
+        if (otpData.attempts >= 3) {
+            otpStore.delete(user.email);
+            return res.status(400).json({
+                success: false,
+                error: 'Too many OTP attempts'
+            });
+        }
+
+        if (otpData.otp !== otp) {
+            otpData.attempts++;
+            otpStore.set(user.email, otpData);
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid OTP'
+            });
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 12);
+        await User.updateOne(
+            { _id: user._id },
+            {
+                password: hashedPassword,
+                loginAttempts: 0
+            }
+        );
+
+        // Invalidate all sessions for security
+        await invalidateAllSessions(user._id, serverKey);
+
+        otpStore.delete(user.email);
+        userCache.del(`${serverKey}_${username}`);
+
+        res.json({
+            success: true,
+            message: 'Password changed successfully',
+            changedAt: getIndianDateTime(),
+            indianDate: formatIndianDate(new Date()),
+            username: user.username,
+            sessionsInvalidated: true
+        });
+
+    } catch (error) {
+        console.error('Username password change error:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to change password'
+        });
+    }
+});
+
+// User email setup with OTP (requires current password)
+app.post('/api/user/setEmail/requestOTP', async (req, res) => {
+    try {
+        const { username, serverKey, currentPassword, newEmail } = req.body;
+
+        if (!username || !serverKey || !currentPassword || !newEmail) {
+            return res.status(400).json({
+                success: false,
+                error: 'All fields are required'
+            });
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(newEmail)) {
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid email format'
+            });
+        }
+
+        const user = await User.findOne({ username, serverKey });
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                error: 'User not found'
+            });
+        }
+
+        // Verify current password
+        const isValidPassword = await bcrypt.compare(currentPassword, user.password);
+        if (!isValidPassword) {
+            return res.status(401).json({
+                success: false,
+                error: 'Invalid current password'
+            });
+        }
+
+        // Check if email already in use
+        const existingUser = await User.findOne({
+            email: newEmail,
+            serverKey,
+            username: { $ne: username }
+        });
+
+        if (existingUser) {
+            return res.status(400).json({
+                success: false,
+                error: 'Email already registered to another user'
+            });
+        }
+
+        const otp = generateOTP();
+
+        // Store OTP with email as key
+        otpStore.set(newEmail, {
+            otp,
+            expires: Date.now() + OTP_EXPIRY,
+            attempts: 0,
+            username,
+            serverKey,
+            currentEmail: user.email
+        });
+
+        const emailHtml = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1a1a1a; color: #ffffff; padding: 30px; border-radius: 10px;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h1 style="color: #6366f1; margin: 0;">🔐 AdvanceAuth</h1>
+                    <p style="color: #94a3b8; margin: 5px 0;">Email Verification</p>
+                </div>
+                
+                <div style="background: #2d2d2d; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <p style="margin: 10px 0;">Hello <strong>${username}</strong>,</p>
+                    <p style="margin: 10px 0;">You requested to set your email to ${newEmail}. Use the OTP below to verify:</p>
+                    
+                    <div style="background: #6366f1; color: white; padding: 20px; text-align: center; font-size: 32px; letter-spacing: 10px; margin: 20px 0; border-radius: 8px; font-weight: bold;">
+                        ${otp}
+                    </div>
+                    
+                    <p style="margin: 10px 0; color: #94a3b8; font-size: 14px;">
+                        Username: ${username}<br>
+                        Server: ${serverKey.substring(0, 8)}...
+                    </p>
+                    
+                    <p style="margin: 10px 0; color: #94a3b8; font-size: 14px;">
+                        This OTP is valid for 10 minutes.
+                    </p>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #374151;">
+                    <p style="color: #94a3b8; font-size: 12px; margin: 5px 0;">
+                        If you didn't request this, please ignore this email.
+                    </p>
+                </div>
+            </div>
+        `;
+
+        const emailResult = await sendEmail(newEmail, 'Email Verification - AdvanceAuth', emailHtml);
+
+        if (!emailResult.success) {
+            return res.status(500).json({
+                success: false,
+                error: 'Failed to send verification email'
+            });
+        }
+
+        res.json({
+            success: true,
+            message: 'Verification OTP sent to new email',
+            email: newEmail.substring(0, 3) + '***' + newEmail.substring(newEmail.indexOf('@')),
+            expiresIn: '10 minutes'
+        });
+
+    } catch (error) {
+        console.error('Email OTP request error:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to process email verification'
+        });
+    }
+});
+
+// Verify OTP and set user email
+app.post('/api/user/setEmail/verifyOTP', async (req, res) => {
+    try {
+        const { username, serverKey, newEmail, otp } = req.body;
+
+        if (!username || !serverKey || !newEmail || !otp) {
+            return res.status(400).json({
+                success: false,
+                error: 'All fields are required'
+            });
+        }
+
+        const otpData = otpStore.get(newEmail);
+        if (!otpData) {
+            return res.status(400).json({
+                success: false,
+                error: 'OTP not found or expired'
+            });
+        }
+
+        if (Date.now() > otpData.expires) {
+            otpStore.delete(newEmail);
+            return res.status(400).json({
+                success: false,
+                error: 'OTP expired'
+            });
+        }
+
+        if (otpData.attempts >= 3) {
+            otpStore.delete(newEmail);
+            return res.status(400).json({
+                success: false,
+                error: 'Too many OTP attempts'
+            });
+        }
+
+        if (otpData.username !== username || otpData.serverKey !== serverKey) {
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid OTP data'
+            });
+        }
+
+        if (otpData.otp !== otp) {
+            otpData.attempts++;
+            otpStore.set(newEmail, otpData);
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid OTP'
+            });
+        }
+
+        // Update user email
+        await User.updateOne(
+            { username, serverKey },
+            {
+                email: newEmail,
+                emailVerified: true,
+                emailUpdatedAt: getIndianDateTime()
+            }
+        );
+
+        otpStore.delete(newEmail);
+        userCache.del(`${serverKey}_${username}`);
+
+        res.json({
+            success: true,
+            message: 'Email set successfully',
+            username,
+            email: newEmail,
+            verified: true,
+            updatedAt: getIndianDateTime(),
+            indianDate: formatIndianDate(new Date())
+        });
+
+    } catch (error) {
+        console.error('Email verification error:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to verify email'
+        });
+    }
+});
+
+
+// Get users by IP (admin only)
+app.get('/api/admin/ip/:ip', checkServerKey, async (req, res) => {
+    try {
+        const { ip } = req.params;
+        const serverKey = req.serverKey;
+
+        const users = await getUsersByIP(ip, serverKey);
+
+        res.json({
+            ip,
+            totalUsers: users.length,
+            users,
+            timestamp: getIndianDateTime()
+        });
+    } catch (error) {
+        console.error('Get users by IP error:', error);
+        res.status(500).json({ error: 'Failed to fetch users by IP' });
+    }
+});
+
+// Get IP statistics for a user (admin only)
+app.get('/api/admin/user/:username/ipStats', checkServerKey, async (req, res) => {
+    try {
+        const { username } = req.params;
+        const serverKey = req.serverKey;
+
+        const user = await User.findOne({ username, serverKey });
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const ipStats = await getUserIPStats(user._id);
+
+        res.json({
+            username,
+            ...ipStats,
+            timestamp: getIndianDateTime()
+        });
+    } catch (error) {
+        console.error('Get user IP stats error:', error);
+        res.status(500).json({ error: 'Failed to fetch IP statistics' });
+    }
+});
+
+// Get active sessions for a user (admin only)
+app.get('/api/admin/user/:username/sessions', checkServerKey, async (req, res) => {
+    try {
+        const { username } = req.params;
+        const serverKey = req.serverKey;
+
+        const user = await User.findOne({ username, serverKey });
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const sessions = await Session.find({
+            userId: user._id,
+            serverKey,
+            isValid: true,
+            expiresAt: { $gt: new Date() }
+        }).sort({ lastActivity: -1 }).lean();
+
+        res.json({
+            username,
+            totalActiveSessions: sessions.length,
+            sessions: sessions.map(s => ({
+                sessionToken: s.sessionToken.substring(0, 10) + '...',
+                ipAddress: s.ipAddress,
+                userAgent: s.userAgent,
+                createdAt: s.createdAt,
+                expiresAt: s.expiresAt,
+                lastActivity: s.lastActivity,
+                timeRemaining: Math.max(0, s.expiresAt - Date.now()) / 1000 / 60 // Minutes
+            }))
+        });
+    } catch (error) {
+        console.error('Get user sessions error:', error);
+        res.status(500).json({ error: 'Failed to fetch sessions' });
+    }
+});
+
+// Force logout user from all sessions (admin only)
+app.post('/api/admin/user/:username/forceLogout', checkServerKey, async (req, res) => {
+    try {
+        const { username } = req.params;
+        const serverKey = req.serverKey;
+
+        const user = await User.findOne({ username, serverKey });
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const invalidated = await invalidateAllSessions(user._id, serverKey);
+
+        if (invalidated) {
+            res.json({
+                success: true,
+                message: 'All sessions invalidated',
+                username,
+                timestamp: getIndianDateTime()
+            });
+        } else {
+            res.json({
+                success: false,
+                error: 'Failed to invalidate sessions'
+            });
+        }
+    } catch (error) {
+        console.error('Force logout error:', error);
+        res.status(500).json({ error: 'Failed to force logout' });
     }
 });
 
@@ -1445,6 +2540,7 @@ app.get('/api/enhancedStats', checkServerKey, async (req, res) => {
     }
 });
 
+// Update the enhanced stats function to include IP statistics
 async function calculateEnhancedStats(serverKey) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -1454,7 +2550,9 @@ async function calculateEnhancedStats(serverKey) {
         activeToday,
         newRegistrations,
         bannedUsers,
-        userList
+        userList,
+        // Get IP statistics
+        ipStats
     ] = await Promise.all([
         User.countDocuments({ serverKey }),
         User.countDocuments({
@@ -1466,7 +2564,23 @@ async function calculateEnhancedStats(serverKey) {
             createdAt: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) }
         }),
         User.countDocuments({ serverKey, isBanned: true }),
-        User.find({ serverKey }).select('lastLogin createdAt').lean()
+        User.find({ serverKey }).select('lastLogin createdAt').lean(),
+        // Calculate IP statistics
+        (async () => {
+            const users = await User.find({ serverKey }).select('ipHistory').lean();
+            const ips = new Set();
+            users.forEach(user => {
+                if (user.ipHistory) {
+                    user.ipHistory.forEach(entry => {
+                        ips.add(entry.ip);
+                    });
+                }
+            });
+            return {
+                uniqueIPs: ips.size,
+                averageIPsPerUser: users.length > 0 ? Array.from(ips).length / users.length : 0
+            };
+        })()
     ]);
 
     const hourCounts = new Array(24).fill(0);
@@ -1496,6 +2610,7 @@ async function calculateEnhancedStats(serverKey) {
         peakLoginHour: peakHour,
         retentionRate: `${retentionRate}%`,
         activeLast7Days,
+        ipStatistics: ipStats,
         timestamp: getIndianDateTime(),
         indianDate: formatIndianDate(new Date()),
         timezone: 'IST (UTC+5:30)'

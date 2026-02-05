@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>easyMCWeb - Create Minecraft Server Websites Without Coding | Zenuxs Plugins</title>
+    <link rel="shortcut icon" href="/images/zenux.png" type="image/x-icon">
+
+    <!-- 🔥 SEO Meta Tags -->
+    <meta name="description"
+        content="easyMCWeb: Create beautiful Minecraft server websites without coding. Drag-and-drop builder, built-in APIs, server status, player lists, and more. Perfect for server owners.">
+    <meta name="keywords"
+        content="minecraft website builder, minecraft server website, no-code website builder, minecraft web interface, server status page, player list website, minecraft api, zenuxs plugins">
+    <meta name="author" content="Zenuxs Plugins">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="theme-color" content="#1a1f36">
+
+    <!-- 🔗 Canonical -->
+    <link rel="canonical" href="https://plugins.zenuxs.in/easyMCWeb">
+    <meta name="language" content="English">
+
+    <!-- 📱 Social Media -->
+    <meta property="og:title" content="easyMCWeb - Create Minecraft Server Websites Without Coding">
+    <meta property="og:description"
+        content="Build beautiful Minecraft server websites instantly with drag-and-drop builder. No coding required!">
+    <meta property="og:image" content="https://plugins.zenuxs.in/images/easyMCWeb-banner.png">
+    <meta property="og:url" content="https://plugins.zenuxs.in/easyMCWeb">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- 🎨 Fonts & Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+
+    <!-- 📊 Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "easyMCWeb - Minecraft Website Builder",
+        "applicationCategory": "WebApplication",
+        "operatingSystem": "Minecraft Server",
+        "softwareVersion": "1.0.0",
+        "description": "Create Minecraft server websites without coding. Drag-and-drop builder with built-in APIs.",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "author": {
+            "@type": "Organization",
+            "name": "Zenuxs Plugins"
+        },
+        "featureList": [
+            "Drag-and-drop website builder",
+            "Built-in REST APIs",
+            "Real-time server status",
+            "Player list management",
+            "Customizable themes",
+            "No coding required"
+        ]
+    }
+    </script>
+
+    <style>
+        :root {
+            --primary: #1a1f36;
+            --secondary: #0f1322;
+            --accent: #8b5cf6;
+            --accent-hover: #7c3aed;
+            --accent-light: rgba(139, 92, 246, 0.1);
+            --text: #f0f6fc;
+            --text-muted: #8b949e;
+            --card-bg: #212936;
+            --card-border: #2d3748;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --radius: 12px;
+            --shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            --shadow-hover: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* Navigation */
+        nav {
+            background-color: rgba(15, 19, 34, 0.98);
+            backdrop-filter: blur(20px);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--card-border);
+            padding: 1rem 0;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        .nav-links a::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::before {
+            width: 100%;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Plugin Header */
+        .plugin-header {
+            padding: 4rem 0 2rem;
+            text-align: center;
+        }
+
+        .plugin-icon {
+            width: 120px;
+            height: 120px;
+            border-radius: 25px;
+            object-fit: cover;
+            border: 4px solid var(--accent);
+            box-shadow: 0 15px 40px rgba(139, 92, 246, 0.3);
+            margin-bottom: 2rem;
+        }
+
+        .plugin-title {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #fff, var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .plugin-subtitle {
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .plugin-tags {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin: 2rem 0;
+        }
+
+        .tag {
+            background: var(--accent-light);
+            color: var(--accent);
+            padding: 0.5rem 1.25rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: 2px solid rgba(139, 92, 246, 0.3);
+            transition: var(--transition);
+        }
+
+        .tag:hover {
+            background: var(--accent);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Stats Banner */
+        .stats-banner {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(16, 185, 129, 0.1));
+            border-radius: var(--radius);
+            padding: 2rem;
+            margin: 3rem 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            text-align: center;
+        }
+
+        .stat-item {
+            padding: 1.5rem;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        /* Features */
+        .features-section {
+            padding: 4rem 0;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 5px;
+            background: var(--accent);
+            border-radius: 3px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 2rem;
+            border: 1px solid var(--card-border);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--accent);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .feature-description {
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+
+        /* Screenshots */
+        .screenshots-section {
+            padding: 4rem 0;
+        }
+
+        .screenshots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .screenshot-item {
+            position: relative;
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 3px solid var(--card-border);
+            transition: var(--transition);
+        }
+
+        .screenshot-item:hover {
+            transform: scale(1.03);
+            border-color: var(--accent);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .screenshot-img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .screenshot-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 1rem;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .screenshot-item:hover .screenshot-caption {
+            transform: translateY(0);
+        }
+
+        /* How It Works */
+        .how-it-works {
+            padding: 4rem 0;
+            background: rgba(139, 92, 246, 0.05);
+            border-radius: var(--radius);
+            margin: 3rem 0;
+        }
+
+        .steps-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .step {
+            display: flex;
+            align-items: flex-start;
+            gap: 2rem;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .step-number {
+            background: var(--accent);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .step-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .step-content p {
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+
+        /* API Preview */
+        .api-preview {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 2rem;
+            margin: 3rem 0;
+            border: 1px solid var(--card-border);
+            overflow-x: auto;
+        }
+
+        pre {
+            color: var(--text);
+            font-family: 'Courier New', monospace;
+            line-height: 1.6;
+            font-size: 0.95rem;
+            white-space: pre-wrap;
+        }
+
+        code {
+            color: #8b5cf6;
+            background: rgba(139, 92, 246, 0.1);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            text-align: center;
+            padding: 5rem 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: var(--radius);
+            margin: 4rem 0;
+            border: 1px solid var(--card-border);
+        }
+
+        .cta-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .cta-description {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 3rem;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 1rem 2.5rem;
+            border-radius: var(--radius);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text);
+            border: 2px solid var(--card-border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent);
+            transform: translateY(-3px);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--secondary);
+            padding: 4rem 0 2rem;
+            margin-top: 4rem;
+            border-top: 1px solid var(--card-border);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-column h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 0.75rem;
+        }
+
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: var(--accent);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+            padding-left: 5px;
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid var(--card-border);
+            color: var(--text-muted);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .plugin-title {
+                font-size: 2.2rem;
+            }
+
+            .plugin-subtitle {
+                font-size: 1.2rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .screenshots-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .step {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .plugin-title {
+                font-size: 1.8rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .stat-number {
+                font-size: 2rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="container nav-container">
+            <a href="/" class="logo">
+                <i class="fas fa-cube"></i>
+                <span>Zenuxs Plugins</span>
+            </a>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/plugins">Plugins</a>
+                <a href="/categories">Categories</a>
+                <a href="/premium">Premium</a>
+                <a href="https://discord.zenuxs.xyz">Support</a>
+                <a href="#download" class="btn btn-primary">Download</a>
+            </div>
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Plugin Header -->
+    <header class="plugin-header container">
+        <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
+            alt="easyMCWeb Plugin Icon" class="plugin-icon">
+        <h1 class="plugin-title fade-in">easyMCWeb</h1>
+        <h2 class="plugin-subtitle fade-in">
+            Create beautiful Minecraft server websites instantly with drag-and-drop builder. 
+            No coding required!
+        </h2>
+        <div class="plugin-tags">
+            <span class="tag">Website Builder</span>
+            <span class="tag">No-Code</span>
+            <span class="tag">Drag & Drop</span>
+            <span class="tag">REST APIs</span>
+            <span class="tag">Server Status</span>
+            <span class="tag">Free Plugin</span>
+        </div>
+    </header>
+
+    <!-- Stats Banner -->
+    <section class="stats-banner container fade-in">
+        <div class="stat-item">
+            <div class="stat-number">0</div>
+            <div class="stat-label">Lines of Code Required</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">6+</div>
+            <div class="stat-label">Built-in APIs</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">∞</div>
+            <div class="stat-label">Customizable Pages</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">100%</div>
+            <div class="stat-label">No Coding Needed</div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section container">
+        <h2 class="section-title fade-in">Powerful Features</h2>
+        <div class="features-grid">
+            <div class="feature-card fade-in">
+                <div class="feature-icon">
+                    <i class="fas fa-mouse-pointer"></i>
+                </div>
+                <h3 class="feature-title">Drag & Drop Builder</h3>
+                <p class="feature-description">
+                    Create your website visually with intuitive drag-and-drop interface. 
+                    Add elements, customize layouts, and see changes in real-time.
+                </p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon">
+                    <i class="fas fa-code"></i>
+                </div>
+                <h3 class="feature-title">Built-in REST APIs</h3>
+                <p class="feature-description">
+                    Access server data through powerful REST APIs. Get player lists, 
+                    server status, statistics, and more for custom integrations.
+                </p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon">
+                    <i class="fas fa-server"></i>
+                </div>
+                <h3 class="feature-title">Real-time Server Status</h3>
+                <p class="feature-description">
+                    Display live server information including online players, 
+                    server health, performance metrics, and uptime statistics.
+                </p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3 class="feature-title">Player Management</h3>
+                <p class="feature-description">
+                    Showcase your community with beautiful player lists, 
+                    leaderboards, and profile pages with avatar integration.
+                </p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon">
+                    <i class="fas fa-palette"></i>
+                </div>
+                <h3 class="feature-title">Customizable Themes</h3>
+                <p class="feature-description">
+                    Choose from multiple beautiful themes or create your own. 
+                    Customize colors, fonts, and layouts to match your server's brand.
+                </p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <h3 class="feature-title">Instant Deployment</h3>
+                <p class="feature-description">
+                    One-click publishing to your domain. No server configuration needed. 
+                    Your website goes live instantly after setup.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Screenshots Section -->
+    <section class="screenshots-section container">
+        <h2 class="section-title fade-in">Screenshots</h2>
+        <div class="screenshots-grid">
+            <div class="screenshot-item fade-in">
+                <img src="https://images.unsplash.com/photo-1551650975-87deedd944c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                    alt="easyMCWeb Dashboard Interface" class="screenshot-img">
+                <div class="screenshot-caption">
+                    <p>Dashboard Interface</p>
+                </div>
+            </div>
+            <div class="screenshot-item fade-in">
+                <img src="https://images.unsplash.com/photo-1517697471339-4aa32003c11a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                    alt="Drag & Drop Builder" class="screenshot-img">
+                <div class="screenshot-caption">
+                    <p>Drag & Drop Builder</p>
+                </div>
+            </div>
+            <div class="screenshot-item fade-in">
+                <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                    alt="Server Status Page" class="screenshot-img">
+                <div class="screenshot-caption">
+                    <p>Server Status Page</p>
+                </div>
+            </div>
+            <div class="screenshot-item fade-in">
+                <img src="https://images.unsplash.com/photo-1545235617-9465d2a55698?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                    alt="Player List Interface" class="screenshot-img">
+                <div class="screenshot-caption">
+                    <p>Player List Interface</p>
+                </div>
+            </div>
+            <div class="screenshot-item fade-in">
+                <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                    alt="Theme Customization" class="screenshot-img">
+                <div class="screenshot-caption">
+                    <p>Theme Customization</p>
+                </div>
+            </div>
+            <div class="screenshot-item fade-in">
+                <img src="https://images.unsplash.com/photo-1561070791-2526d30994b5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                    alt="API Documentation" class="screenshot-img">
+                <div class="screenshot-caption">
+                    <p>API Documentation</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works container">
+        <h2 class="section-title fade-in">How It Works</h2>
+        <div class="steps-container">
+            <div class="step fade-in">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3>Install the Plugin</h3>
+                    <p>Download and install easyMCWeb on your Minecraft server. It works with Spigot, PaperMC, and Bukkit.</p>
+                </div>
+            </div>
+            <div class="step fade-in">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3>Access Web Dashboard</h3>
+                    <p>Open the web interface through your browser. No port forwarding or complex setup required.</p>
+                </div>
+            </div>
+            <div class="step fade-in">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3>Design Your Website</h3>
+                    <p>Use the drag-and-drop builder to create pages, add elements, and customize your design.</p>
+                </div>
+            </div>
+            <div class="step fade-in">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h3>Publish & Share</h3>
+                    <p>Click publish and share your website URL with players. Your website is now live!</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- API Preview -->
+    <section class="container fade-in">
+        <h2 class="section-title">Built-in APIs</h2>
+        <div class="api-preview">
+            <pre><code>// Example API Endpoints
+GET /api/server/status
+Response:
+{
+  "status": "online",
+  "players": {
+    "online": 42,
+    "max": 100
+  },
+  "version": "1.20.1",
+  "motd": "Welcome to our Server!"
+}
+
+GET /api/players/online
+Response:
+{
+  "players": [
+    {
+      "name": "Player1",
+      "uuid": "...",
+      "playtime": 3600
+    }
+  ],
+  "count": 42
+}
+
+GET /api/stats/server
+Response:
+{
+  "uptime": 86400,
+  "tps": 19.8,
+  "memory": {
+    "used": "4GB",
+    "max": "8GB"
+  }
+}</code></pre>
+        </div>
+    </section>
+
+    <!-- Download CTA -->
+    <section class="cta-section container fade-in" id="download">
+        <h2 class="cta-title">Create Your Server Website Today</h2>
+        <p class="cta-description">
+            Join thousands of server owners who created beautiful websites without writing a single line of code.
+        </p>
+        <div class="cta-buttons">
+            <a href="/download/easyMCWeb-1.0.0.jar" class="btn btn-primary">
+                <i class="fas fa-download"></i> Download Free
+            </a>
+            <a href="https://demo.easymcweb.zenuxs.in" class="btn btn-secondary" target="_blank">
+                <i class="fas fa-eye"></i> View Demo
+            </a>
+        </div>
+        <p style="margin-top: 2rem; color: var(--text-muted);">
+            <i class="fas fa-info-circle"></i> Version 1.0.0 | File Size: 2.5MB | Compatible with Spigot 1.8+
+        </p>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h3>Zenuxs Plugins</h3>
+                    <p>Creating powerful plugins for Minecraft server owners. Focus on simplicity and performance.</p>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/plugins">All Plugins</a></li>
+                        <li><a href="/documentation">Documentation</a></li>
+                        <li><a href="/support">Support</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Resources</h3>
+                    <ul class="footer-links">
+                        <li><a href="https://discord.zenuxs.xyz">Discord Community</a></li>
+                        <li><a href="/blog">Blog & Tutorials</a></li>
+                        <li><a href="/api-docs">API Documentation</a></li>
+                        <li><a href="/faq">FAQs</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Legal</h3>
+                    <ul class="footer-links">
+                        <li><a href="/privacy">Privacy Policy</a></li>
+                        <li><a href="/terms">Terms of Service</a></li>
+                        <li><a href="/license">License</a></li>
+                        <li><a href="/contact">Contact Us</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2024 Zenuxs Plugins. All rights reserved.</p>
+                <p>Minecraft is a trademark of Mojang AB. Not affiliated with Mojang or Microsoft.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile Menu
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        const navLinks = document.querySelector('.nav-links');
+        
+        mobileMenuBtn.addEventListener('click', () => {
+            navLinks.style.display = navLinks.style.display === 'flex' ? 'none' : 'flex';
+        });
+
+        // Fade in animations on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all sections
+        document.querySelectorAll('.fade-in').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Track downloads
+        document.querySelector('.btn-primary').addEventListener('click', () => {
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'download', {
+                    'event_category': 'Plugin',
+                    'event_label': 'easyMCWeb'
+                });
+            }
+        });
+
+        // SEO: Update page title dynamically
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                document.title = "👋 Come back to easyMCWeb!";
+            } else {
+                document.title = "easyMCWeb - Create Minecraft Server Websites Without Coding";
+            }
+        });
+    </script>
+</body>
+
+</html>
