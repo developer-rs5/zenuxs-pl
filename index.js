@@ -1172,6 +1172,261 @@ app.post('/api/changePassword/requestOTP', async (req, res) => {
     }
 });
 
+// Add this route to get user email by username
+app.post('/api/getUserEmail', async (req, res) => {
+    try {
+        const { username, serverKey } = req.body;
+
+        if (!username || !serverKey) {
+            return res.status(400).json({
+                success: false,
+                error: 'Username and serverKey are required'
+            });
+        }
+
+        const user = await User.findOne({ username, serverKey })
+            .select('email username')
+            .lean();
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                error: 'User not found'
+            });
+        }
+
+        res.json({
+            success: true,
+            username: user.username,
+            email: user.email || null,
+            hasEmail: !!user.email
+        });
+
+    } catch (error) {
+        console.error('Get user email error:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to get user email'
+        });
+    }
+});
+
+// Add this route for password reset by username (without email parameter)
+app.post('/api/resetPasswordByUsername', async (req, res) => {
+    try {
+        const { username, serverKey } = req.body;
+
+        if (!username || !serverKey) {
+            return res.status(400).json({
+                success: false,
+                error: 'Username and serverKey are required'
+            });
+        }
+
+        const user = await User.findOne({ username, serverKey });
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                error: 'User not found'
+            });
+        }
+
+        if (!user.email) {
+            return res.status(400).json({
+                success: false,
+                error: 'No email set for this user'
+            });
+        }
+
+        const otp = generateOTP();
+
+        otpStore.set(user.email, {
+            otp,
+            expires: Date.now() + OTP_EXPIRY,
+            attempts: 0,
+            username: user.username,
+            serverKey: user.serverKey
+        });
+
+        const emailHtml = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1a1a1a; color: #ffffff; padding: 30px; border-radius: 10px;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h1 style="color: #6366f1; margin: 0;">🔐 AdvanceAuth</h1>
+                    <p style="color: #94a3b8; margin: 5px 0;">Password Reset Request</p>
+                </div>
+                
+                <div style="background: #2d2d2d; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <p style="margin: 10px 0;">Hello <strong>${user.username}</strong>,</p>
+                    <p style="margin: 10px 0;">You requested to reset your password. Use the OTP below:</p>
+                    
+                    <div style="background: #6366f1; color: white; padding: 20px; text-align: center; font-size: 32px; letter-spacing: 10px; margin: 20px 0; border-radius: 8px; font-weight: bold;">
+                        ${otp}
+                    </div>
+                    
+                    <p style="margin: 10px 0; color: #94a3b8; font-size: 14px;">
+                        Username: ${user.username}<br>
+                        Server: ${serverKey.substring(0, 8)}...
+                    </p>
+                    
+                    <p style="margin: 10px 0; color: #94a3b8; font-size: 14px;">
+                        This OTP is valid for 10 minutes. Do not share it with anyone.
+                    </p>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #374151;">
+                    <p style="color: #94a3b8; font-size: 12px; margin: 5px 0;">
+                        If you didn't request this, please ignore this email.
+                    </p>
+                    <p style="color: #94a3b8; font-size: 12px; margin: 5px 0;">
+                        Need help? Join our Discord: <a href="https://discord.zenuxs.in" style="color: #6366f1;">discord.zenuxs.in</a>
+                    </p>
+                </div>
+            </div>
+        `;
+
+        const emailResult = await sendEmail(user.email, 'Password Reset OTP - AdvanceAuth', emailHtml);
+
+        if (!emailResult.success) {
+            return res.status(500).json({
+                success: false,
+                error: 'Failed to send OTP email'
+            });
+        }
+
+        // Mask email for display
+        const maskedEmail = maskEmailForDisplay(user.email);
+
+        res.json({
+            success: true,
+            message: 'OTP sent to registered email',
+            email: maskedEmail,
+            expiresIn: '10 minutes'
+        });
+
+    } catch (error) {
+        console.error('Reset password by username error:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to process password reset'
+        });
+    }
+});
+
+// Add this route for OTP verification by username
+app.post('/api/verifyOTPByUsername', async (req, res) => {
+    try {
+        const { username, serverKey, otp, newPassword } = req.body;
+
+        if (!username || !serverKey || !otp || !newPassword) {
+            return res.status(400).json({
+                success: false,
+                error: 'All fields are required'
+            });
+        }
+
+        const user = await User.findOne({ username, serverKey });
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                error: 'User not found'
+            });
+        }
+
+        if (!user.email) {
+            return res.status(400).json({
+                success: false,
+                error: 'No email set for this user'
+            });
+        }
+
+        const otpData = otpStore.get(user.email);
+        if (!otpData) {
+            return res.status(400).json({
+                success: false,
+                error: 'OTP not found or expired'
+            });
+        }
+
+        if (Date.now() > otpData.expires) {
+            otpStore.delete(user.email);
+            return res.status(400).json({
+                success: false,
+                error: 'OTP expired'
+            });
+        }
+
+        if (otpData.attempts >= 3) {
+            otpStore.delete(user.email);
+            return res.status(400).json({
+                success: false,
+                error: 'Too many OTP attempts'
+            });
+        }
+
+        if (otpData.otp !== otp) {
+            otpData.attempts++;
+            otpStore.set(user.email, otpData);
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid OTP'
+            });
+        }
+
+        if (otpData.username !== username || otpData.serverKey !== serverKey) {
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid OTP data'
+            });
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 12);
+        await User.updateOne(
+            { _id: user._id },
+            {
+                password: hashedPassword,
+                loginAttempts: 0
+            }
+        );
+
+        // Invalidate all sessions for security
+        await invalidateAllSessions(user._id, serverKey);
+
+        otpStore.delete(user.email);
+
+        res.json({
+            success: true,
+            message: 'Password changed successfully',
+            username: user.username,
+            changedAt: getIndianDateTime(),
+            sessionsInvalidated: true
+        });
+
+    } catch (error) {
+        console.error('Verify OTP by username error:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to verify OTP'
+        });
+    }
+});
+
+// Helper function to mask email
+function maskEmailForDisplay(email) {
+    if (!email) return 'unknown@email.com';
+    
+    const parts = email.split('@');
+    if (parts.length !== 2) return email;
+    
+    const username = parts[0];
+    const domain = parts[1];
+    
+    if (username.length <= 3) {
+        return username.charAt(0) + '***' + '@' + domain;
+    } else {
+        return username.substring(0, 3) + '***' + '@' + domain;
+    }
+}
+
 app.post('/api/changePassword/verifyOTP', async (req, res) => {
     try {
         const { email, otp, newPassword } = req.body;
